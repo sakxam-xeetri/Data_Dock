@@ -33,6 +33,7 @@ onAuthStateChanged(auth, async (user) => {
   currentUser = user;
   populateUserInfo(user);
   applyViewMode();
+  termLog(`User authenticated: ${user.email}`);
 
   // Load cached data first for instant display
   const cached = getCachedData();
@@ -46,6 +47,7 @@ onAuthStateChanged(auth, async (user) => {
     userData = await loadUserData(user.uid);
     cacheData(userData);
     renderAll();
+    termLog(`Loaded ${userData.contacts.length} contacts, ${userData.teams.length} teams, ${userData.links.length} links`);
   } catch (err) {
     showToast("Failed to load data. Using cached version.", "warning");
   }
@@ -94,6 +96,7 @@ function showToast(message, type = "info") {
   toast.innerHTML = `<i class="fas ${icons[type] || icons.info}"></i><span>${escapeHTML(message)}</span>`;
   container.appendChild(toast);
   setTimeout(() => toast.remove(), 3200);
+  termLog(message);
 }
 
 // ============================================================
@@ -101,7 +104,11 @@ function showToast(message, type = "info") {
 // ============================================================
 function hideLoading() {
   const el = document.getElementById("loading-overlay");
-  if (el) { el.classList.add("fade-out"); setTimeout(() => el.classList.add("hidden"), 300); }
+  if (el) {
+    const bar = el.querySelector('.neon-progress-bar');
+    if (bar) bar.style.width = '100%';
+    setTimeout(() => { el.classList.add("fade-out"); setTimeout(() => el.classList.add("hidden"), 300); }, 400);
+  }
 }
 
 // ============================================================
@@ -176,20 +183,18 @@ document.getElementById("logout-btn").addEventListener("click", async () => {
 });
 
 // ============================================================
-// DARK MODE
+// TERMINAL CONSOLE
 // ============================================================
-const darkToggle = document.getElementById("dark-mode-toggle");
-
-// Restore preference
-if (localStorage.getItem("datadock_dark") === "true") {
-  document.body.classList.add("dark-mode");
-  darkToggle.checked = true;
+function termLog(message) {
+  const body = document.getElementById('terminal-body');
+  if (!body) return;
+  const line = document.createElement('div');
+  line.className = 'terminal-line';
+  const ts = new Date().toLocaleTimeString('en-US', { hour12: false });
+  line.innerHTML = `<span class="terminal-time">[${ts}]</span> <span class="terminal-prompt">&gt;</span> ${escapeHTML(message)}`;
+  body.appendChild(line);
+  body.scrollTop = body.scrollHeight;
 }
-
-darkToggle.addEventListener("change", () => {
-  document.body.classList.toggle("dark-mode", darkToggle.checked);
-  localStorage.setItem("datadock_dark", darkToggle.checked);
-});
 
 // ============================================================
 // VIEW MODE
@@ -840,14 +845,7 @@ function commandActions() {
         applyViewMode();
       }
     },
-    {
-      title: darkToggle.checked ? "Switch to Light Mode" : "Switch to Dark Mode",
-      meta: "Appearance",
-      run: () => {
-        darkToggle.checked = !darkToggle.checked;
-        darkToggle.dispatchEvent(new Event("change"));
-      }
-    }
+    { title: "Clear Terminal", meta: "Tools", run: () => { const b = document.getElementById('terminal-body'); if (b) b.innerHTML = ''; } }
   ];
 }
 
@@ -938,6 +936,32 @@ document.addEventListener("keydown", (e) => {
     closeCommandPalette();
   }
 });
+
+// ============================================================
+// BUTTON RIPPLE EFFECT
+// ============================================================
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('.btn, .action-btn, .quick-fab-main');
+  if (!btn) return;
+  const ripple = document.createElement('span');
+  ripple.className = 'ripple-effect';
+  const rect = btn.getBoundingClientRect();
+  ripple.style.left = (e.clientX - rect.left) + 'px';
+  ripple.style.top = (e.clientY - rect.top) + 'px';
+  btn.style.position = 'relative';
+  btn.style.overflow = 'hidden';
+  btn.appendChild(ripple);
+  setTimeout(() => ripple.remove(), 600);
+});
+
+// Terminal clear button
+const termClearBtn = document.getElementById('terminal-clear');
+if (termClearBtn) {
+  termClearBtn.addEventListener('click', () => {
+    const body = document.getElementById('terminal-body');
+    if (body) body.innerHTML = '<div class="terminal-line"><span class="terminal-prompt">&gt;</span> Console cleared.<span class="typewriter-cursor"></span></div>';
+  });
+}
 
 // ============================================================
 // EXPOSE FUNCTIONS TO WINDOW (for inline onclick handlers)
