@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DataDock — Login</title>
   <link rel="stylesheet" href="style.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 </head>
 <body class="auth-page">
+  <!-- Matrix Background -->
+  <canvas id="matrix-bg"></canvas>
+  <div class="grid-overlay"></div>
 
   <!-- Toast container -->
   <div id="toast-container"></div>
@@ -22,7 +22,7 @@
         <i class="fas fa-database"></i>
         <span>DataDock</span>
       </div>
-      <p class="auth-subtitle">Your personal data management hub</p>
+      <p class="auth-subtitle">&gt;_ Your personal data management hub</p>
 
       <!-- Tab Switcher -->
       <div class="auth-tabs">
@@ -107,10 +107,48 @@
 
   <!-- Loading overlay -->
   <div id="loading-overlay" class="loading-overlay hidden">
+    <div class="loading-text">AUTHENTICATING...</div>
     <div class="spinner"></div>
+    <div class="neon-progress"><div class="neon-progress-bar"></div></div>
   </div>
 
   <script type="module" src="firebase-config.js"></script>
   <script type="module" src="auth.js"></script>
+
+  <script>
+    // Matrix rain animation
+    (function() {
+      const canvas = document.getElementById('matrix-bg');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let w, h, cols, drops;
+      const chars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEF';
+
+      function resize() {
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+        cols = Math.floor(w / 18);
+        drops = Array(cols).fill(1);
+      }
+
+      function draw() {
+        ctx.fillStyle = 'rgba(10, 10, 15, 0.06)';
+        ctx.fillRect(0, 0, w, h);
+        ctx.fillStyle = '#00ff9930';
+        ctx.font = '14px monospace';
+        for (let i = 0; i < cols; i++) {
+          const char = chars[Math.floor(Math.random() * chars.length)];
+          ctx.fillText(char, i * 18, drops[i] * 18);
+          if (drops[i] * 18 > h && Math.random() > 0.975) drops[i] = 0;
+          drops[i]++;
+        }
+        requestAnimationFrame(draw);
+      }
+
+      resize();
+      window.addEventListener('resize', resize);
+      draw();
+    })();
+  </script>
 </body>
 </html>
