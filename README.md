@@ -33,7 +33,8 @@ It is designed to run as a static site and deploy cleanly on GitHub Pages.
 
 ```text
 Data_Dock/
-├── index.html          # Login / signup page
+├── index.html          # Default landing page
+├── auth.html           # Login / signup page
 ├── dashboard.html      # Main app dashboard
 ├── style.css           # Shared styling and responsive UI
 ├── firebase-config.js  # Firebase app/auth/db initialization
@@ -98,12 +99,12 @@ users/
 
 ## Local Development
 
-Because this project uses JavaScript modules, run it through a local server (do not open `index.html` directly with `file://`).
+Because this project uses JavaScript modules, run it through a local server (do not open `index.html` or `auth.html` directly with `file://`).
 
 ### Option 1: VS Code Live Server
 
 1. Install the Live Server extension.
-2. Open `index.html`.
+2. Open `index.html` for landing, then click `Get Started` to open `auth.html`.
 3. Click `Go Live`.
 
 ### Option 2: Python HTTP Server
@@ -192,7 +193,7 @@ https://<your-username>.github.io/datadock/
   - `teams: []`
   - `links: []`
 - Authenticated users are redirected to `dashboard.html`.
-- Unauthenticated users are redirected to `index.html`.
+- Unauthenticated users are redirected to `auth.html`.
 
 ## CRUD and Real-Time Sync
 
