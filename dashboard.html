@@ -179,6 +179,14 @@
             <i class="fas fa-search"></i>
             <input type="text" id="contacts-search" placeholder="Search contacts..." />
           </div>
+          <div class="view-toggle" data-scope="contacts">
+            <button class="view-btn active" data-view="card" title="Card view">
+              <i class="fas fa-th-large"></i>
+            </button>
+            <button class="view-btn" data-view="list" title="List view">
+              <i class="fas fa-list"></i>
+            </button>
+          </div>
           <button class="btn btn-primary" id="add-contact-btn">
             <i class="fas fa-plus"></i> Add Contact
           </button>
@@ -204,6 +212,14 @@
             <i class="fas fa-search"></i>
             <input type="text" id="teams-search" placeholder="Search teams..." />
           </div>
+          <div class="view-toggle" data-scope="teams">
+            <button class="view-btn active" data-view="card" title="Card view">
+              <i class="fas fa-th-large"></i>
+            </button>
+            <button class="view-btn" data-view="list" title="List view">
+              <i class="fas fa-list"></i>
+            </button>
+          </div>
           <button class="btn btn-primary" id="add-team-btn">
             <i class="fas fa-plus"></i> Add Team
           </button>
@@ -228,6 +244,14 @@
           <div class="search-bar">
             <i class="fas fa-search"></i>
             <input type="text" id="links-search" placeholder="Search links..." />
+          </div>
+          <div class="view-toggle" data-scope="links">
+            <button class="view-btn active" data-view="card" title="Card view">
+              <i class="fas fa-th-large"></i>
+            </button>
+            <button class="view-btn" data-view="list" title="List view">
+              <i class="fas fa-list"></i>
+            </button>
           </div>
           <button class="btn btn-primary" id="add-link-btn">
             <i class="fas fa-plus"></i> Add Link
@@ -298,6 +322,18 @@
       </div>
     </section>
   </main>
+
+  <!-- Floating Quick Add -->
+  <div class="quick-fab" id="quick-fab">
+    <button class="quick-fab-main" id="quick-fab-main" title="Quick add">
+      <i class="fas fa-plus"></i>
+    </button>
+    <div class="quick-fab-menu" id="quick-fab-menu">
+      <button class="quick-fab-item" id="fab-add-contact"><i class="fas fa-user-plus"></i> Contact</button>
+      <button class="quick-fab-item" id="fab-add-team"><i class="fas fa-users"></i> Team</button>
+      <button class="quick-fab-item" id="fab-add-link"><i class="fas fa-link"></i> Link</button>
+    </div>
+  </div>
 
   <!-- ==================== MODALS ==================== -->
 
@@ -434,6 +470,22 @@
         <button class="btn btn-danger" id="confirm-delete-btn">
           <i class="fas fa-trash-alt"></i> Delete
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Command Palette -->
+  <div id="command-palette" class="modal-overlay hidden">
+    <div class="command-palette-shell">
+      <div class="command-palette-header">
+        <i class="fas fa-terminal"></i>
+        <input id="command-input" type="text" placeholder="Type a command..." autocomplete="off" />
+        <kbd>Esc</kbd>
+      </div>
+      <div id="command-list" class="command-list"></div>
+      <div class="command-palette-footer">
+        <span><kbd>Ctrl</kbd> + <kbd>K</kbd> to open</span>
+        <span><kbd>Enter</kbd> to run</span>
       </div>
     </div>
   </div>
