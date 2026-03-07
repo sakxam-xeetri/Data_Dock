@@ -20,6 +20,7 @@ let currentUser = null;
 let userData = { contacts: [], teams: [], links: [] };
 let pendingDeleteAction = null;
 let unsubscribe = null;
+let viewMode = localStorage.getItem("datadock_view_mode") || "card";
 
 // ============================================================
 // INIT — Auth Guard
@@ -31,6 +32,7 @@ onAuthStateChanged(auth, async (user) => {
   }
   currentUser = user;
   populateUserInfo(user);
+  applyViewMode();
 
   // Load cached data first for instant display
   const cached = getCachedData();
@@ -132,14 +134,19 @@ const sections = document.querySelectorAll(".content-section");
 navItems.forEach((item) => {
   item.addEventListener("click", (e) => {
     e.preventDefault();
-    const target = item.getAttribute("data-section");
-    navItems.forEach((n) => n.classList.remove("active"));
-    sections.forEach((s) => s.classList.remove("active"));
-    item.classList.add("active");
-    document.getElementById(`section-${target}`).classList.add("active");
-    closeMobileMenu();
+    gotoSection(item.getAttribute("data-section"));
   });
 });
+
+function gotoSection(sectionName) {
+  navItems.forEach((n) => n.classList.remove("active"));
+  sections.forEach((s) => s.classList.remove("active"));
+  const nav = document.querySelector(`[data-section="${sectionName}"]`);
+  const section = document.getElementById(`section-${sectionName}`);
+  if (nav) nav.classList.add("active");
+  if (section) section.classList.add("active");
+  closeMobileMenu();
+}
 
 // Mobile menu
 const mobileToggle = document.getElementById("mobile-menu-toggle");
@@ -182,6 +189,25 @@ if (localStorage.getItem("datadock_dark") === "true") {
 darkToggle.addEventListener("change", () => {
   document.body.classList.toggle("dark-mode", darkToggle.checked);
   localStorage.setItem("datadock_dark", darkToggle.checked);
+});
+
+// ============================================================
+// VIEW MODE
+// ============================================================
+function applyViewMode() {
+  document.body.classList.toggle("compact-mode", viewMode === "list");
+  document.querySelectorAll(".view-btn").forEach((btn) => {
+    btn.classList.toggle("active", btn.getAttribute("data-view") === viewMode);
+  });
+}
+
+document.querySelectorAll(".view-btn").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    viewMode = btn.getAttribute("data-view") === "list" ? "list" : "card";
+    localStorage.setItem("datadock_view_mode", viewMode);
+    applyViewMode();
+    showToast(viewMode === "list" ? "List view enabled." : "Card view enabled.", "info");
+  });
 });
 
 // ============================================================
@@ -637,6 +663,9 @@ document.getElementById("confirm-delete-btn").addEventListener("click", async ()
     } else if (type === "link") {
       userData.links = await deleteLink(currentUser.uid, index, userData.links);
       showToast("Link deleted.", "success");
+    } else if (type === "all") {
+      userData = await deleteAllData(currentUser.uid);
+      showToast("All data deleted.", "success");
     }
     cacheData(userData);
     renderAll();
@@ -715,47 +744,21 @@ document.getElementById("delete-all-data-btn").addEventListener("click", () => {
   openModal("confirm-modal");
 });
 
-// Extend confirm handler for "all"
-const originalConfirmHandler = document.getElementById("confirm-delete-btn").onclick;
-document.getElementById("confirm-delete-btn").addEventListener("click", async () => {
-  if (pendingDeleteAction && pendingDeleteAction.type === "all") {
-    try {
-      userData = await deleteAllData(currentUser.uid);
-      cacheData(userData);
-      renderAll();
-      showToast("All data deleted.", "success");
-    } catch {
-      showToast("Failed to delete data.", "error");
-    }
-    pendingDeleteAction = null;
-    closeModal("confirm-modal");
-  }
-});
-
 // ============================================================
 // QUICK ACTION BUTTONS
 // ============================================================
 document.getElementById("quick-add-contact").addEventListener("click", () => {
-  navItems.forEach((n) => n.classList.remove("active"));
-  sections.forEach((s) => s.classList.remove("active"));
-  document.querySelector('[data-section="contacts"]').classList.add("active");
-  document.getElementById("section-contacts").classList.add("active");
+  gotoSection("contacts");
   openContactModal();
 });
 
 document.getElementById("quick-add-team").addEventListener("click", () => {
-  navItems.forEach((n) => n.classList.remove("active"));
-  sections.forEach((s) => s.classList.remove("active"));
-  document.querySelector('[data-section="teams"]').classList.add("active");
-  document.getElementById("section-teams").classList.add("active");
+  gotoSection("teams");
   openTeamModal();
 });
 
 document.getElementById("quick-add-link").addEventListener("click", () => {
-  navItems.forEach((n) => n.classList.remove("active"));
-  sections.forEach((s) => s.classList.remove("active"));
-  document.querySelector('[data-section="links"]').classList.add("active");
-  document.getElementById("section-links").classList.add("active");
+  gotoSection("links");
   openLinkModal();
 });
 
@@ -773,6 +776,168 @@ document.getElementById("add-first-link-btn").addEventListener("click", () => op
 // Settings export/import
 document.getElementById("settings-export").addEventListener("click", exportJSON);
 document.getElementById("settings-import").addEventListener("click", triggerImport);
+
+// ============================================================
+// QUICK FAB
+// ============================================================
+const quickFab = document.getElementById("quick-fab");
+const quickFabMain = document.getElementById("quick-fab-main");
+
+quickFabMain.addEventListener("click", () => {
+  quickFab.classList.toggle("open");
+});
+
+document.getElementById("fab-add-contact").addEventListener("click", () => {
+  quickFab.classList.remove("open");
+  gotoSection("contacts");
+  openContactModal();
+});
+
+document.getElementById("fab-add-team").addEventListener("click", () => {
+  quickFab.classList.remove("open");
+  gotoSection("teams");
+  openTeamModal();
+});
+
+document.getElementById("fab-add-link").addEventListener("click", () => {
+  quickFab.classList.remove("open");
+  gotoSection("links");
+  openLinkModal();
+});
+
+document.addEventListener("click", (e) => {
+  if (!quickFab.contains(e.target)) {
+    quickFab.classList.remove("open");
+  }
+});
+
+// ============================================================
+// COMMAND PALETTE
+// ============================================================
+const commandPalette = document.getElementById("command-palette");
+const commandInput = document.getElementById("command-input");
+const commandList = document.getElementById("command-list");
+let commandCursor = 0;
+
+function commandActions() {
+  return [
+    { title: "Go: Dashboard", meta: "Navigation", run: () => gotoSection("dashboard") },
+    { title: "Go: Contacts", meta: "Navigation", run: () => gotoSection("contacts") },
+    { title: "Go: Teams", meta: "Navigation", run: () => gotoSection("teams") },
+    { title: "Go: Links", meta: "Navigation", run: () => gotoSection("links") },
+    { title: "Go: Settings", meta: "Navigation", run: () => gotoSection("settings") },
+    { title: "Add Contact", meta: "Quick Add", run: () => { gotoSection("contacts"); openContactModal(); } },
+    { title: "Add Team", meta: "Quick Add", run: () => { gotoSection("teams"); openTeamModal(); } },
+    { title: "Add Link", meta: "Quick Add", run: () => { gotoSection("links"); openLinkModal(); } },
+    { title: "Export JSON", meta: "Data", run: exportJSON },
+    { title: "Import JSON", meta: "Data", run: triggerImport },
+    {
+      title: viewMode === "card" ? "Switch to List View" : "Switch to Card View",
+      meta: "Appearance",
+      run: () => {
+        viewMode = viewMode === "card" ? "list" : "card";
+        localStorage.setItem("datadock_view_mode", viewMode);
+        applyViewMode();
+      }
+    },
+    {
+      title: darkToggle.checked ? "Switch to Light Mode" : "Switch to Dark Mode",
+      meta: "Appearance",
+      run: () => {
+        darkToggle.checked = !darkToggle.checked;
+        darkToggle.dispatchEvent(new Event("change"));
+      }
+    }
+  ];
+}
+
+function filteredCommands() {
+  const q = commandInput.value.trim().toLowerCase();
+  const all = commandActions();
+  if (!q) return all;
+  return all.filter((cmd) => `${cmd.title} ${cmd.meta}`.toLowerCase().includes(q));
+}
+
+function renderCommands() {
+  const items = filteredCommands();
+  if (commandCursor >= items.length) commandCursor = 0;
+  commandList.innerHTML = items.length
+    ? items.map((cmd, idx) => `
+        <button class="command-item ${idx === commandCursor ? "active" : ""}" data-idx="${idx}">
+          <span>${escapeHTML(cmd.title)}</span>
+          <small>${escapeHTML(cmd.meta)}</small>
+        </button>
+      `).join("")
+    : '<div class="command-item"><span>No commands found</span><small>Try another keyword</small></div>';
+
+  commandList.querySelectorAll(".command-item[data-idx]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      commandCursor = Number(btn.getAttribute("data-idx"));
+      runCommandAtCursor();
+    });
+  });
+}
+
+function openCommandPalette() {
+  commandPalette.classList.remove("hidden");
+  commandInput.value = "";
+  commandCursor = 0;
+  renderCommands();
+  commandInput.focus();
+}
+
+function closeCommandPalette() {
+  commandPalette.classList.add("hidden");
+}
+
+function runCommandAtCursor() {
+  const items = filteredCommands();
+  if (!items.length) return;
+  const selected = items[commandCursor];
+  closeCommandPalette();
+  selected.run();
+}
+
+commandInput.addEventListener("input", () => {
+  commandCursor = 0;
+  renderCommands();
+});
+
+commandInput.addEventListener("keydown", (e) => {
+  const size = filteredCommands().length;
+  if (e.key === "ArrowDown" && size) {
+    e.preventDefault();
+    commandCursor = (commandCursor + 1) % size;
+    renderCommands();
+  }
+  if (e.key === "ArrowUp" && size) {
+    e.preventDefault();
+    commandCursor = (commandCursor - 1 + size) % size;
+    renderCommands();
+  }
+  if (e.key === "Enter") {
+    e.preventDefault();
+    runCommandAtCursor();
+  }
+  if (e.key === "Escape") {
+    e.preventDefault();
+    closeCommandPalette();
+  }
+});
+
+commandPalette.addEventListener("click", (e) => {
+  if (e.target === commandPalette) closeCommandPalette();
+});
+
+document.addEventListener("keydown", (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+    e.preventDefault();
+    openCommandPalette();
+  }
+  if (e.key === "Escape" && !commandPalette.classList.contains("hidden")) {
+    closeCommandPalette();
+  }
+});
 
 // ============================================================
 // EXPOSE FUNCTIONS TO WINDOW (for inline onclick handlers)
