@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DataDock — Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+</head>
+<body class="dashboard-page">
+
+  <!-- Toast container -->
+  <div id="toast-container"></div>
+
+  <!-- Loading overlay -->
+  <div id="loading-overlay" class="loading-overlay">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- Mobile menu toggle -->
+  <button id="mobile-menu-toggle" class="mobile-menu-toggle" aria-label="Toggle menu">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <!-- Sidebar Overlay (mobile) -->
+  <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+  <!-- Sidebar -->
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <i class="fas fa-database"></i>
+        <span>DataDock</span>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="#" class="nav-item active" data-section="dashboard">
+        <i class="fas fa-th-large"></i>
+        <span>Dashboard</span>
+      </a>
+      <a href="#" class="nav-item" data-section="contacts">
+        <i class="fas fa-address-book"></i>
+        <span>Contacts</span>
+      </a>
+      <a href="#" class="nav-item" data-section="teams">
+        <i class="fas fa-users"></i>
+        <span>Teams</span>
+      </a>
+      <a href="#" class="nav-item" data-section="links">
+        <i class="fas fa-link"></i>
+        <span>Links</span>
+      </a>
+      <a href="#" class="nav-item" data-section="settings">
+        <i class="fas fa-cog"></i>
+        <span>Settings</span>
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="user-avatar">
+          <i class="fas fa-user"></i>
+        </div>
+        <div class="user-details">
+          <span id="user-display-name" class="user-name">User</span>
+          <span id="user-email-display" class="user-email">user@email.com</span>
+        </div>
+      </div>
+      <button id="logout-btn" class="btn btn-logout" title="Logout">
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Logout</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+
+    <!-- ==================== DASHBOARD SECTION ==================== -->
+    <section id="section-dashboard" class="content-section active">
+      <div class="section-header">
+        <h1><i class="fas fa-th-large"></i> Dashboard</h1>
+        <div class="header-actions">
+          <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input type="text" id="global-search" placeholder="Search everything..." />
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Cards -->
+      <div class="stats-grid">
+        <div class="stat-card stat-contacts">
+          <div class="stat-icon"><i class="fas fa-address-book"></i></div>
+          <div class="stat-info">
+            <span class="stat-number" id="stat-contacts">0</span>
+            <span class="stat-label">Contacts</span>
+          </div>
+        </div>
+        <div class="stat-card stat-teams">
+          <div class="stat-icon"><i class="fas fa-users"></i></div>
+          <div class="stat-info">
+            <span class="stat-number" id="stat-teams">0</span>
+            <span class="stat-label">Teams</span>
+          </div>
+        </div>
+        <div class="stat-card stat-links">
+          <div class="stat-icon"><i class="fas fa-link"></i></div>
+          <div class="stat-info">
+            <span class="stat-number" id="stat-links">0</span>
+            <span class="stat-label">Links</span>
+          </div>
+        </div>
+        <div class="stat-card stat-members">
+          <div class="stat-icon"><i class="fas fa-user-friends"></i></div>
+          <div class="stat-info">
+            <span class="stat-number" id="stat-members">0</span>
+            <span class="stat-label">Team Members</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="quick-actions">
+        <h2>Quick Actions</h2>
+        <div class="actions-grid">
+          <button class="action-btn" id="quick-add-contact">
+            <i class="fas fa-user-plus"></i>
+            <span>Add Contact</span>
+          </button>
+          <button class="action-btn" id="quick-add-team">
+            <i class="fas fa-users-cog"></i>
+            <span>Add Team</span>
+          </button>
+          <button class="action-btn" id="quick-add-link">
+            <i class="fas fa-plus-circle"></i>
+            <span>Add Link</span>
+          </button>
+          <button class="action-btn" id="quick-export">
+            <i class="fas fa-file-export"></i>
+            <span>Export JSON</span>
+          </button>
+          <button class="action-btn" id="quick-import">
+            <i class="fas fa-file-import"></i>
+            <span>Import JSON</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="recent-section">
+        <h2>Recent Contacts</h2>
+        <div id="recent-contacts" class="cards-grid"></div>
+      </div>
+      <div class="recent-section">
+        <h2>Recent Teams</h2>
+        <div id="recent-teams" class="cards-grid"></div>
+      </div>
+      <div class="recent-section">
+        <h2>Recent Links</h2>
+        <div id="recent-links" class="cards-grid"></div>
+      </div>
+
+      <!-- Search Results -->
+      <div id="search-results" class="search-results hidden">
+        <h2>Search Results</h2>
+        <div id="search-results-list" class="cards-grid"></div>
+      </div>
+    </section>
+
+    <!-- ==================== CONTACTS SECTION ==================== -->
+    <section id="section-contacts" class="content-section">
+      <div class="section-header">
+        <h1><i class="fas fa-address-book"></i> Contacts</h1>
+        <div class="header-actions">
+          <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input type="text" id="contacts-search" placeholder="Search contacts..." />
+          </div>
+          <button class="btn btn-primary" id="add-contact-btn">
+            <i class="fas fa-plus"></i> Add Contact
+          </button>
+        </div>
+      </div>
+      <div id="contacts-list" class="cards-grid"></div>
+      <div id="contacts-empty" class="empty-state hidden">
+        <i class="fas fa-address-book"></i>
+        <h3>No contacts yet</h3>
+        <p>Add your first contact to get started.</p>
+        <button class="btn btn-primary" id="add-first-contact-btn">
+          <i class="fas fa-plus"></i> Add Contact
+        </button>
+      </div>
+    </section>
+
+    <!-- ==================== TEAMS SECTION ==================== -->
+    <section id="section-teams" class="content-section">
+      <div class="section-header">
+        <h1><i class="fas fa-users"></i> Teams</h1>
+        <div class="header-actions">
+          <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input type="text" id="teams-search" placeholder="Search teams..." />
+          </div>
+          <button class="btn btn-primary" id="add-team-btn">
+            <i class="fas fa-plus"></i> Add Team
+          </button>
+        </div>
+      </div>
+      <div id="teams-list" class="cards-grid"></div>
+      <div id="teams-empty" class="empty-state hidden">
+        <i class="fas fa-users"></i>
+        <h3>No teams yet</h3>
+        <p>Create your first team to get started.</p>
+        <button class="btn btn-primary" id="add-first-team-btn">
+          <i class="fas fa-plus"></i> Add Team
+        </button>
+      </div>
+    </section>
+
+    <!-- ==================== LINKS SECTION ==================== -->
+    <section id="section-links" class="content-section">
+      <div class="section-header">
+        <h1><i class="fas fa-link"></i> Links</h1>
+        <div class="header-actions">
+          <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input type="text" id="links-search" placeholder="Search links..." />
+          </div>
+          <button class="btn btn-primary" id="add-link-btn">
+            <i class="fas fa-plus"></i> Add Link
+          </button>
+        </div>
+      </div>
+      <div id="links-list" class="cards-grid"></div>
+      <div id="links-empty" class="empty-state hidden">
+        <i class="fas fa-link"></i>
+        <h3>No links yet</h3>
+        <p>Save your first link to get started.</p>
+        <button class="btn btn-primary" id="add-first-link-btn">
+          <i class="fas fa-plus"></i> Add Link
+        </button>
+      </div>
+    </section>
+
+    <!-- ==================== SETTINGS SECTION ==================== -->
+    <section id="section-settings" class="content-section">
+      <div class="section-header">
+        <h1><i class="fas fa-cog"></i> Settings</h1>
+      </div>
+      <div class="settings-grid">
+        <div class="settings-card">
+          <h3><i class="fas fa-user-circle"></i> Account</h3>
+          <div class="setting-row">
+            <span>Display Name</span>
+            <span id="settings-name">—</span>
+          </div>
+          <div class="setting-row">
+            <span>Email</span>
+            <span id="settings-email">—</span>
+          </div>
+          <div class="setting-row">
+            <span>UID</span>
+            <span id="settings-uid" class="uid-text">—</span>
+          </div>
+        </div>
+        <div class="settings-card">
+          <h3><i class="fas fa-palette"></i> Appearance</h3>
+          <div class="setting-row">
+            <span>Dark Mode</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="dark-mode-toggle" />
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+        <div class="settings-card">
+          <h3><i class="fas fa-database"></i> Data Management</h3>
+          <div class="setting-actions">
+            <button class="btn btn-secondary" id="settings-export">
+              <i class="fas fa-file-export"></i> Export All Data (JSON)
+            </button>
+            <button class="btn btn-secondary" id="settings-import">
+              <i class="fas fa-file-import"></i> Import Data (JSON)
+            </button>
+            <input type="file" id="import-file-input" accept=".json" class="hidden" />
+          </div>
+        </div>
+        <div class="settings-card danger-zone">
+          <h3><i class="fas fa-exclamation-triangle"></i> Danger Zone</h3>
+          <p>Delete all your data from DataDock. This action cannot be undone.</p>
+          <button class="btn btn-danger" id="delete-all-data-btn">
+            <i class="fas fa-trash-alt"></i> Delete All Data
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==================== MODALS ==================== -->
+
+  <!-- Contact Modal -->
+  <div id="contact-modal" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="contact-modal-title">Add Contact</h2>
+        <button class="modal-close" data-modal="contact-modal"><i class="fas fa-times"></i></button>
+      </div>
+      <form id="contact-form" class="modal-form">
+        <input type="hidden" id="contact-edit-index" value="-1" />
+        <div class="form-group">
+          <label for="contact-name">Full Name *</label>
+          <input type="text" id="contact-name" required placeholder="John Doe" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="contact-email">Email *</label>
+            <input type="email" id="contact-email" required placeholder="john@example.com" />
+          </div>
+          <div class="form-group">
+            <label for="contact-phone">Phone</label>
+            <input type="tel" id="contact-phone" placeholder="9800000000" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="contact-github">GitHub</label>
+            <input type="text" id="contact-github" placeholder="github.com/username" />
+          </div>
+          <div class="form-group">
+            <label for="contact-linkedin">LinkedIn</label>
+            <input type="text" id="contact-linkedin" placeholder="linkedin.com/in/username" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="contact-role">Role</label>
+          <input type="text" id="contact-role" placeholder="Developer" />
+        </div>
+        <div class="form-group">
+          <label for="contact-notes">Notes</label>
+          <textarea id="contact-notes" rows="3" placeholder="Additional notes..."></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary modal-cancel" data-modal="contact-modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i> Save Contact
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Team Modal -->
+  <div id="team-modal" class="modal-overlay hidden">
+    <div class="modal modal-large">
+      <div class="modal-header">
+        <h2 id="team-modal-title">Add Team</h2>
+        <button class="modal-close" data-modal="team-modal"><i class="fas fa-times"></i></button>
+      </div>
+      <form id="team-form" class="modal-form">
+        <input type="hidden" id="team-edit-index" value="-1" />
+        <div class="form-group">
+          <label for="team-name">Team Name *</label>
+          <input type="text" id="team-name" required placeholder="Team Alpha" />
+        </div>
+        <div class="form-group">
+          <label>Members</label>
+          <div id="team-members-container" class="members-container">
+            <!-- Dynamic member rows -->
+          </div>
+          <button type="button" class="btn btn-secondary btn-sm" id="add-member-btn">
+            <i class="fas fa-plus"></i> Add Member
+          </button>
+        </div>
+        <div class="form-group">
+          <label for="team-notes">Notes</label>
+          <textarea id="team-notes" rows="3" placeholder="Team project info..."></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary modal-cancel" data-modal="team-modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i> Save Team
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Link Modal -->
+  <div id="link-modal" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="link-modal-title">Add Link</h2>
+        <button class="modal-close" data-modal="link-modal"><i class="fas fa-times"></i></button>
+      </div>
+      <form id="link-form" class="modal-form">
+        <input type="hidden" id="link-edit-index" value="-1" />
+        <div class="form-group">
+          <label for="link-title">Title *</label>
+          <input type="text" id="link-title" required placeholder="GitHub" />
+        </div>
+        <div class="form-group">
+          <label for="link-url">URL *</label>
+          <input type="url" id="link-url" required placeholder="https://github.com/username" />
+        </div>
+        <div class="form-group">
+          <label for="link-notes">Notes</label>
+          <textarea id="link-notes" rows="3" placeholder="Description..."></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary modal-cancel" data-modal="link-modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i> Save Link
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Confirm Delete Modal -->
+  <div id="confirm-modal" class="modal-overlay hidden">
+    <div class="modal modal-small">
+      <div class="modal-header">
+        <h2>Confirm Delete</h2>
+        <button class="modal-close" data-modal="confirm-modal"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <p id="confirm-message">Are you sure you want to delete this item?</p>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary modal-cancel" data-modal="confirm-modal">Cancel</button>
+        <button class="btn btn-danger" id="confirm-delete-btn">
+          <i class="fas fa-trash-alt"></i> Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="firebase-config.js"></script>
+  <script type="module" src="storage.js"></script>
+  <script type="module" src="script.js"></script>
+</body>
+</html>
