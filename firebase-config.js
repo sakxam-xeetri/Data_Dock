@@ -9,7 +9,7 @@ import { getAuth, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCXyLgk6quFga1FY8eqdehhid4R3PMn9-c",
+  apiKey: "",
   authDomain: "datadock-1ef02.firebaseapp.com",
   projectId: "datadock-1ef02",
   storageBucket: "datadock-1ef02.firebasestorage.app",
