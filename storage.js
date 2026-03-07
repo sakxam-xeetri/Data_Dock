@@ -19,11 +19,14 @@ export async function loadUserData(uid) {
     return {
       contacts: data.contacts || [],
       teams: data.teams || [],
-      links: data.links || []
+      links: data.links || [],
+      todos: data.todos || [],
+      apikeys: data.apikeys || [],
+      notes: data.notes || []
     };
   }
   // Initialize workspace if missing
-  const empty = { contacts: [], teams: [], links: [] };
+  const empty = { contacts: [], teams: [], links: [], todos: [], apikeys: [], notes: [] };
   await setDoc(doc(db, "users", uid), empty);
   return empty;
 }
@@ -39,6 +42,18 @@ export async function saveTeams(uid, teams) {
 
 export async function saveLinks(uid, links) {
   await updateDoc(doc(db, "users", uid), { links });
+}
+
+export async function saveTodos(uid, todos) {
+  await updateDoc(doc(db, "users", uid), { todos });
+}
+
+export async function saveApikeys(uid, apikeys) {
+  await updateDoc(doc(db, "users", uid), { apikeys });
+}
+
+export async function saveNotes(uid, notes) {
+  await updateDoc(doc(db, "users", uid), { notes });
 }
 
 // ---------- Add single item ----------
@@ -57,6 +72,66 @@ export async function addTeam(uid, team, existingTeams) {
 export async function addLink(uid, link, existingLinks) {
   const updated = [...existingLinks, link];
   await saveLinks(uid, updated);
+  return updated;
+}
+
+// --- Todos ---
+export async function addTodo(uid, todo, existing) {
+  const updated = [...existing, todo];
+  await saveTodos(uid, updated);
+  return updated;
+}
+
+export async function updateTodo(uid, index, todo, existing) {
+  const updated = [...existing];
+  updated[index] = todo;
+  await saveTodos(uid, updated);
+  return updated;
+}
+
+export async function deleteTodo(uid, index, existing) {
+  const updated = existing.filter((_, i) => i !== index);
+  await saveTodos(uid, updated);
+  return updated;
+}
+
+// --- API Keys ---
+export async function addApikey(uid, key, existing) {
+  const updated = [...existing, key];
+  await saveApikeys(uid, updated);
+  return updated;
+}
+
+export async function updateApikey(uid, index, key, existing) {
+  const updated = [...existing];
+  updated[index] = key;
+  await saveApikeys(uid, updated);
+  return updated;
+}
+
+export async function deleteApikey(uid, index, existing) {
+  const updated = existing.filter((_, i) => i !== index);
+  await saveApikeys(uid, updated);
+  return updated;
+}
+
+// --- Notes ---
+export async function addNote(uid, note, existing) {
+  const updated = [...existing, note];
+  await saveNotes(uid, updated);
+  return updated;
+}
+
+export async function updateNote(uid, index, note, existing) {
+  const updated = [...existing];
+  updated[index] = note;
+  await saveNotes(uid, updated);
+  return updated;
+}
+
+export async function deleteNote(uid, index, existing) {
+  const updated = existing.filter((_, i) => i !== index);
+  await saveNotes(uid, updated);
   return updated;
 }
 
@@ -107,7 +182,10 @@ export async function importData(uid, data) {
   const merged = {
     contacts: [...current.contacts, ...(data.contacts || [])],
     teams: [...current.teams, ...(data.teams || [])],
-    links: [...current.links, ...(data.links || [])]
+    links: [...current.links, ...(data.links || [])],
+    todos: [...current.todos, ...(data.todos || [])],
+    apikeys: [...current.apikeys, ...(data.apikeys || [])],
+    notes: [...current.notes, ...(data.notes || [])]
   };
   await setDoc(doc(db, "users", uid), merged);
   return merged;
@@ -115,7 +193,7 @@ export async function importData(uid, data) {
 
 // ---------- Delete all data ----------
 export async function deleteAllData(uid) {
-  const empty = { contacts: [], teams: [], links: [] };
+  const empty = { contacts: [], teams: [], links: [], todos: [], apikeys: [], notes: [] };
   await setDoc(doc(db, "users", uid), empty);
   return empty;
 }
@@ -128,7 +206,10 @@ export function subscribeToUserData(uid, callback) {
       callback({
         contacts: data.contacts || [],
         teams: data.teams || [],
-        links: data.links || []
+        links: data.links || [],
+        todos: data.todos || [],
+        apikeys: data.apikeys || [],
+        notes: data.notes || []
       });
     }
   });
