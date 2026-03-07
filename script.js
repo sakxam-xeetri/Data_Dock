@@ -27,7 +27,7 @@ let viewMode = localStorage.getItem("datadock_view_mode") || "card";
 // ============================================================
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
-    window.location.href = "index.html";
+    window.location.href = "auth.html";
     return;
   }
   currentUser = user;
@@ -172,7 +172,7 @@ document.getElementById("logout-btn").addEventListener("click", async () => {
   if (unsubscribe) unsubscribe();
   await signOut(auth);
   localStorage.removeItem("datadock_cache");
-  window.location.href = "index.html";
+  window.location.href = "auth.html";
 });
 
 // ============================================================
