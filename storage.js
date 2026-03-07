@@ -22,11 +22,12 @@ export async function loadUserData(uid) {
       links: data.links || [],
       todos: data.todos || [],
       apikeys: data.apikeys || [],
-      notes: data.notes || []
+      notes: data.notes || [],
+      calendarEvents: data.calendarEvents || []
     };
   }
   // Initialize workspace if missing
-  const empty = { contacts: [], teams: [], links: [], todos: [], apikeys: [], notes: [] };
+  const empty = { contacts: [], teams: [], links: [], todos: [], apikeys: [], notes: [], calendarEvents: [] };
   await setDoc(doc(db, "users", uid), empty);
   return empty;
 }
@@ -54,6 +55,10 @@ export async function saveApikeys(uid, apikeys) {
 
 export async function saveNotes(uid, notes) {
   await updateDoc(doc(db, "users", uid), { notes });
+}
+
+export async function saveCalendarEvents(uid, calendarEvents) {
+  await updateDoc(doc(db, "users", uid), { calendarEvents });
 }
 
 // ---------- Add single item ----------
@@ -135,6 +140,26 @@ export async function deleteNote(uid, index, existing) {
   return updated;
 }
 
+// --- Calendar Events ---
+export async function addCalendarEvent(uid, event, existing) {
+  const updated = [...existing, event];
+  await saveCalendarEvents(uid, updated);
+  return updated;
+}
+
+export async function updateCalendarEvent(uid, index, event, existing) {
+  const updated = [...existing];
+  updated[index] = event;
+  await saveCalendarEvents(uid, updated);
+  return updated;
+}
+
+export async function deleteCalendarEvent(uid, index, existing) {
+  const updated = existing.filter((_, i) => i !== index);
+  await saveCalendarEvents(uid, updated);
+  return updated;
+}
+
 // ---------- Update item at index ----------
 export async function updateContact(uid, index, contact, existingContacts) {
   const updated = [...existingContacts];
@@ -185,7 +210,8 @@ export async function importData(uid, data) {
     links: [...current.links, ...(data.links || [])],
     todos: [...current.todos, ...(data.todos || [])],
     apikeys: [...current.apikeys, ...(data.apikeys || [])],
-    notes: [...current.notes, ...(data.notes || [])]
+    notes: [...current.notes, ...(data.notes || [])],
+    calendarEvents: [...current.calendarEvents, ...(data.calendarEvents || [])]
   };
   await setDoc(doc(db, "users", uid), merged);
   return merged;
@@ -193,7 +219,7 @@ export async function importData(uid, data) {
 
 // ---------- Delete all data ----------
 export async function deleteAllData(uid) {
-  const empty = { contacts: [], teams: [], links: [], todos: [], apikeys: [], notes: [] };
+  const empty = { contacts: [], teams: [], links: [], todos: [], apikeys: [], notes: [], calendarEvents: [] };
   await setDoc(doc(db, "users", uid), empty);
   return empty;
 }
@@ -209,7 +235,8 @@ export function subscribeToUserData(uid, callback) {
         links: data.links || [],
         todos: data.todos || [],
         apikeys: data.apikeys || [],
-        notes: data.notes || []
+        notes: data.notes || [],
+        calendarEvents: data.calendarEvents || []
       });
     }
   });
