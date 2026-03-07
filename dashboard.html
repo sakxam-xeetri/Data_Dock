@@ -55,6 +55,18 @@
         <i class="fas fa-link"></i>
         <span>Links</span>
       </a>
+      <a href="#" class="nav-item" data-section="todos">
+        <i class="fas fa-check-square"></i>
+        <span>To-Do</span>
+      </a>
+      <a href="#" class="nav-item" data-section="apikeys">
+        <i class="fas fa-key"></i>
+        <span>API Keys</span>
+      </a>
+      <a href="#" class="nav-item" data-section="notes">
+        <i class="fas fa-sticky-note"></i>
+        <span>Notes</span>
+      </a>
       <a href="#" class="nav-item" data-section="settings">
         <i class="fas fa-cog"></i>
         <span>Settings</span>
@@ -83,7 +95,13 @@
     <!-- ==================== DASHBOARD SECTION ==================== -->
     <section id="section-dashboard" class="content-section active">
       <div class="section-header">
-        <h1><i class="fas fa-th-large"></i> Dashboard</h1>
+        <div>
+          <h1><i class="fas fa-th-large"></i> Dashboard</h1>
+          <div class="nepali-date-display" id="nepali-date">
+            <i class="fas fa-calendar-alt"></i>
+            <span id="nepali-date-text">Loading BS date...</span>
+          </div>
+        </div>
         <div class="header-actions">
           <div class="search-bar">
             <i class="fas fa-search"></i>
@@ -115,11 +133,25 @@
             <span class="stat-label">Links</span>
           </div>
         </div>
-        <div class="stat-card stat-members">
-          <div class="stat-icon"><i class="fas fa-user-friends"></i></div>
+        <div class="stat-card stat-todos">
+          <div class="stat-icon"><i class="fas fa-check-square"></i></div>
           <div class="stat-info">
-            <span class="stat-number" id="stat-members">0</span>
-            <span class="stat-label">Team Members</span>
+            <span class="stat-number" id="stat-todos">0</span>
+            <span class="stat-label">To-Do</span>
+          </div>
+        </div>
+        <div class="stat-card stat-apikeys">
+          <div class="stat-icon"><i class="fas fa-key"></i></div>
+          <div class="stat-info">
+            <span class="stat-number" id="stat-apikeys">0</span>
+            <span class="stat-label">API Keys</span>
+          </div>
+        </div>
+        <div class="stat-card stat-notes">
+          <div class="stat-icon"><i class="fas fa-sticky-note"></i></div>
+          <div class="stat-info">
+            <span class="stat-number" id="stat-notes">0</span>
+            <span class="stat-label">Notes</span>
           </div>
         </div>
       </div>
@@ -140,6 +172,18 @@
             <i class="fas fa-plus-circle"></i>
             <span>Add Link</span>
           </button>
+          <button class="action-btn" id="quick-add-todo">
+            <i class="fas fa-check-square"></i>
+            <span>Add To-Do</span>
+          </button>
+          <button class="action-btn" id="quick-add-apikey">
+            <i class="fas fa-key"></i>
+            <span>Add API Key</span>
+          </button>
+          <button class="action-btn" id="quick-add-note">
+            <i class="fas fa-sticky-note"></i>
+            <span>Add Note</span>
+          </button>
           <button class="action-btn" id="quick-export">
             <i class="fas fa-file-export"></i>
             <span>Export JSON</span>
@@ -148,6 +192,17 @@
             <i class="fas fa-file-import"></i>
             <span>Import JSON</span>
           </button>
+        </div>
+      </div>
+
+      <!-- Dashboard To-Do Widget -->
+      <div class="dashboard-todo-widget">
+        <div class="widget-header">
+          <h2><i class="fas fa-check-square"></i> To-Do</h2>
+          <button class="btn btn-sm btn-secondary" id="dash-todo-viewall">View All <i class="fas fa-arrow-right"></i></button>
+        </div>
+        <div id="dash-todo-list" class="dash-todo-list">
+          <p class="text-muted">No tasks yet.</p>
         </div>
       </div>
 
@@ -279,6 +334,85 @@
         <p>Save your first link to get started.</p>
         <button class="btn btn-primary" id="add-first-link-btn">
           <i class="fas fa-plus"></i> Add Link
+        </button>
+      </div>
+    </section>
+
+    <!-- ==================== TO-DO SECTION ==================== -->
+    <section id="section-todos" class="content-section">
+      <div class="section-header">
+        <h1><i class="fas fa-check-square"></i> To-Do</h1>
+        <div class="header-actions">
+          <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input type="text" id="todos-search" placeholder="Search tasks..." />
+          </div>
+          <button class="btn btn-primary" id="add-todo-btn">
+            <i class="fas fa-plus"></i> Add Task
+          </button>
+        </div>
+      </div>
+      <div id="todos-list" class="todo-list-full"></div>
+      <div id="todos-empty" class="empty-state hidden">
+        <i class="fas fa-check-square"></i>
+        <h3>No tasks yet</h3>
+        <p>Add your first to-do task.</p>
+        <button class="btn btn-primary" id="add-first-todo-btn">
+          <i class="fas fa-plus"></i> Add Task
+        </button>
+      </div>
+    </section>
+
+    <!-- ==================== API KEYS SECTION ==================== -->
+    <section id="section-apikeys" class="content-section">
+      <div class="section-header">
+        <h1><i class="fas fa-key"></i> API Keys &amp; Passwords</h1>
+        <div class="header-actions">
+          <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input type="text" id="apikeys-search" placeholder="Search keys..." />
+          </div>
+          <button class="btn btn-primary" id="add-apikey-btn">
+            <i class="fas fa-plus"></i> Add Entry
+          </button>
+        </div>
+      </div>
+      <div class="secure-warning">
+        <i class="fas fa-shield-alt"></i>
+        <span>Sensitive data is masked by default. Click the eye icon to reveal.</span>
+      </div>
+      <div id="apikeys-list" class="cards-grid"></div>
+      <div id="apikeys-empty" class="empty-state hidden">
+        <i class="fas fa-key"></i>
+        <h3>No API keys or passwords yet</h3>
+        <p>Store your first credential securely.</p>
+        <button class="btn btn-primary" id="add-first-apikey-btn">
+          <i class="fas fa-plus"></i> Add Entry
+        </button>
+      </div>
+    </section>
+
+    <!-- ==================== NOTES SECTION ==================== -->
+    <section id="section-notes" class="content-section">
+      <div class="section-header">
+        <h1><i class="fas fa-sticky-note"></i> Notes</h1>
+        <div class="header-actions">
+          <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input type="text" id="notes-search" placeholder="Search notes..." />
+          </div>
+          <button class="btn btn-primary" id="add-note-btn">
+            <i class="fas fa-plus"></i> Add Note
+          </button>
+        </div>
+      </div>
+      <div id="notes-list" class="cards-grid"></div>
+      <div id="notes-empty" class="empty-state hidden">
+        <i class="fas fa-sticky-note"></i>
+        <h3>No notes yet</h3>
+        <p>Write your first note.</p>
+        <button class="btn btn-primary" id="add-first-note-btn">
+          <i class="fas fa-plus"></i> Add Note
         </button>
       </div>
     </section>
@@ -482,6 +616,118 @@
           <i class="fas fa-trash-alt"></i> Delete
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- Todo Modal -->
+  <div id="todo-modal" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="todo-modal-title">Add Task</h2>
+        <button class="modal-close" data-modal="todo-modal"><i class="fas fa-times"></i></button>
+      </div>
+      <form id="todo-form" class="modal-form">
+        <input type="hidden" id="todo-edit-index" value="-1" />
+        <div class="form-group">
+          <label for="todo-text">Task *</label>
+          <input type="text" id="todo-text" required placeholder="What needs to be done?" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="todo-priority">Priority</label>
+            <select id="todo-priority">
+              <option value="low">Low</option>
+              <option value="medium" selected>Medium</option>
+              <option value="high">High</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="todo-due">Due Date</label>
+            <input type="date" id="todo-due" />
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary modal-cancel" data-modal="todo-modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i> Save Task
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- API Key Modal -->
+  <div id="apikey-modal" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="apikey-modal-title">Add API Key / Password</h2>
+        <button class="modal-close" data-modal="apikey-modal"><i class="fas fa-times"></i></button>
+      </div>
+      <form id="apikey-form" class="modal-form">
+        <input type="hidden" id="apikey-edit-index" value="-1" />
+        <div class="form-group">
+          <label for="apikey-label">Label *</label>
+          <input type="text" id="apikey-label" required placeholder="e.g. GitHub Token" />
+        </div>
+        <div class="form-group">
+          <label for="apikey-value">Key / Password *</label>
+          <div class="input-icon">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="apikey-value" required placeholder="••••••••" />
+            <button type="button" class="btn-icon toggle-visibility" title="Toggle visibility"><i class="fas fa-eye"></i></button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="apikey-category">Category</label>
+          <input type="text" id="apikey-category" placeholder="e.g. API, Database, SSH" />
+        </div>
+        <div class="form-group">
+          <label for="apikey-notes">Notes</label>
+          <textarea id="apikey-notes" rows="2" placeholder="Additional info..."></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary modal-cancel" data-modal="apikey-modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i> Save Entry
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Note Modal -->
+  <div id="note-modal" class="modal-overlay hidden">
+    <div class="modal modal-large">
+      <div class="modal-header">
+        <h2 id="note-modal-title">Add Note</h2>
+        <button class="modal-close" data-modal="note-modal"><i class="fas fa-times"></i></button>
+      </div>
+      <form id="note-form" class="modal-form">
+        <input type="hidden" id="note-edit-index" value="-1" />
+        <div class="form-group">
+          <label for="note-title">Title *</label>
+          <input type="text" id="note-title" required placeholder="Note title" />
+        </div>
+        <div class="form-group">
+          <label for="note-body">Content *</label>
+          <div class="note-toolbar">
+            <button type="button" class="note-fmt-btn" data-fmt="bold" title="Bold"><i class="fas fa-bold"></i></button>
+            <button type="button" class="note-fmt-btn" data-fmt="italic" title="Italic"><i class="fas fa-italic"></i></button>
+            <button type="button" class="note-fmt-btn" data-fmt="code" title="Code"><i class="fas fa-code"></i></button>
+          </div>
+          <textarea id="note-body" rows="8" required placeholder="Write your note... (supports **bold**, *italic*, `code`)"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="note-tag">Tag</label>
+          <input type="text" id="note-tag" placeholder="e.g. work, personal, snippet" />
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary modal-cancel" data-modal="note-modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i> Save Note
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 
