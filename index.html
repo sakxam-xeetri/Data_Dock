@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DataDock — Personal Data Dashboard</title>
   <link rel="stylesheet" href="style.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 </head>
 <body class="landing-page">
+  <!-- Matrix Background -->
+  <canvas id="matrix-bg"></canvas>
+  <div class="grid-overlay"></div>
   <header class="landing-header">
     <div class="landing-container landing-nav">
       <a href="index.html" class="landing-brand">
@@ -28,11 +28,11 @@
     <section class="hero-section">
       <div class="landing-container hero-grid">
         <div class="hero-content">
-          <span class="hero-badge"><i class="fas fa-shield-alt"></i> Secure Firebase-Powered Workspace</span>
-          <h1>Organize Contacts, Teams, Links, and Notes in One Smart Dashboard</h1>
+          <span class="hero-badge"><i class="fas fa-terminal"></i> &gt;_ Secure Firebase-Powered Workspace</span>
+          <h1>Organize Contacts, Teams &amp; Links in One <span style="color:#00ff99;text-shadow:0 0 20px rgba(0,255,153,0.4)">Terminal-Grade</span> Dashboard</h1>
           <p>
             DataDock helps you store and manage your frequently used information with personal
-            authentication, real-time sync, and a clean productivity-first interface.
+            authentication, real-time sync, and a retro coder-first interface.
           </p>
           <div class="hero-cta">
             <a class="btn btn-primary" href="auth.html"><i class="fas fa-rocket"></i> Launch DataDock</a>
@@ -166,5 +166,41 @@
       <a href="auth.html">Open App</a>
     </div>
   </footer>
+
+  <script>
+    // Matrix rain animation
+    (function() {
+      const canvas = document.getElementById('matrix-bg');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let w, h, cols, drops;
+      const chars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEF';
+
+      function resize() {
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+        cols = Math.floor(w / 18);
+        drops = Array(cols).fill(1);
+      }
+
+      function draw() {
+        ctx.fillStyle = 'rgba(10, 10, 15, 0.06)';
+        ctx.fillRect(0, 0, w, h);
+        ctx.fillStyle = '#00ff9930';
+        ctx.font = '14px monospace';
+        for (let i = 0; i < cols; i++) {
+          const char = chars[Math.floor(Math.random() * chars.length)];
+          ctx.fillText(char, i * 18, drops[i] * 18);
+          if (drops[i] * 18 > h && Math.random() > 0.975) drops[i] = 0;
+          drops[i]++;
+        }
+        requestAnimationFrame(draw);
+      }
+
+      resize();
+      window.addEventListener('resize', resize);
+      draw();
+    })();
+  </script>
 </body>
 </html>
