@@ -67,6 +67,10 @@
         <i class="fas fa-sticky-note"></i>
         <span>Notes</span>
       </a>
+      <a href="#" class="nav-item" data-section="calendar">
+        <i class="fas fa-calendar-alt"></i>
+        <span>Calendar</span>
+      </a>
       <a href="#" class="nav-item" data-section="settings">
         <i class="fas fa-cog"></i>
         <span>Settings</span>
@@ -417,6 +421,88 @@
       </div>
     </section>
 
+    <!-- ==================== CALENDAR SECTION ==================== -->
+    <section id="section-calendar" class="content-section">
+      <div class="section-header">
+        <h1><i class="fas fa-calendar-alt"></i> Nepali Calendar (BS)</h1>
+        <div class="header-actions">
+          <button class="btn btn-secondary" id="calendar-today-btn">
+            <i class="fas fa-crosshairs"></i> Today
+          </button>
+          <button class="btn btn-primary" id="add-calendar-event-btn">
+            <i class="fas fa-plus"></i> Add Event
+          </button>
+        </div>
+      </div>
+
+      <div class="calendar-container">
+        <!-- Month Navigation -->
+        <div class="calendar-nav">
+          <button class="btn btn-icon calendar-nav-btn" id="calendar-prev-year" title="Previous Year">
+            <i class="fas fa-angle-double-left"></i>
+          </button>
+          <button class="btn btn-icon calendar-nav-btn" id="calendar-prev-month" title="Previous Month">
+            <i class="fas fa-angle-left"></i>
+          </button>
+          <div class="calendar-month-display">
+            <span class="calendar-month-name" id="calendar-month-name">Baisakh</span>
+            <span class="calendar-year" id="calendar-year">2081</span>
+          </div>
+          <button class="btn btn-icon calendar-nav-btn" id="calendar-next-month" title="Next Month">
+            <i class="fas fa-angle-right"></i>
+          </button>
+          <button class="btn btn-icon calendar-nav-btn" id="calendar-next-year" title="Next Year">
+            <i class="fas fa-angle-double-right"></i>
+          </button>
+        </div>
+
+        <!-- Calendar Grid -->
+        <div class="calendar-grid">
+          <div class="calendar-weekdays">
+            <div class="calendar-weekday sun">आइत</div>
+            <div class="calendar-weekday">सोम</div>
+            <div class="calendar-weekday">मंगल</div>
+            <div class="calendar-weekday">बुध</div>
+            <div class="calendar-weekday">बिही</div>
+            <div class="calendar-weekday">शुक्र</div>
+            <div class="calendar-weekday sat">शनि</div>
+          </div>
+          <div class="calendar-days" id="calendar-days">
+            <!-- Days rendered by JS -->
+          </div>
+        </div>
+
+        <!-- Date Detail Panel -->
+        <div class="calendar-detail-panel" id="calendar-detail-panel">
+          <div class="calendar-detail-header">
+            <h3 id="calendar-detail-date">Select a date</h3>
+            <span class="calendar-detail-ad" id="calendar-detail-ad"></span>
+          </div>
+          <div class="calendar-detail-section">
+            <h4><i class="fas fa-calendar-check"></i> Events</h4>
+            <div id="calendar-detail-events" class="calendar-detail-list">
+              <p class="text-muted">No events for this date.</p>
+            </div>
+            <button class="btn btn-sm btn-secondary" id="calendar-add-event-for-date">
+              <i class="fas fa-plus"></i> Add Event
+            </button>
+          </div>
+          <div class="calendar-detail-section">
+            <h4><i class="fas fa-check-square"></i> Tasks Due</h4>
+            <div id="calendar-detail-todos" class="calendar-detail-list">
+              <p class="text-muted">No tasks due.</p>
+            </div>
+          </div>
+          <div class="calendar-detail-section">
+            <h4><i class="fas fa-sticky-note"></i> Notes</h4>
+            <div id="calendar-detail-notes" class="calendar-detail-list">
+              <p class="text-muted">No notes for this date.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- ==================== SETTINGS SECTION ==================== -->
     <section id="section-settings" class="content-section">
       <div class="section-header">
@@ -725,6 +811,50 @@
           <button type="button" class="btn btn-secondary modal-cancel" data-modal="note-modal">Cancel</button>
           <button type="submit" class="btn btn-primary">
             <i class="fas fa-save"></i> Save Note
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Calendar Event Modal -->
+  <div id="calendar-event-modal" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="calendar-event-modal-title">Add Event</h2>
+        <button class="modal-close" data-modal="calendar-event-modal"><i class="fas fa-times"></i></button>
+      </div>
+      <form id="calendar-event-form" class="modal-form">
+        <input type="hidden" id="calendar-event-edit-index" value="-1" />
+        <div class="form-group">
+          <label for="calendar-event-title">Title *</label>
+          <input type="text" id="calendar-event-title" required placeholder="Event title" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="calendar-event-bs-date">Date (BS) *</label>
+            <input type="text" id="calendar-event-bs-date" required placeholder="YYYY-MM-DD" pattern="\d{4}-\d{2}-\d{2}" />
+          </div>
+          <div class="form-group">
+            <label for="calendar-event-color">Color</label>
+            <select id="calendar-event-color">
+              <option value="green">Green</option>
+              <option value="cyan">Cyan</option>
+              <option value="magenta">Magenta</option>
+              <option value="purple">Purple</option>
+              <option value="yellow">Yellow</option>
+              <option value="orange">Orange</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="calendar-event-notes">Notes</label>
+          <textarea id="calendar-event-notes" rows="3" placeholder="Event details..."></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary modal-cancel" data-modal="calendar-event-modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i> Save Event
           </button>
         </div>
       </form>
