@@ -12,6 +12,7 @@ import {
   addTodo, updateTodo, deleteTodo,
   addApikey, updateApikey, deleteApikey,
   addNote, updateNote, deleteNote,
+  addCalendarEvent, updateCalendarEvent, deleteCalendarEvent,
   importData, deleteAllData,
   subscribeToUserData, cacheData, getCachedData
 } from "./storage.js";
@@ -20,7 +21,7 @@ import {
 // STATE
 // ============================================================
 let currentUser = null;
-let userData = { contacts: [], teams: [], links: [], todos: [], apikeys: [], notes: [] };
+let userData = { contacts: [], teams: [], links: [], todos: [], apikeys: [], notes: [], calendarEvents: [] };
 let pendingDeleteAction = null;
 let unsubscribe = null;
 let viewMode = localStorage.getItem("datadock_view_mode") || "card";
@@ -231,6 +232,7 @@ function renderAll() {
   renderNotes();
   renderRecent();
   renderDashTodos();
+  renderCalendar();
 }
 
 // ============================================================
@@ -442,6 +444,7 @@ document.getElementById("global-search").addEventListener("input", (e) => {
   const matchedTodos = userData.todos.filter((t) => matchesSearch(t, query));
   const matchedApikeys = userData.apikeys.filter((k) => matchesSearch(k, query));
   const matchedNotes = userData.notes.filter((n) => matchesSearch(n, query));
+  const matchedCalEvents = (userData.calendarEvents || []).filter((ev) => matchesSearch(ev, query));
 
   let html = "";
   matchedContacts.forEach((c) => {
@@ -462,6 +465,9 @@ document.getElementById("global-search").addEventListener("input", (e) => {
   });
   matchedNotes.forEach((n) => {
     html += `<div class="note-card"><div class="card-header"><div class="card-header-info"><h3><i class="fas fa-sticky-note" style="color:var(--neon-magenta);margin-right:6px;"></i>${escapeHTML(n.title)}</h3>${n.tag ? `<span class="note-tag">${escapeHTML(n.tag)}</span>` : ''}</div></div></div>`;
+  });
+  matchedCalEvents.forEach((ev) => {
+    html += `<div class="calendar-event-item" style="border-left-color:var(--neon-${ev.color || 'green'})"><div class="calendar-event-title"><i class="fas fa-calendar-alt" style="color:var(--neon-cyan);margin-right:6px;"></i>${escapeHTML(ev.title)}</div><div class="calendar-event-notes">${escapeHTML(ev.bsDate || '')}</div></div>`;
   });
 
   resultsList.innerHTML = html || '<p style="color:var(--text-muted);">No results found.</p>';
@@ -671,7 +677,7 @@ document.getElementById("link-form").addEventListener("submit", async (e) => {
 // DELETE CONFIRMATION
 // ============================================================
 function confirmDelete(type, index) {
-  const labels = { contact: "contact", team: "team", link: "link", todo: "task", apikey: "API key", note: "note" };
+  const labels = { contact: "contact", team: "team", link: "link", todo: "task", apikey: "API key", note: "note", calendarEvent: "calendar event" };
   document.getElementById("confirm-message").textContent = `Are you sure you want to delete this ${labels[type]}? This action cannot be undone.`;
   pendingDeleteAction = { type, index };
   openModal("confirm-modal");
@@ -700,6 +706,9 @@ document.getElementById("confirm-delete-btn").addEventListener("click", async ()
     } else if (type === "note") {
       userData.notes = await deleteNote(currentUser.uid, index, userData.notes);
       showToast("Note deleted.", "success");
+    } else if (type === "calendarEvent") {
+      userData.calendarEvents = await deleteCalendarEvent(currentUser.uid, index, userData.calendarEvents);
+      showToast("Event deleted.", "success");
     } else if (type === "all") {
       userData = await deleteAllData(currentUser.uid);
       showToast("All data deleted.", "success");
@@ -1362,6 +1371,302 @@ document.querySelectorAll('.note-fmt-btn').forEach(btn => {
 });
 
 // ============================================================
+// NEPALI CALENDAR — FULL MONTHLY GRID
+// ============================================================
+let calendarState = { year: 2081, month: 1, selectedDate: null };
+
+// Initialize calendar to today's BS date
+(function initCalendarState() {
+  const now = new Date();
+  const bs = adToBS(now.getFullYear(), now.getMonth() + 1, now.getDate());
+  if (bs) {
+    calendarState.year = bs.year;
+    calendarState.month = bs.month;
+  }
+})();
+
+// Reverse conversion: BS to AD
+function bsToAD(bsYear, bsMonth, bsDay) {
+  // Reference: 2000-01-01 BS = 1943-04-14 AD
+  const refAD = new Date(1943, 3, 14); // April 14, 1943
+  let totalDays = 0;
+
+  for (const row of BS_CALENDAR) {
+    if (row[0] === bsYear) {
+      for (let m = 1; m < bsMonth; m++) totalDays += row[m];
+      totalDays += bsDay - 1;
+      break;
+    }
+    for (let m = 1; m <= 12; m++) totalDays += row[m];
+  }
+
+  const result = new Date(refAD.getTime() + totalDays * 86400000);
+  return result;
+}
+
+// Get the day of week for BS date (0=Sun, 6=Sat)
+function getBSDayOfWeek(bsYear, bsMonth, bsDay) {
+  const ad = bsToAD(bsYear, bsMonth, bsDay);
+  return ad.getDay();
+}
+
+// Get days in a BS month
+function getBSMonthDays(bsYear, bsMonth) {
+  const row = BS_CALENDAR.find(r => r[0] === bsYear);
+  return row ? row[bsMonth] : 30;
+}
+
+// Get today's BS date
+function getTodayBS() {
+  const now = new Date();
+  return adToBS(now.getFullYear(), now.getMonth() + 1, now.getDate());
+}
+
+// Format BS date as YYYY-MM-DD
+function formatBSDate(year, month, day) {
+  return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+}
+
+// Get events for a specific BS date
+function getEventsForDate(bsDateStr) {
+  return (userData.calendarEvents || []).filter(ev => ev.bsDate === bsDateStr);
+}
+
+// Get todos due on date (by converting BS to AD and matching due date)
+function getTodosForBSDate(bsYear, bsMonth, bsDay) {
+  const ad = bsToAD(bsYear, bsMonth, bsDay);
+  const adStr = ad.toISOString().slice(0, 10);
+  return userData.todos.filter(t => t.due === adStr);
+}
+
+// Get notes created on date
+function getNotesForBSDate(bsYear, bsMonth, bsDay) {
+  const ad = bsToAD(bsYear, bsMonth, bsDay);
+  const adStr = ad.toISOString().slice(0, 10);
+  return userData.notes.filter(n => n.createdAt && n.createdAt.slice(0, 10) === adStr);
+}
+
+function renderCalendar() {
+  const daysContainer = document.getElementById('calendar-days');
+  if (!daysContainer) return;
+
+  const { year, month } = calendarState;
+
+  // Check valid range
+  const row = BS_CALENDAR.find(r => r[0] === year);
+  if (!row) {
+    daysContainer.innerHTML = '<p class="text-muted" style="grid-column:1/-1;text-align:center;">Year not in calendar data range (2000-2099 BS)</p>';
+    return;
+  }
+
+  // Update header
+  document.getElementById('calendar-month-name').textContent = BS_MONTHS[month - 1];
+  document.getElementById('calendar-year').textContent = year;
+
+  const totalDays = getBSMonthDays(year, month);
+  const startDow = getBSDayOfWeek(year, month, 1);
+  const today = getTodayBS();
+
+  let html = '';
+
+  // Empty cells before first day
+  for (let i = 0; i < startDow; i++) {
+    html += '<div class="calendar-day empty"></div>';
+  }
+
+  // Day cells
+  for (let d = 1; d <= totalDays; d++) {
+    const dateStr = formatBSDate(year, month, d);
+    const isToday = today && today.year === year && today.month === month && today.day === d;
+    const isSelected = calendarState.selectedDate === dateStr;
+    const events = getEventsForDate(dateStr);
+    const todos = getTodosForBSDate(year, month, d);
+    const isSunday = (startDow + d - 1) % 7 === 0;
+    const isSaturday = (startDow + d - 1) % 7 === 6;
+
+    let classes = 'calendar-day';
+    if (isToday) classes += ' today';
+    if (isSelected) classes += ' selected';
+    if (isSunday) classes += ' sunday';
+    if (isSaturday) classes += ' saturday';
+
+    // Event dots
+    let dotsHtml = '';
+    if (events.length || todos.length) {
+      dotsHtml = '<div class="calendar-day-dots">';
+      events.forEach(ev => {
+        const colorVar = `var(--neon-${ev.color || 'green'})`;
+        dotsHtml += `<span class="calendar-dot" style="background:${colorVar}"></span>`;
+      });
+      todos.forEach(() => {
+        dotsHtml += '<span class="calendar-dot" style="background:var(--neon-cyan)"></span>';
+      });
+      dotsHtml += '</div>';
+    }
+
+    html += `<div class="${classes}" data-date="${dateStr}" onclick="window.datadock.selectCalendarDate('${dateStr}')">${d}${dotsHtml}</div>`;
+  }
+
+  daysContainer.innerHTML = html;
+}
+
+function selectCalendarDate(dateStr) {
+  calendarState.selectedDate = dateStr;
+  renderCalendar();
+  renderCalendarDetail(dateStr);
+}
+
+function renderCalendarDetail(dateStr) {
+  const panel = document.getElementById('calendar-detail-panel');
+  if (!panel) return;
+
+  // Parse BS date
+  const parts = dateStr.split('-');
+  const bsY = parseInt(parts[0]), bsM = parseInt(parts[1]), bsD = parseInt(parts[2]);
+  const ad = bsToAD(bsY, bsM, bsD);
+  const adStr = ad.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+  document.getElementById('calendar-detail-date').textContent = `${bsD} ${BS_MONTHS[bsM - 1]} ${bsY}`;
+  document.getElementById('calendar-detail-ad').textContent = adStr;
+
+  // Events
+  const eventsEl = document.getElementById('calendar-detail-events');
+  const events = getEventsForDate(dateStr);
+  if (events.length) {
+    eventsEl.innerHTML = events.map((ev, i) => {
+      const idx = userData.calendarEvents.indexOf(ev);
+      const colorVar = `var(--neon-${ev.color || 'green'})`;
+      return `<div class="calendar-event-item" style="border-left-color:${colorVar}">
+        <div class="calendar-event-title">${escapeHTML(ev.title)}</div>
+        ${ev.notes ? `<div class="calendar-event-notes">${escapeHTML(ev.notes)}</div>` : ''}
+        <div class="calendar-event-actions">
+          <button class="btn-icon" title="Edit" onclick="window.datadock.editCalendarEvent(${idx})"><i class="fas fa-pen"></i></button>
+          <button class="btn-icon danger" title="Delete" onclick="window.datadock.confirmDelete('calendarEvent', ${idx})"><i class="fas fa-trash-alt"></i></button>
+        </div>
+      </div>`;
+    }).join('');
+  } else {
+    eventsEl.innerHTML = '<p class="text-muted">No events for this date.</p>';
+  }
+
+  // Todos due
+  const todosEl = document.getElementById('calendar-detail-todos');
+  const todos = getTodosForBSDate(bsY, bsM, bsD);
+  if (todos.length) {
+    todosEl.innerHTML = todos.map(t => {
+      const idx = userData.todos.indexOf(t);
+      return `<div class="calendar-detail-todo ${t.done ? 'completed' : ''}">
+        <input type="checkbox" class="todo-checkbox" ${t.done ? 'checked' : ''} onchange="window.datadock.toggleTodo(${idx})" />
+        <span class="todo-text">${escapeHTML(t.text)}</span>
+        <span class="todo-priority ${escapeHTML(t.priority || 'medium')}">${escapeHTML(t.priority || 'medium')}</span>
+      </div>`;
+    }).join('');
+  } else {
+    todosEl.innerHTML = '<p class="text-muted">No tasks due.</p>';
+  }
+
+  // Notes
+  const notesEl = document.getElementById('calendar-detail-notes');
+  const notes = getNotesForBSDate(bsY, bsM, bsD);
+  if (notes.length) {
+    notesEl.innerHTML = notes.map(n => {
+      const idx = userData.notes.indexOf(n);
+      return `<div class="calendar-detail-note" onclick="window.datadock.editNote(${idx})">
+        <i class="fas fa-sticky-note" style="color:var(--neon-magenta);margin-right:6px;"></i>
+        <span>${escapeHTML(n.title)}</span>
+      </div>`;
+    }).join('');
+  } else {
+    notesEl.innerHTML = '<p class="text-muted">No notes for this date.</p>';
+  }
+}
+
+function navigateCalendar(dir) {
+  calendarState.month += dir;
+  if (calendarState.month > 12) { calendarState.month = 1; calendarState.year++; }
+  if (calendarState.month < 1) { calendarState.month = 12; calendarState.year--; }
+  calendarState.selectedDate = null;
+  renderCalendar();
+}
+
+function navigateCalendarYear(dir) {
+  calendarState.year += dir;
+  calendarState.selectedDate = null;
+  renderCalendar();
+}
+
+function goToTodayCalendar() {
+  const today = getTodayBS();
+  if (today) {
+    calendarState.year = today.year;
+    calendarState.month = today.month;
+    calendarState.selectedDate = formatBSDate(today.year, today.month, today.day);
+    renderCalendar();
+    renderCalendarDetail(calendarState.selectedDate);
+  }
+}
+
+// Calendar event modal
+function openCalendarEventModal(index = -1, presetDate = null) {
+  const form = document.getElementById('calendar-event-form');
+  form.reset();
+  document.getElementById('calendar-event-edit-index').value = index;
+  document.getElementById('calendar-event-modal-title').textContent = index >= 0 ? 'Edit Event' : 'Add Event';
+
+  if (index >= 0) {
+    const ev = userData.calendarEvents[index];
+    document.getElementById('calendar-event-title').value = ev.title || '';
+    document.getElementById('calendar-event-bs-date').value = ev.bsDate || '';
+    document.getElementById('calendar-event-color').value = ev.color || 'green';
+    document.getElementById('calendar-event-notes').value = ev.notes || '';
+  } else if (presetDate) {
+    document.getElementById('calendar-event-bs-date').value = presetDate;
+  } else if (calendarState.selectedDate) {
+    document.getElementById('calendar-event-bs-date').value = calendarState.selectedDate;
+  }
+  openModal('calendar-event-modal');
+}
+
+document.getElementById('calendar-event-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const index = parseInt(document.getElementById('calendar-event-edit-index').value);
+  const event = {
+    title: document.getElementById('calendar-event-title').value.trim(),
+    bsDate: document.getElementById('calendar-event-bs-date').value.trim(),
+    color: document.getElementById('calendar-event-color').value,
+    notes: document.getElementById('calendar-event-notes').value.trim(),
+    createdAt: index >= 0 ? (userData.calendarEvents[index]?.createdAt || new Date().toISOString()) : new Date().toISOString()
+  };
+
+  try {
+    if (index >= 0) {
+      userData.calendarEvents = await updateCalendarEvent(currentUser.uid, index, event, userData.calendarEvents);
+      showToast('Event updated!', 'success');
+    } else {
+      userData.calendarEvents = await addCalendarEvent(currentUser.uid, event, userData.calendarEvents);
+      showToast('Event added!', 'success');
+    }
+    cacheData(userData);
+    renderAll();
+    if (calendarState.selectedDate) renderCalendarDetail(calendarState.selectedDate);
+    closeModal('calendar-event-modal');
+  } catch (err) {
+    showToast('Failed to save event.', 'error');
+  }
+});
+
+// Calendar navigation buttons
+document.getElementById('calendar-prev-month').addEventListener('click', () => navigateCalendar(-1));
+document.getElementById('calendar-next-month').addEventListener('click', () => navigateCalendar(1));
+document.getElementById('calendar-prev-year').addEventListener('click', () => navigateCalendarYear(-1));
+document.getElementById('calendar-next-year').addEventListener('click', () => navigateCalendarYear(1));
+document.getElementById('calendar-today-btn').addEventListener('click', goToTodayCalendar);
+document.getElementById('add-calendar-event-btn').addEventListener('click', () => openCalendarEventModal());
+document.getElementById('calendar-add-event-for-date').addEventListener('click', () => {
+  openCalendarEventModal(-1, calendarState.selectedDate);
+});
+
+// ============================================================
 // COMMAND PALETTE
 // ============================================================
 const commandPalette = document.getElementById("command-palette");
@@ -1378,6 +1683,7 @@ function commandActions() {
     { title: "Go: To-Do", meta: "Navigation", run: () => gotoSection("todos") },
     { title: "Go: API Keys", meta: "Navigation", run: () => gotoSection("apikeys") },
     { title: "Go: Notes", meta: "Navigation", run: () => gotoSection("notes") },
+    { title: "Go: Calendar", meta: "Navigation", run: () => gotoSection("calendar") },
     { title: "Go: Settings", meta: "Navigation", run: () => gotoSection("settings") },
     { title: "Add Contact", meta: "Quick Add", run: () => { gotoSection("contacts"); openContactModal(); } },
     { title: "Add Team", meta: "Quick Add", run: () => { gotoSection("teams"); openTeamModal(); } },
@@ -1385,6 +1691,7 @@ function commandActions() {
     { title: "Add Task", meta: "Quick Add", run: () => { gotoSection("todos"); openTodoModal(); } },
     { title: "Add API Key", meta: "Quick Add", run: () => { gotoSection("apikeys"); openApikeyModal(); } },
     { title: "Add Note", meta: "Quick Add", run: () => { gotoSection("notes"); openNoteModal(); } },
+    { title: "Add Calendar Event", meta: "Quick Add", run: () => { gotoSection("calendar"); openCalendarEventModal(); } },
     { title: "Export JSON", meta: "Data", run: exportJSON },
     { title: "Import JSON", meta: "Data", run: triggerImport },
     {
@@ -1537,6 +1844,8 @@ window.datadock = {
   editTodo: openTodoModal,
   editApikey: openApikeyModal,
   editNote: openNoteModal,
+  editCalendarEvent: openCalendarEventModal,
+  selectCalendarDate,
   toggleTodo,
   toggleReveal,
   copyApikey,
