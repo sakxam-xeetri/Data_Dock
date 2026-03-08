@@ -1687,7 +1687,7 @@ kbd {
   inset: 0;
   background: var(--bg-modal-overlay);
   display: flex;
-  align-items: center;
+h  align-items: center;
   justify-content: center;
   z-index: 1000;
   padding: 20px;
