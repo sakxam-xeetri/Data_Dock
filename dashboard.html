@@ -37,6 +37,9 @@
         <i class="fas fa-database"></i>
         <span>DataDock</span>
       </div>
+      <button id="sidebar-collapse-btn" class="sidebar-collapse-btn" title="Collapse sidebar">
+        <i class="fas fa-chevron-left"></i>
+      </button>
     </div>
     <nav class="sidebar-nav">
       <a href="#" class="nav-item active" data-section="dashboard">
@@ -349,7 +352,10 @@
     <!-- ==================== TO-DO SECTION ==================== -->
     <section id="section-todos" class="content-section">
       <div class="section-header">
-        <h1><i class="fas fa-check-square"></i> To-Do</h1>
+        <div>
+          <h1><i class="fas fa-check-square"></i> To-Do</h1>
+          <div class="todo-dual-date" id="todo-dual-date"></div>
+        </div>
         <div class="header-actions">
           <div class="search-bar">
             <i class="fas fa-search"></i>
@@ -635,6 +641,19 @@
         <div class="form-group">
           <label for="team-name">Team Name *</label>
           <input type="text" id="team-name" required placeholder="Team Alpha" />
+        </div>
+        <div class="form-group">
+          <label for="team-phone">Contact Number</label>
+          <input type="tel" id="team-phone" placeholder="9800000000" />
+        </div>
+        <div class="form-group">
+          <label>Social Profiles</label>
+          <div id="team-socials-container" class="socials-container">
+            <!-- Dynamic social rows -->
+          </div>
+          <button type="button" class="btn btn-secondary btn-sm" id="add-social-btn">
+            <i class="fas fa-plus"></i> Add Social Profile
+          </button>
         </div>
         <div class="form-group">
           <label>Members</label>
