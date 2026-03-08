@@ -177,6 +177,30 @@ function closeMobileMenu() {
 }
 
 // ============================================================
+// COLLAPSIBLE SIDEBAR
+// ============================================================
+const sidebarCollapseBtn = document.getElementById("sidebar-collapse-btn");
+let sidebarCollapsed = localStorage.getItem("datadock_sidebar_collapsed") === "true";
+
+function applySidebarState() {
+  document.body.classList.toggle("sidebar-collapsed", sidebarCollapsed);
+  const icon = sidebarCollapseBtn?.querySelector("i");
+  if (icon) {
+    icon.className = sidebarCollapsed ? "fas fa-chevron-right" : "fas fa-chevron-left";
+  }
+}
+
+if (sidebarCollapseBtn) {
+  sidebarCollapseBtn.addEventListener("click", () => {
+    sidebarCollapsed = !sidebarCollapsed;
+    localStorage.setItem("datadock_sidebar_collapsed", sidebarCollapsed);
+    applySidebarState();
+  });
+}
+
+applySidebarState();
+
+// ============================================================
 // LOGOUT
 // ============================================================
 document.getElementById("logout-btn").addEventListener("click", async () => {
@@ -234,6 +258,7 @@ function renderAll() {
   renderDashTodos();
   renderCalendar();
   renderDashCalendar();
+  renderTodoDualDate();
 }
 
 // ============================================================
@@ -320,6 +345,19 @@ function renderTeams(filterText = "") {
       `;
     }).join("");
 
+    const socialIcons = { linkedin: 'fab fa-linkedin', github: 'fab fa-github', instagram: 'fab fa-instagram' };
+    const socialsHTML = (team.socials || []).map((s) => {
+      const icon = socialIcons[s.platform] || 'fas fa-globe';
+      const safeUrl = sanitizeURL(s.url);
+      return `
+        <div class="team-social-row">
+          <i class="${icon}"></i>
+          ${safeUrl ? `<a href="${safeUrl}" target="_blank" rel="noopener noreferrer">${escapeHTML(s.url)}</a>` : `<span>${escapeHTML(s.url)}</span>`}
+          <span class="social-type-badge ${escapeHTML(s.type || 'professional')}">${escapeHTML(s.type || 'professional')}</span>
+        </div>
+      `;
+    }).join("");
+
     return `
       <div class="team-card">
         <div class="card-header">
@@ -332,6 +370,8 @@ function renderTeams(filterText = "") {
             <button class="btn-icon danger" title="Delete" onclick="window.datadock.confirmDelete('team', ${originalIdx})"><i class="fas fa-trash-alt"></i></button>
           </div>
         </div>
+        ${team.phone ? `<div class="card-detail"><i class="fas fa-phone"></i><span>${escapeHTML(team.phone)}</span><button class="btn-icon copy-btn" title="Copy" onclick="window.datadock.copyText('${escapeHTML(team.phone)}')"><i class="fas fa-copy"></i></button></div>` : ""}
+        ${socialsHTML ? `<div class="team-socials-list">${socialsHTML}</div>` : ""}
         <div class="team-members-list">${membersHTML}</div>
         ${team.notes ? `<div class="card-notes">${escapeHTML(team.notes)}</div>` : ""}
       </div>
@@ -581,11 +621,15 @@ function openTeamModal(index = -1) {
 
   const membersContainer = document.getElementById("team-members-container");
   membersContainer.innerHTML = "";
+  const socialsContainer = document.getElementById("team-socials-container");
+  socialsContainer.innerHTML = "";
 
   if (index >= 0) {
     const t = userData.teams[index];
     document.getElementById("team-name").value = t.teamName || "";
+    document.getElementById("team-phone").value = t.phone || "";
     document.getElementById("team-notes").value = t.notes || "";
+    (t.socials || []).forEach((s) => addSocialRow(s.platform, s.url, s.type));
     (t.members || []).forEach((m) => addMemberRow(m.name, m.role, m.email));
   } else {
     addMemberRow();
@@ -608,7 +652,30 @@ function addMemberRow(name = "", role = "", email = "") {
   container.appendChild(row);
 }
 
+function addSocialRow(platform = "", url = "", type = "") {
+  const container = document.getElementById("team-socials-container");
+  const row = document.createElement("div");
+  row.className = "social-row";
+  row.innerHTML = `
+    <select class="social-platform-input">
+      <option value="linkedin" ${platform === 'linkedin' ? 'selected' : ''}>LinkedIn</option>
+      <option value="github" ${platform === 'github' ? 'selected' : ''}>GitHub</option>
+      <option value="instagram" ${platform === 'instagram' ? 'selected' : ''}>Instagram</option>
+    </select>
+    <input type="url" placeholder="Profile URL" value="${escapeHTML(url)}" class="social-url-input" />
+    <select class="social-type-input">
+      <option value="professional" ${type === 'professional' ? 'selected' : ''}>Professional</option>
+      <option value="personal" ${type === 'personal' ? 'selected' : ''}>Personal</option>
+      <option value="portfolio" ${type === 'portfolio' ? 'selected' : ''}>Portfolio</option>
+    </select>
+    <button type="button" class="remove-member-btn" title="Remove"><i class="fas fa-times"></i></button>
+  `;
+  row.querySelector(".remove-member-btn").addEventListener("click", () => row.remove());
+  container.appendChild(row);
+}
+
 document.getElementById("add-member-btn").addEventListener("click", () => addMemberRow());
+document.getElementById("add-social-btn").addEventListener("click", () => addSocialRow());
 
 document.getElementById("team-form").addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -620,8 +687,17 @@ document.getElementById("team-form").addEventListener("submit", async (e) => {
     email: row.querySelector(".member-email-input").value.trim()
   })).filter((m) => m.name);
 
+  const socialRows = document.querySelectorAll("#team-socials-container .social-row");
+  const socials = Array.from(socialRows).map((row) => ({
+    platform: row.querySelector(".social-platform-input").value,
+    url: row.querySelector(".social-url-input").value.trim(),
+    type: row.querySelector(".social-type-input").value
+  })).filter((s) => s.url);
+
   const team = {
     teamName: document.getElementById("team-name").value.trim(),
+    phone: document.getElementById("team-phone").value.trim(),
+    socials,
     members,
     notes: document.getElementById("team-notes").value.trim()
   };
@@ -1019,6 +1095,25 @@ function updateNepaliDate() {
 updateNepaliDate();
 
 // ============================================================
+// TO-DO SECTION DUAL DATE HEADER
+// ============================================================
+function renderTodoDualDate() {
+  const el = document.getElementById('todo-dual-date');
+  if (!el) return;
+  const now = new Date();
+  const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const dayName = dayNames[now.getDay()];
+  const enDate = `${dayName}, ${monthNames[now.getMonth()]} ${now.getFullYear()}`;
+  const bs = adToBS(now.getFullYear(), now.getMonth() + 1, now.getDate());
+  let bsDate = '';
+  if (bs) {
+    bsDate = `${dayName}, ${bs.monthName} ${bs.year}`;
+  }
+  el.innerHTML = `<span class="dual-date-en"><i class="fas fa-calendar"></i> ${escapeHTML(enDate)}</span>${bsDate ? `<span class="dual-date-bs"><i class="fas fa-calendar-alt"></i> ${escapeHTML(bsDate)} (BS)</span>` : ''}`;
+}
+
+// ============================================================
 // TO-DO CRUD & RENDER
 // ============================================================
 function isOverdue(todo) {
@@ -1027,15 +1122,34 @@ function isOverdue(todo) {
   return todo.due < today;
 }
 
+function formatDualDate(dueDateStr) {
+  if (!dueDateStr) return '';
+  const d = new Date(dueDateStr + 'T00:00:00');
+  if (isNaN(d)) return escapeHTML(dueDateStr);
+  const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const dayName = dayNames[d.getDay()];
+  const enStr = `${dayName}, ${monthNames[d.getMonth()]} ${d.getFullYear()}`;
+  const bs = adToBS(d.getFullYear(), d.getMonth() + 1, d.getDate());
+  let bsStr = '';
+  if (bs) {
+    bsStr = `${dayName}, ${bs.monthName} ${bs.year}`;
+  }
+  return `<span class="todo-date-en">${escapeHTML(enStr)}</span>${bsStr ? `<span class="todo-date-bs">${escapeHTML(bsStr)} (BS)</span>` : ''}`;
+}
+
 function renderTodoItem(todo, idx, compact = false) {
   const overdue = isOverdue(todo);
   const cls = `dash-todo-item${todo.done ? ' completed' : ''}${overdue ? ' overdue' : ''}`;
+  const dualDate = todo.due ? formatDualDate(todo.due) : '';
   return `
     <div class="${cls}" data-idx="${idx}">
       <input type="checkbox" class="todo-checkbox" ${todo.done ? 'checked' : ''} onchange="window.datadock.toggleTodo(${idx})" />
-      <span class="todo-text">${escapeHTML(todo.text)}</span>
+      <div class="todo-content">
+        <span class="todo-text">${escapeHTML(todo.text)}</span>
+        ${dualDate ? `<div class="todo-dual-date">${dualDate}</div>` : ''}
+      </div>
       <span class="todo-priority ${escapeHTML(todo.priority || 'medium')}">${escapeHTML(todo.priority || 'medium')}</span>
-      ${todo.due ? `<span class="todo-due"><i class="fas fa-clock"></i> ${escapeHTML(todo.due)}</span>` : ''}
       <div class="todo-actions">
         <button class="btn-icon" title="Edit" onclick="window.datadock.editTodo(${idx})"><i class="fas fa-pen"></i></button>
         <button class="btn-icon danger" title="Delete" onclick="window.datadock.confirmDelete('todo', ${idx})"><i class="fas fa-trash-alt"></i></button>
