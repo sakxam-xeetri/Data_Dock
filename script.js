@@ -333,19 +333,49 @@ function renderTeams(filterText = "") {
 
   list.innerHTML = filtered.map((team, idx) => {
     const originalIdx = userData.teams.indexOf(team);
+    const socialIcons = { linkedin: 'fab fa-linkedin', github: 'fab fa-github', instagram: 'fab fa-instagram' };
+
+    // Build plain-text summary for copy
+    const copyLines = [`Team: ${team.teamName}`];
+    if (team.phone) copyLines.push(`Contact: ${team.phone}`);
+    (team.socials || []).forEach(s => copyLines.push(`${s.platform}: ${s.url}`));
+    (team.members || []).forEach((m, mi) => {
+      copyLines.push(`\nMember ${mi + 1}: ${m.name}`);
+      if (m.role) copyLines.push(`  Role: ${m.role}`);
+      if (m.phone) copyLines.push(`  Phone: ${m.phone}`);
+      if (m.email) copyLines.push(`  Email: ${m.email}`);
+      if (m.college) copyLines.push(`  College: ${m.college}`);
+      (m.socials || []).forEach(s => copyLines.push(`  ${s.platform}: ${s.url}`));
+    });
+    if (team.notes) copyLines.push(`\nNotes: ${team.notes}`);
+    const copyText = copyLines.join('\n');
+
     const membersHTML = (team.members || []).map((m) => {
       const initials = (m.name || "?").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
+      const memberSocialsHTML = (m.socials || []).map(s => {
+        const icon = socialIcons[s.platform] || 'fas fa-globe';
+        const safeUrl = sanitizeURL(s.url);
+        return safeUrl ? `<a href="${safeUrl}" target="_blank" rel="noopener noreferrer" class="member-social-link" title="${escapeHTML(s.platform)}"><i class="${icon}"></i></a>` : '';
+      }).join("");
       return `
         <div class="team-member-row">
           <div class="member-avatar">${escapeHTML(initials)}</div>
-          <span class="member-name">${escapeHTML(m.name)}</span>
-          <span class="member-role">${escapeHTML(m.role || "")}</span>
-          ${m.email ? `<button class="btn-icon copy-btn" title="Copy email" onclick="window.datadock.copyText('${escapeHTML(m.email)}')"><i class="fas fa-copy"></i></button>` : ""}
+          <div class="member-info">
+            <div class="member-info-top">
+              <span class="member-name">${escapeHTML(m.name)}</span>
+              ${m.role ? `<span class="member-role">${escapeHTML(m.role)}</span>` : ""}
+            </div>
+            <div class="member-info-details">
+              ${m.phone ? `<span class="member-detail"><i class="fas fa-phone"></i> ${escapeHTML(m.phone)}</span>` : ""}
+              ${m.email ? `<span class="member-detail"><i class="fas fa-envelope"></i> ${escapeHTML(m.email)}</span>` : ""}
+              ${m.college ? `<span class="member-detail"><i class="fas fa-university"></i> ${escapeHTML(m.college)}</span>` : ""}
+            </div>
+            ${memberSocialsHTML ? `<div class="member-socials-display">${memberSocialsHTML}</div>` : ""}
+          </div>
         </div>
       `;
     }).join("");
 
-    const socialIcons = { linkedin: 'fab fa-linkedin', github: 'fab fa-github', instagram: 'fab fa-instagram' };
     const socialsHTML = (team.socials || []).map((s) => {
       const icon = socialIcons[s.platform] || 'fas fa-globe';
       const safeUrl = sanitizeURL(s.url);
@@ -366,14 +396,17 @@ function renderTeams(filterText = "") {
             <span class="card-role">${(team.members || []).length} member${(team.members || []).length !== 1 ? "s" : ""}</span>
           </div>
           <div class="card-actions">
+            <button class="btn-icon" title="Copy All Info" onclick="window.datadock.copyText(${JSON.stringify(copyText).replace(/'/g, "\\'").replace(/"/g, '&quot;')})"><i class="fas fa-copy"></i></button>
             <button class="btn-icon" title="Edit" onclick="window.datadock.editTeam(${originalIdx})"><i class="fas fa-pen"></i></button>
             <button class="btn-icon danger" title="Delete" onclick="window.datadock.confirmDelete('team', ${originalIdx})"><i class="fas fa-trash-alt"></i></button>
           </div>
         </div>
-        ${team.phone ? `<div class="card-detail"><i class="fas fa-phone"></i><span>${escapeHTML(team.phone)}</span><button class="btn-icon copy-btn" title="Copy" onclick="window.datadock.copyText('${escapeHTML(team.phone)}')"><i class="fas fa-copy"></i></button></div>` : ""}
-        ${socialsHTML ? `<div class="team-socials-list">${socialsHTML}</div>` : ""}
-        <div class="team-members-list">${membersHTML}</div>
-        ${team.notes ? `<div class="card-notes">${escapeHTML(team.notes)}</div>` : ""}
+        <div class="team-full-info">
+          ${team.phone ? `<div class="team-info-row"><i class="fas fa-phone"></i><span>${escapeHTML(team.phone)}</span></div>` : ""}
+          ${socialsHTML ? `<div class="team-socials-list">${socialsHTML}</div>` : ""}
+          <div class="team-members-list">${membersHTML}</div>
+          ${team.notes ? `<div class="card-notes"><i class="fas fa-sticky-note"></i> ${escapeHTML(team.notes)}</div>` : ""}
+        </div>
       </div>
     `;
   }).join("");
@@ -630,7 +663,7 @@ function openTeamModal(index = -1) {
     document.getElementById("team-phone").value = t.phone || "";
     document.getElementById("team-notes").value = t.notes || "";
     (t.socials || []).forEach((s) => addSocialRow(s.platform, s.url, s.type));
-    (t.members || []).forEach((m) => addMemberRow(m.name, m.role, m.email));
+    (t.members || []).forEach((m) => addMemberRow(m.name, m.role, m.email, m.phone, m.college, m.socials));
   } else {
     addMemberRow();
   }
@@ -638,14 +671,48 @@ function openTeamModal(index = -1) {
   openModal("team-modal");
 }
 
-function addMemberRow(name = "", role = "", email = "") {
+function addMemberRow(name = "", role = "", email = "", phone = "", college = "", socials = []) {
   const container = document.getElementById("team-members-container");
   const row = document.createElement("div");
   row.className = "member-row";
   row.innerHTML = `
-    <input type="text" placeholder="Name" value="${escapeHTML(name)}" class="member-name-input" required />
-    <input type="text" placeholder="Role" value="${escapeHTML(role)}" class="member-role-input" />
-    <input type="email" placeholder="Email" value="${escapeHTML(email)}" class="member-email-input" />
+    <div class="member-row-header">
+      <input type="text" placeholder="Name" value="${escapeHTML(name)}" class="member-name-input" required />
+      <input type="text" placeholder="Role" value="${escapeHTML(role)}" class="member-role-input" />
+      <button type="button" class="remove-member-btn" title="Remove member"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="member-row-details">
+      <input type="tel" placeholder="Contact Number" value="${escapeHTML(phone)}" class="member-phone-input" />
+      <input type="email" placeholder="Email" value="${escapeHTML(email)}" class="member-email-input" />
+      <input type="text" placeholder="College" value="${escapeHTML(college)}" class="member-college-input" />
+    </div>
+    <div class="member-socials-section">
+      <label class="member-socials-label">Social Links</label>
+      <div class="member-socials-list"></div>
+      <button type="button" class="btn btn-secondary btn-xs add-member-social-btn">
+        <i class="fas fa-plus"></i> Add Social Link
+      </button>
+    </div>
+  `;
+  row.querySelector(".remove-member-btn").addEventListener("click", () => row.remove());
+  row.querySelector(".add-member-social-btn").addEventListener("click", () => {
+    addMemberSocialRow(row.querySelector(".member-socials-list"));
+  });
+  const socialsList = row.querySelector(".member-socials-list");
+  (socials || []).forEach(s => addMemberSocialRow(socialsList, s.platform, s.url));
+  container.appendChild(row);
+}
+
+function addMemberSocialRow(container, platform = "", url = "") {
+  const row = document.createElement("div");
+  row.className = "member-social-input-row";
+  row.innerHTML = `
+    <select class="member-social-platform">
+      <option value="linkedin" ${platform === 'linkedin' ? 'selected' : ''}>LinkedIn</option>
+      <option value="github" ${platform === 'github' ? 'selected' : ''}>GitHub</option>
+      <option value="instagram" ${platform === 'instagram' ? 'selected' : ''}>Instagram</option>
+    </select>
+    <input type="url" placeholder="Profile URL" value="${escapeHTML(url)}" class="member-social-url" />
     <button type="button" class="remove-member-btn" title="Remove"><i class="fas fa-times"></i></button>
   `;
   row.querySelector(".remove-member-btn").addEventListener("click", () => row.remove());
@@ -681,11 +748,21 @@ document.getElementById("team-form").addEventListener("submit", async (e) => {
   e.preventDefault();
   const index = parseInt(document.getElementById("team-edit-index").value);
   const memberRows = document.querySelectorAll("#team-members-container .member-row");
-  const members = Array.from(memberRows).map((row) => ({
-    name: row.querySelector(".member-name-input").value.trim(),
-    role: row.querySelector(".member-role-input").value.trim(),
-    email: row.querySelector(".member-email-input").value.trim()
-  })).filter((m) => m.name);
+  const members = Array.from(memberRows).map((row) => {
+    const memberSocialRows = row.querySelectorAll(".member-social-input-row");
+    const memberSocials = Array.from(memberSocialRows).map(sr => ({
+      platform: sr.querySelector(".member-social-platform").value,
+      url: sr.querySelector(".member-social-url").value.trim()
+    })).filter(s => s.url);
+    return {
+      name: row.querySelector(".member-name-input").value.trim(),
+      phone: row.querySelector(".member-phone-input").value.trim(),
+      role: row.querySelector(".member-role-input").value.trim(),
+      email: row.querySelector(".member-email-input").value.trim(),
+      college: row.querySelector(".member-college-input").value.trim(),
+      socials: memberSocials
+    };
+  }).filter((m) => m.name);
 
   const socialRows = document.querySelectorAll("#team-socials-container .social-row");
   const socials = Array.from(socialRows).map((row) => ({
