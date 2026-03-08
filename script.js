@@ -233,6 +233,7 @@ function renderAll() {
   renderRecent();
   renderDashTodos();
   renderCalendar();
+  renderDashCalendar();
 }
 
 // ============================================================
@@ -391,31 +392,42 @@ function renderRecent() {
 
   recentContacts.innerHTML = last3Contacts.length
     ? last3Contacts.map((c) => `
-        <div class="contact-card">
-          <div class="card-header"><div class="card-header-info"><h3>${escapeHTML(c.name)}</h3>${c.role ? `<span class="card-role">${escapeHTML(c.role)}</span>` : ""}</div></div>
-          ${c.email ? `<div class="card-detail"><i class="fas fa-envelope"></i><span>${escapeHTML(c.email)}</span></div>` : ""}
+        <div class="dash-recent-item">
+          <div class="dash-recent-icon"><i class="fas fa-user"></i></div>
+          <div class="dash-recent-info">
+            <span class="dash-recent-name">${escapeHTML(c.name)}</span>
+            ${c.email ? `<span class="dash-recent-detail">${escapeHTML(c.email)}</span>` : ''}
+          </div>
         </div>
       `).join("")
-    : '<p style="color:var(--text-muted);font-size:0.9rem;">No contacts yet.</p>';
+    : '<p class="dash-empty-msg"><i class="fas fa-address-book"></i> No contacts yet.</p>';
 
   recentTeams.innerHTML = last3Teams.length
     ? last3Teams.map((t) => `
-        <div class="team-card">
-          <div class="card-header"><div class="card-header-info"><h3>${escapeHTML(t.teamName)}</h3><span class="card-role">${(t.members || []).length} members</span></div></div>
+        <div class="dash-recent-item">
+          <div class="dash-recent-icon team"><i class="fas fa-users"></i></div>
+          <div class="dash-recent-info">
+            <span class="dash-recent-name">${escapeHTML(t.teamName)}</span>
+            <span class="dash-recent-detail">${(t.members || []).length} member${(t.members || []).length !== 1 ? 's' : ''}</span>
+          </div>
         </div>
       `).join("")
-    : '<p style="color:var(--text-muted);font-size:0.9rem;">No teams yet.</p>';
+    : '<p class="dash-empty-msg"><i class="fas fa-users"></i> No teams yet.</p>';
 
   recentLinks.innerHTML = last3Links.length
     ? last3Links.map((l) => {
         const safeUrl = sanitizeURL(l.url);
         return `
-          <div class="link-card">
-            <div class="card-header"><div class="card-header-info"><h3>${escapeHTML(l.title)}</h3>${safeUrl ? `<a class="link-url" href="${safeUrl}" target="_blank" rel="noopener noreferrer">${escapeHTML(l.url)}</a>` : `<span class="link-url">${escapeHTML(l.url)}</span>`}</div></div>
+          <div class="dash-recent-item">
+            <div class="dash-recent-icon link"><i class="fas fa-link"></i></div>
+            <div class="dash-recent-info">
+              <span class="dash-recent-name">${escapeHTML(l.title)}</span>
+              ${safeUrl ? `<a class="dash-recent-detail link-url" href="${safeUrl}" target="_blank" rel="noopener noreferrer">${escapeHTML(l.url)}</a>` : `<span class="dash-recent-detail">${escapeHTML(l.url)}</span>`}
+            </div>
           </div>
         `;
       }).join("")
-    : '<p style="color:var(--text-muted);font-size:0.9rem;">No links yet.</p>';
+    : '<p class="dash-empty-msg"><i class="fas fa-link"></i> No links yet.</p>';
 }
 
 // ============================================================
@@ -791,41 +803,8 @@ document.getElementById("delete-all-data-btn").addEventListener("click", () => {
 });
 
 // ============================================================
-// QUICK ACTION BUTTONS
+// QUICK ACTION BUTTONS (removed — no longer on dashboard)
 // ============================================================
-document.getElementById("quick-add-contact").addEventListener("click", () => {
-  gotoSection("contacts");
-  openContactModal();
-});
-
-document.getElementById("quick-add-team").addEventListener("click", () => {
-  gotoSection("teams");
-  openTeamModal();
-});
-
-document.getElementById("quick-add-link").addEventListener("click", () => {
-  gotoSection("links");
-  openLinkModal();
-});
-
-document.getElementById("quick-export").addEventListener("click", exportJSON);
-document.getElementById("quick-import").addEventListener("click", triggerImport);
-
-// New quick action buttons
-document.getElementById("quick-add-todo").addEventListener("click", () => {
-  gotoSection("todos");
-  openTodoModal();
-});
-
-document.getElementById("quick-add-apikey").addEventListener("click", () => {
-  gotoSection("apikeys");
-  openApikeyModal();
-});
-
-document.getElementById("quick-add-note").addEventListener("click", () => {
-  gotoSection("notes");
-  openNoteModal();
-});
 
 // Dashboard todo widget view all
 document.getElementById("dash-todo-viewall").addEventListener("click", () => gotoSection("todos"));
@@ -1093,7 +1072,7 @@ function renderDashTodos() {
   if (!el) return;
   const pending = userData.todos.filter(t => !t.done).slice(0, 5);
   if (!pending.length) {
-    el.innerHTML = '<p class="text-muted" style="color:var(--text-muted);font-size:0.85rem;">No pending tasks. You\'re all caught up!</p>';
+    el.innerHTML = '<p class="dash-empty-msg"><i class="fas fa-check-circle"></i> No pending tasks. You\'re all caught up!</p>';
     return;
   }
   el.innerHTML = pending.map(t => {
@@ -1654,6 +1633,70 @@ document.getElementById('calendar-event-form').addEventListener('submit', async 
     showToast('Failed to save event.', 'error');
   }
 });
+
+// ============================================================
+// DASHBOARD CALENDAR WIDGET
+// ============================================================
+let dashCalState = { year: 0, month: 0 };
+
+(function initDashCalState() {
+  const now = new Date();
+  const bs = adToBS(now.getFullYear(), now.getMonth() + 1, now.getDate());
+  if (bs) {
+    dashCalState.year = bs.year;
+    dashCalState.month = bs.month;
+  }
+})();
+
+function renderDashCalendar() {
+  const daysContainer = document.getElementById('dash-cal-days');
+  const label = document.getElementById('dash-cal-month-label');
+  if (!daysContainer || !label) return;
+
+  const { year, month } = dashCalState;
+  const row = BS_CALENDAR.find(r => r[0] === year);
+  if (!row) {
+    daysContainer.innerHTML = '<span style="grid-column:1/-1;text-align:center;color:var(--text-muted);font-size:0.75rem;">Year out of range</span>';
+    return;
+  }
+
+  label.textContent = `${BS_MONTHS[month - 1]} ${year}`;
+  const totalDays = getBSMonthDays(year, month);
+  const startDow = getBSDayOfWeek(year, month, 1);
+  const today = getTodayBS();
+
+  let html = '';
+  for (let i = 0; i < startDow; i++) {
+    html += '<span class="dash-cal-day empty"></span>';
+  }
+  for (let d = 1; d <= totalDays; d++) {
+    const isToday = today && today.year === year && today.month === month && today.day === d;
+    const isSun = (startDow + d - 1) % 7 === 0;
+    const isSat = (startDow + d - 1) % 7 === 6;
+    const dateStr = formatBSDate(year, month, d);
+    const hasEvents = getEventsForDate(dateStr).length > 0;
+    const hasTodos = getTodosForBSDate(year, month, d).length > 0;
+
+    let cls = 'dash-cal-day';
+    if (isToday) cls += ' today';
+    if (isSun) cls += ' sun';
+    if (isSat) cls += ' sat';
+    if (hasEvents || hasTodos) cls += ' has-events';
+
+    html += `<span class="${cls}">${d}</span>`;
+  }
+  daysContainer.innerHTML = html;
+}
+
+function navigateDashCalendar(dir) {
+  dashCalState.month += dir;
+  if (dashCalState.month > 12) { dashCalState.month = 1; dashCalState.year++; }
+  if (dashCalState.month < 1) { dashCalState.month = 12; dashCalState.year--; }
+  renderDashCalendar();
+}
+
+document.getElementById('dash-cal-prev')?.addEventListener('click', () => navigateDashCalendar(-1));
+document.getElementById('dash-cal-next')?.addEventListener('click', () => navigateDashCalendar(1));
 
 // Calendar navigation buttons
 document.getElementById('calendar-prev-month').addEventListener('click', () => navigateCalendar(-1));
