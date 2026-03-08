@@ -1181,11 +1181,11 @@ function renderTodoDualDate() {
   const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   const dayName = dayNames[now.getDay()];
-  const enDate = `${dayName}, ${monthNames[now.getMonth()]} ${now.getFullYear()}`;
+  const enDate = `${dayName}, ${monthNames[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
   const bs = adToBS(now.getFullYear(), now.getMonth() + 1, now.getDate());
   let bsDate = '';
   if (bs) {
-    bsDate = `${dayName}, ${bs.monthName} ${bs.year}`;
+    bsDate = `${dayName}, ${bs.monthName} ${bs.day}, ${bs.year}`;
   }
   el.innerHTML = `<span class="dual-date-en"><i class="fas fa-calendar"></i> ${escapeHTML(enDate)}</span>${bsDate ? `<span class="dual-date-bs"><i class="fas fa-calendar-alt"></i> ${escapeHTML(bsDate)} (BS)</span>` : ''}`;
 }
@@ -1206,11 +1206,11 @@ function formatDualDate(dueDateStr) {
   const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   const dayName = dayNames[d.getDay()];
-  const enStr = `${dayName}, ${monthNames[d.getMonth()]} ${d.getFullYear()}`;
+  const enStr = `${dayName}, ${monthNames[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
   const bs = adToBS(d.getFullYear(), d.getMonth() + 1, d.getDate());
   let bsStr = '';
   if (bs) {
-    bsStr = `${dayName}, ${bs.monthName} ${bs.year}`;
+    bsStr = `${dayName}, ${bs.monthName} ${bs.day}, ${bs.year}`;
   }
   return `<span class="todo-date-en">${escapeHTML(enStr)}</span>${bsStr ? `<span class="todo-date-bs">${escapeHTML(bsStr)} (BS)</span>` : ''}`;
 }
