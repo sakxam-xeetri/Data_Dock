@@ -1329,22 +1329,49 @@ body.compact-mode .card-notes {
 }
 
 /* ---------- Team Card Extras ---------- */
-.team-members-list {
-  margin-top: 12px;
+.team-full-info {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.team-member-row {
+.team-info-row {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 5px 0;
+  gap: 8px;
   font-size: 0.8rem;
   color: var(--text-secondary);
 }
 
+.team-info-row i {
+  color: var(--neon-cyan);
+  width: 16px;
+  text-align: center;
+  font-size: 0.75rem;
+}
+
+.team-members-list {
+  margin-top: 4px;
+}
+
+.team-member-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 0;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.team-member-row:last-child {
+  border-bottom: none;
+}
+
 .team-member-row .member-avatar {
-  width: 26px;
-  height: 26px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background: rgba(180, 74, 255, 0.15);
   border: 1px solid rgba(180, 74, 255, 0.3);
@@ -1355,6 +1382,19 @@ body.compact-mode .card-notes {
   font-size: 0.6rem;
   font-weight: 600;
   flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.member-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.member-info-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .team-member-row .member-name {
@@ -1365,6 +1405,57 @@ body.compact-mode .card-notes {
 .team-member-row .member-role {
   color: var(--text-muted);
   font-size: 0.72rem;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1px 8px;
+  border-radius: 10px;
+}
+
+.member-info-details {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 3px;
+}
+
+.member-detail {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.member-detail i {
+  font-size: 0.65rem;
+  color: var(--neon-cyan);
+}
+
+.member-socials-display {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.member-social-link {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  transition: color var(--transition);
+}
+
+.member-social-link:hover {
+  color: var(--neon-cyan);
+}
+
+.member-social-link .fa-linkedin {
+  color: #0a66c2;
+}
+
+.member-social-link .fa-github {
+  color: #c9d1d9;
+}
+
+.member-social-link .fa-instagram {
+  color: #e1306c;
 }
 
 .link-url {
@@ -1698,16 +1789,35 @@ kbd {
 
 .member-row {
   display: flex;
-  gap: 8px;
-  align-items: center;
+  flex-direction: column;
+  gap: 10px;
   background: var(--bg-input);
-  padding: 10px 12px;
+  padding: 14px 14px;
   border-radius: var(--radius-sm);
   border: 1px solid var(--border-color);
 }
 
-.member-row input {
+.member-row-header {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.member-row-header input {
   flex: 1;
+}
+
+.member-row-details {
+  display: flex;
+  gap: 8px;
+}
+
+.member-row-details input {
+  flex: 1;
+}
+
+.member-row input,
+.member-row select {
   padding: 6px 10px;
   border: 1px solid var(--border-input);
   border-radius: 4px;
@@ -1717,7 +1827,8 @@ kbd {
   font-size: 0.8rem;
 }
 
-.member-row input:focus {
+.member-row input:focus,
+.member-row select:focus {
   outline: none;
   border-color: var(--neon-green);
   box-shadow: 0 0 6px rgba(0, 255, 153, 0.15);
@@ -1731,10 +1842,77 @@ kbd {
   padding: 4px;
   font-size: 0.85rem;
   transition: all var(--transition);
+  flex-shrink: 0;
 }
 
 .member-row .remove-member-btn:hover {
   text-shadow: 0 0 6px rgba(255, 42, 109, 0.5);
+}
+
+/* Member Social Links (form) */
+.member-socials-section {
+  border-top: 1px solid var(--border-color);
+  padding-top: 8px;
+}
+
+.member-socials-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.member-socials-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.member-social-input-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.member-social-input-row select {
+  width: 120px;
+  padding: 5px 8px;
+  border: 1px solid var(--border-input);
+  border-radius: 4px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+}
+
+.member-social-input-row input {
+  flex: 1;
+  padding: 5px 8px;
+  border: 1px solid var(--border-input);
+  border-radius: 4px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+}
+
+.member-social-input-row select:focus,
+.member-social-input-row input:focus {
+  outline: none;
+  border-color: var(--neon-green);
+  box-shadow: 0 0 6px rgba(0, 255, 153, 0.15);
+}
+
+.btn-xs {
+  font-size: 0.7rem;
+  padding: 4px 10px;
+}
+
+.add-member-social-btn {
+  font-size: 0.7rem !important;
 }
 
 /* Social Profile Row (Team Modal) */
