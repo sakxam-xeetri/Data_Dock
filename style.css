@@ -2216,7 +2216,272 @@ kbd {
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   padding: 20px;
+}
+
+/* ============================================================
+   DASHBOARD GRID LAYOUT
+   ============================================================ */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
   margin-bottom: 24px;
+}
+
+.dashboard-col-left,
+.dashboard-col-right {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.dashboard-widget {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 20px;
+}
+
+.dashboard-widget .widget-header,
+.dashboard-todo-widget .widget-header,
+.dashboard-calendar-widget .widget-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.dashboard-widget .widget-header h2,
+.dashboard-todo-widget .widget-header h2,
+.dashboard-calendar-widget .widget-header h2 {
+  font-size: 0.9rem;
+  color: var(--neon-green);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.dashboard-widget .widget-header h2 i,
+.dashboard-todo-widget .widget-header h2 i,
+.dashboard-calendar-widget .widget-header h2 i {
+  color: var(--neon-cyan);
+  font-size: 0.85rem;
+}
+
+/* ---- Dashboard Calendar Widget ---- */
+.dashboard-calendar-widget {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 20px;
+}
+
+.dash-cal-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dash-cal-nav-btn {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  transition: color 0.2s;
+}
+
+.dash-cal-nav-btn:hover {
+  color: var(--neon-green);
+  text-shadow: 0 0 8px rgba(0, 255, 153, 0.5);
+}
+
+.dash-cal-month {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--neon-green);
+  text-shadow: 0 0 8px rgba(0, 255, 153, 0.3);
+  min-width: 140px;
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
+.dash-cal-grid {
+  user-select: none;
+}
+
+.dash-cal-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  margin-bottom: 4px;
+}
+
+.dash-cal-wday {
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  padding: 4px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.dash-cal-wday.sun { color: var(--accent-danger); }
+.dash-cal-wday.sat { color: var(--neon-cyan); }
+
+.dash-cal-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.dash-cal-day {
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text-primary);
+  padding: 7px 2px;
+  border-radius: var(--radius-sm);
+  transition: background 0.15s;
+  border: 1px solid transparent;
+  position: relative;
+}
+
+.dash-cal-day.empty {
+  visibility: hidden;
+}
+
+.dash-cal-day.sun { color: var(--accent-danger); }
+.dash-cal-day.sat { color: var(--neon-cyan); }
+
+.dash-cal-day.today {
+  background: rgba(0, 255, 153, 0.12);
+  border-color: var(--neon-green);
+  color: var(--neon-green);
+  font-weight: 700;
+  box-shadow: inset 0 0 10px rgba(0, 255, 153, 0.1), 0 0 6px rgba(0, 255, 153, 0.15);
+  text-shadow: 0 0 6px rgba(0, 255, 153, 0.5);
+}
+
+.dash-cal-day.has-events::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--neon-cyan);
+  box-shadow: 0 0 4px rgba(0, 255, 255, 0.5);
+}
+
+/* ---- Dashboard Recent Items ---- */
+.dash-recent-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dash-recent-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  transition: border-color 0.2s;
+}
+
+.dash-recent-item:hover {
+  border-color: rgba(0, 255, 153, 0.25);
+}
+
+.dash-recent-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 0.8rem;
+  background: rgba(0, 255, 255, 0.08);
+  color: var(--neon-cyan);
+}
+
+.dash-recent-icon.team {
+  background: rgba(180, 74, 255, 0.08);
+  color: var(--neon-purple);
+}
+
+.dash-recent-icon.link {
+  background: rgba(255, 0, 255, 0.08);
+  color: var(--neon-magenta);
+}
+
+.dash-recent-info {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.dash-recent-name {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dash-recent-detail {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+a.dash-recent-detail.link-url { color: var(--neon-cyan); }
+a.dash-recent-detail.link-url:hover { color: var(--neon-green); }
+
+/* ---- Dashboard Empty Messages ---- */
+.dash-empty-msg {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  padding: 14px 0;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.dash-empty-msg i {
+  font-size: 0.9rem;
+  opacity: 0.6;
+}
+
+/* ---- Dashboard layout responsive ---- */
+@media (max-width: 1024px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .dashboard-grid { gap: 14px; }
+  .dashboard-widget,
+  .dashboard-todo-widget,
+  .dashboard-calendar-widget { padding: 14px; }
+  .dash-cal-day { padding: 5px 1px; font-size: 0.7rem; }
 }
 
 .widget-header {
