@@ -690,11 +690,6 @@ a:hover {
   transition: transform 0.3s ease;
 }
 
-.sidebar-header {
-  padding: 24px 20px;
-  border-bottom: 1px solid rgba(0, 255, 153, 0.08);
-}
-
 .sidebar-logo {
   display: flex;
   align-items: center;
@@ -711,6 +706,99 @@ a:hover {
   color: var(--neon-green);
   font-size: 1.2rem;
   filter: drop-shadow(0 0 6px rgba(0, 255, 153, 0.6));
+}
+
+/* Sidebar Collapse Button */
+.sidebar-collapse-btn {
+  background: none;
+  border: 1px solid rgba(0, 255, 153, 0.15);
+  color: var(--text-sidebar);
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  transition: all var(--transition);
+  flex-shrink: 0;
+}
+
+.sidebar-collapse-btn:hover {
+  color: var(--neon-green);
+  border-color: var(--neon-green);
+  box-shadow: var(--glow-green);
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 20px;
+  border-bottom: 1px solid rgba(0, 255, 153, 0.08);
+}
+
+/* ---------- Collapsed Sidebar State ---------- */
+body.sidebar-collapsed .sidebar {
+  width: 64px;
+}
+
+body.sidebar-collapsed .sidebar-logo span,
+body.sidebar-collapsed .nav-item span,
+body.sidebar-collapsed .user-details,
+body.sidebar-collapsed .btn-logout span {
+  display: none;
+}
+
+body.sidebar-collapsed .sidebar-header {
+  padding: 16px 12px;
+  justify-content: center;
+}
+
+body.sidebar-collapsed .sidebar-collapse-btn {
+  margin: 0;
+}
+
+body.sidebar-collapsed .sidebar-logo {
+  justify-content: center;
+}
+
+body.sidebar-collapsed .nav-item {
+  justify-content: center;
+  padding: 11px 0;
+  gap: 0;
+}
+
+body.sidebar-collapsed .nav-item::before {
+  display: none;
+}
+
+body.sidebar-collapsed .nav-item i {
+  font-size: 1.1rem;
+}
+
+body.sidebar-collapsed .sidebar-footer {
+  padding: 12px 8px;
+  align-items: center;
+}
+
+body.sidebar-collapsed .user-info {
+  justify-content: center;
+}
+
+body.sidebar-collapsed .btn-logout {
+  justify-content: center;
+  padding: 8px;
+}
+
+body.sidebar-collapsed .main-content {
+  margin-left: 64px;
+}
+
+body.sidebar-collapsed .sidebar-nav {
+  padding: 16px 8px;
+  align-items: center;
 }
 
 .sidebar-nav {
@@ -1649,6 +1737,187 @@ kbd {
   text-shadow: 0 0 6px rgba(255, 42, 109, 0.5);
 }
 
+/* Social Profile Row (Team Modal) */
+.socials-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.social-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background: var(--bg-input);
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  flex-wrap: wrap;
+}
+
+.social-row select,
+.social-row input {
+  flex: 1;
+  min-width: 100px;
+  padding: 6px 10px;
+  border: 1px solid var(--border-input);
+  border-radius: 4px;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+}
+
+.social-row select {
+  max-width: 140px;
+}
+
+.social-row select:focus,
+.social-row input:focus {
+  outline: none;
+  border-color: var(--neon-green);
+  box-shadow: 0 0 6px rgba(0, 255, 153, 0.15);
+}
+
+/* Team Social Display (Card) */
+.team-socials-list {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.team-social-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 0;
+  font-size: 0.8rem;
+}
+
+.team-social-row i {
+  width: 16px;
+  text-align: center;
+  font-size: 0.85rem;
+}
+
+.team-social-row i.fa-linkedin { color: #0a66c2; }
+.team-social-row i.fa-github { color: var(--text-primary); }
+.team-social-row i.fa-instagram { color: #e1306c; }
+
+.team-social-row a {
+  color: var(--neon-cyan);
+  font-size: 0.78rem;
+  word-break: break-all;
+}
+
+.team-social-row a:hover {
+  color: var(--neon-green);
+}
+
+.social-type-badge {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.social-type-badge.professional {
+  color: var(--neon-cyan);
+  background: rgba(0, 255, 255, 0.08);
+}
+
+.social-type-badge.personal {
+  color: var(--neon-magenta);
+  background: rgba(255, 0, 255, 0.08);
+}
+
+.social-type-badge.portfolio {
+  color: var(--neon-yellow);
+  background: rgba(255, 255, 0, 0.06);
+}
+
+/* ---- To-Do Dual Date ---- */
+.todo-dual-date {
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.todo-dual-date .todo-date-en,
+.todo-dual-date .todo-date-bs {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.todo-dual-date .todo-date-en {
+  color: var(--text-secondary);
+}
+
+.todo-dual-date .todo-date-bs {
+  color: var(--neon-cyan);
+  opacity: 0.8;
+}
+
+.todo-dual-date .todo-date-en::after {
+  content: '|';
+  color: var(--text-muted);
+  margin: 0 2px;
+}
+
+/* To-Do content wrapper */
+.todo-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.todo-content .todo-text {
+  display: block;
+}
+
+/* To-Do Section Header Dual Date */
+.todo-dual-date-header,
+#todo-dual-date {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+
+.dual-date-en,
+.dual-date-bs {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dual-date-en {
+  color: var(--neon-green);
+  text-shadow: 0 0 8px rgba(0, 255, 153, 0.3);
+}
+
+.dual-date-bs {
+  color: var(--neon-cyan);
+  text-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
+}
+
+.dual-date-en i,
+.dual-date-bs i {
+  font-size: 0.72rem;
+}
+
 /* ============================================================
    SETTINGS
    ============================================================ */
@@ -1910,6 +2179,7 @@ kbd {
 
   .sidebar {
     transform: translateX(-100%);
+    width: var(--sidebar-width) !important;
   }
 
   .sidebar.open {
@@ -1920,8 +2190,29 @@ kbd {
     display: block;
   }
 
+  .sidebar-collapse-btn {
+    display: none;
+  }
+
+  body.sidebar-collapsed .sidebar-logo span,
+  body.sidebar-collapsed .nav-item span,
+  body.sidebar-collapsed .user-details,
+  body.sidebar-collapsed .btn-logout span {
+    display: initial;
+  }
+
+  body.sidebar-collapsed .nav-item {
+    justify-content: flex-start;
+    padding: 11px 16px;
+    gap: 12px;
+  }
+
+  body.sidebar-collapsed .nav-item::before {
+    display: initial;
+  }
+
   .main-content {
-    margin-left: 0;
+    margin-left: 0 !important;
     padding: 72px 16px 24px;
   }
 
