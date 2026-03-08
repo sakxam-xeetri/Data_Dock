@@ -160,86 +160,90 @@
         </div>
       </div>
 
-      <!-- Quick Actions -->
-      <div class="quick-actions">
-        <h2>Quick Actions</h2>
-        <div class="actions-grid">
-          <button class="action-btn" id="quick-add-contact">
-            <i class="fas fa-user-plus"></i>
-            <span>Add Contact</span>
-          </button>
-          <button class="action-btn" id="quick-add-team">
-            <i class="fas fa-users-cog"></i>
-            <span>Add Team</span>
-          </button>
-          <button class="action-btn" id="quick-add-link">
-            <i class="fas fa-plus-circle"></i>
-            <span>Add Link</span>
-          </button>
-          <button class="action-btn" id="quick-add-todo">
-            <i class="fas fa-check-square"></i>
-            <span>Add To-Do</span>
-          </button>
-          <button class="action-btn" id="quick-add-apikey">
-            <i class="fas fa-key"></i>
-            <span>Add API Key</span>
-          </button>
-          <button class="action-btn" id="quick-add-note">
-            <i class="fas fa-sticky-note"></i>
-            <span>Add Note</span>
-          </button>
-          <button class="action-btn" id="quick-export">
-            <i class="fas fa-file-export"></i>
-            <span>Export JSON</span>
-          </button>
-          <button class="action-btn" id="quick-import">
-            <i class="fas fa-file-import"></i>
-            <span>Import JSON</span>
-          </button>
-        </div>
-      </div>
+      <!-- Dashboard Two-Column Layout -->
+      <div class="dashboard-grid">
+        <!-- Left Column -->
+        <div class="dashboard-col-left">
+          <!-- Dashboard Calendar Widget -->
+          <div class="dashboard-calendar-widget">
+            <div class="widget-header">
+              <h2><i class="fas fa-calendar-alt"></i> Calendar</h2>
+              <div class="dash-cal-nav">
+                <button class="btn-icon dash-cal-nav-btn" id="dash-cal-prev" title="Previous Month"><i class="fas fa-chevron-left"></i></button>
+                <span class="dash-cal-month" id="dash-cal-month-label">Loading...</span>
+                <button class="btn-icon dash-cal-nav-btn" id="dash-cal-next" title="Next Month"><i class="fas fa-chevron-right"></i></button>
+              </div>
+            </div>
+            <div class="dash-cal-grid">
+              <div class="dash-cal-weekdays">
+                <span class="dash-cal-wday sun">Sun</span>
+                <span class="dash-cal-wday">Mon</span>
+                <span class="dash-cal-wday">Tue</span>
+                <span class="dash-cal-wday">Wed</span>
+                <span class="dash-cal-wday">Thu</span>
+                <span class="dash-cal-wday">Fri</span>
+                <span class="dash-cal-wday sat">Sat</span>
+              </div>
+              <div class="dash-cal-days" id="dash-cal-days"></div>
+            </div>
+          </div>
 
-      <!-- Dashboard To-Do Widget -->
-      <div class="dashboard-todo-widget">
-        <div class="widget-header">
-          <h2><i class="fas fa-check-square"></i> To-Do</h2>
-          <button class="btn btn-sm btn-secondary" id="dash-todo-viewall">View All <i class="fas fa-arrow-right"></i></button>
-        </div>
-        <div id="dash-todo-list" class="dash-todo-list">
-          <p class="text-muted">No tasks yet.</p>
-        </div>
-      </div>
+          <!-- Dashboard To-Do Widget -->
+          <div class="dashboard-todo-widget">
+            <div class="widget-header">
+              <h2><i class="fas fa-check-square"></i> To-Do</h2>
+              <button class="btn btn-sm btn-secondary" id="dash-todo-viewall">View All <i class="fas fa-arrow-right"></i></button>
+            </div>
+            <div id="dash-todo-list" class="dash-todo-list">
+              <p class="dash-empty-msg"><i class="fas fa-check-circle"></i> No pending tasks. You're all caught up!</p>
+            </div>
+          </div>
 
-      <!-- Recent Activity -->
-      <div class="recent-section">
-        <h2>Recent Contacts</h2>
-        <div id="recent-contacts" class="cards-grid"></div>
-      </div>
-      <div class="recent-section">
-        <h2>Recent Teams</h2>
-        <div id="recent-teams" class="cards-grid"></div>
-      </div>
-      <div class="recent-section">
-        <h2>Recent Links</h2>
-        <div id="recent-links" class="cards-grid"></div>
+          <!-- Recent Contacts -->
+          <div class="dashboard-widget">
+            <div class="widget-header">
+              <h2><i class="fas fa-address-book"></i> Recent Contacts</h2>
+            </div>
+            <div id="recent-contacts" class="dash-recent-list"></div>
+          </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="dashboard-col-right">
+          <!-- Recent Teams -->
+          <div class="dashboard-widget">
+            <div class="widget-header">
+              <h2><i class="fas fa-users"></i> Recent Teams</h2>
+            </div>
+            <div id="recent-teams" class="dash-recent-list"></div>
+          </div>
+
+          <!-- Recent Links -->
+          <div class="dashboard-widget">
+            <div class="widget-header">
+              <h2><i class="fas fa-link"></i> Recent Links</h2>
+            </div>
+            <div id="recent-links" class="dash-recent-list"></div>
+          </div>
+
+          <!-- Terminal Console (System Log Panel) -->
+          <div class="terminal-console">
+            <div class="terminal-header">
+              <span><i class="fas fa-terminal"></i> system.log</span>
+              <button class="terminal-clear-btn" id="terminal-clear" title="Clear"><i class="fas fa-eraser"></i></button>
+            </div>
+            <div class="terminal-body" id="terminal-body">
+              <div class="terminal-line"><span class="terminal-prompt">&gt;</span> DataDock v2.0 — Retro terminal interface loaded</div>
+              <div class="terminal-line"><span class="terminal-prompt">&gt;</span> Awaiting commands...<span class="typewriter-cursor"></span></div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Search Results -->
       <div id="search-results" class="search-results hidden">
         <h2>Search Results</h2>
         <div id="search-results-list" class="cards-grid"></div>
-      </div>
-
-      <!-- Terminal Console -->
-      <div class="terminal-console">
-        <div class="terminal-header">
-          <span><i class="fas fa-terminal"></i> system.log</span>
-          <button class="terminal-clear-btn" id="terminal-clear" title="Clear"><i class="fas fa-eraser"></i></button>
-        </div>
-        <div class="terminal-body" id="terminal-body">
-          <div class="terminal-line"><span class="terminal-prompt">&gt;</span> DataDock v2.0 — retro terminal interface loaded</div>
-          <div class="terminal-line"><span class="terminal-prompt">&gt;</span> Awaiting commands...<span class="typewriter-cursor"></span></div>
-        </div>
       </div>
     </section>
 
