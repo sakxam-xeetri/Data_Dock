@@ -534,15 +534,17 @@
       background: rgba(248,113,113,.06) !important;
     }
 
-    /* ── Contact View Modal ── */
+    /* ── View Modal ── */
     #contact-view-modal .cv-shell {
       width: 100%;
-      max-width: 400px;
+      max-width: 480px;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
       background: #12141c;
       border-radius: 12px;
       border: 1px solid #1e2030;
       box-shadow: 0 24px 64px rgba(0,0,0,.7);
-      overflow: hidden;
       animation: modalSlideIn 0.25s ease;
       font-family: 'IBM Plex Mono', 'Fira Code', monospace;
     }
@@ -553,6 +555,8 @@
       padding: 16px 18px 14px;
       background: #0c0e14;
       border-bottom: 1px solid #1e2030;
+      border-radius: 12px 12px 0 0;
+      flex-shrink: 0;
     }
     #contact-view-modal .cv-avatar {
       width: 44px; height: 44px; border-radius: 50%;
@@ -564,21 +568,31 @@
     }
     #contact-view-modal .cv-name {
       font-size: 0.95rem; font-weight: 700; color: #e2e4ec;
+      word-break: break-word;
     }
     #contact-view-modal .cv-role {
-      font-size: 0.7rem; color: #6b7280; margin-top: 2px;
+      font-size: 0.72rem; color: #6b7280; margin-top: 2px;
     }
     #contact-view-modal .cv-close {
       margin-left: auto;
       background: none; border: none; cursor: pointer;
       color: #4a4e66; font-size: 0.85rem; padding: 4px 6px;
       border-radius: 4px; transition: color 0.15s;
+      flex-shrink: 0;
     }
     #contact-view-modal .cv-close:hover { color: #f87171; }
+
+    /* scrollable body */
+    #contact-view-modal #cv-fields {
+      overflow-y: auto;
+      flex: 1 1 auto;
+      min-height: 0;
+    }
+
     #contact-view-modal .cv-row {
       display: flex; align-items: center;
-      padding: 0 14px 0 0;
-      height: 44px;
+      padding: 8px 14px 8px 0;
+      min-height: 42px;
       border-bottom: 1px solid rgba(30,32,48,.8);
       cursor: default;
       transition: background 0.12s;
@@ -586,17 +600,19 @@
     #contact-view-modal .cv-row:last-child { border-bottom: none; }
     #contact-view-modal .cv-row:hover { background: rgba(91,141,239,.04); }
     #contact-view-modal .cv-row-icon {
-      width: 40px; text-align: center;
+      width: 38px; text-align: center;
       font-size: 0.75rem; color: #3d4466; flex-shrink: 0;
+      align-self: flex-start; padding-top: 2px;
     }
     #contact-view-modal .cv-row-label {
       font-size: 0.62rem; color: #4a4e66;
       text-transform: uppercase; letter-spacing: 0.5px;
-      width: 62px; flex-shrink: 0;
+      width: 66px; flex-shrink: 0;
+      align-self: flex-start; padding-top: 2px;
     }
     #contact-view-modal .cv-row-val {
       flex: 1; font-size: 0.8rem; color: #c8d0e0;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;
+      word-break: break-all; line-height: 1.5; min-width: 0;
     }
     #contact-view-modal .cv-row-val.em { color: #67e8f9; }
     #contact-view-modal .cv-row-val.ph { color: #4ade80; }
@@ -608,31 +624,78 @@
       font-size: 0.68rem; transition: all 0.15s;
       display:flex; align-items:center; gap:4px;
       font-family: 'IBM Plex Mono', monospace;
-      flex-shrink: 0;
+      flex-shrink: 0; margin-left: 8px;
+      align-self: flex-start;
     }
     #contact-view-modal .cv-copy-btn:hover {
       color: #7aa3ff; border-color: rgba(91,141,239,.4);
       background: rgba(91,141,239,.08);
     }
+
+    /* member sub-cards */
+    #contact-view-modal .cv-member {
+      margin: 6px 12px;
+      padding: 10px 12px;
+      background: #0e1018;
+      border: 1px solid #1e2030;
+      border-radius: 8px;
+    }
+    #contact-view-modal .cv-member-head {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 6px;
+    }
+    #contact-view-modal .cv-member-avatar {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: rgba(91,141,239,.1); border: 1px solid rgba(91,141,239,.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.6rem; font-weight: 700; color: #5b8def;
+      flex-shrink: 0;
+    }
+    #contact-view-modal .cv-member-name {
+      font-size: 0.82rem; font-weight: 600; color: #c8d0e0;
+    }
+    #contact-view-modal .cv-member-role {
+      font-size: 0.65rem; color: #6b7280; margin-left: auto;
+    }
+    #contact-view-modal .cv-member-detail {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 0.72rem; color: #6b7280; padding: 2px 0 2px 36px;
+    }
+    #contact-view-modal .cv-member-detail i {
+      font-size: 0.62rem; color: #3d4466; width: 14px; text-align: center;
+    }
+    #contact-view-modal .cv-member-detail span { word-break: break-all; }
+
+    /* section dividers inside fields */
+    #contact-view-modal .cv-section-label {
+      font-size: 0.58rem; text-transform: uppercase;
+      letter-spacing: 0.8px; color: #3d4466;
+      padding: 10px 14px 4px;
+      border-bottom: 1px solid rgba(30,32,48,.5);
+    }
+
     #contact-view-modal .cv-notes {
-      margin: 8px 14px 12px;
+      margin: 8px 12px 12px;
       padding: 10px 12px;
       background: #0c0e14;
       border: 1px solid #1e2030;
       border-radius: 6px;
-      font-size: 0.78rem; color: #6b7280;
-      line-height: 1.6; white-space: pre-wrap; word-break: break-word;
+      font-size: 0.78rem; color: #9ca3af;
+      line-height: 1.7; white-space: pre-wrap; word-break: break-word;
+      max-height: 200px; overflow-y: auto;
     }
     #contact-view-modal .cv-notes-lbl {
       font-size: 0.6rem; text-transform: uppercase;
       letter-spacing: 0.5px; color: #3d4466;
-      margin-bottom: 4px; display: block;
+      margin-bottom: 6px; display: block;
     }
     #contact-view-modal .cv-foot {
       display: flex; justify-content: flex-end;
       padding: 10px 14px;
       border-top: 1px solid #1e2030;
       background: #0c0e14;
+      border-radius: 0 0 12px 12px;
+      flex-shrink: 0;
     }
   </style>
 </head>
