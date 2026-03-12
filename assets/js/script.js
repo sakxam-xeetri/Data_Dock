@@ -1176,12 +1176,34 @@ document.getElementById("delete-all-data-btn").addEventListener("click", () => {
   openModal("confirm-modal");
 });
 
-// ============================================================
-// QUICK ACTION BUTTONS (removed — no longer on dashboard)
-// ============================================================
-
 // Dashboard todo widget view all
 document.getElementById("dash-todo-viewall").addEventListener("click", () => gotoSection("todos"));
+
+// Quick Action Chips (dashboard)
+const qaActions = {
+  "qa-add-contact": () => openContactModal(),
+  "qa-add-team": () => openTeamModal(),
+  "qa-add-link": () => openLinkModal(),
+  "qa-add-todo": () => openTodoModal(),
+  "qa-add-note": () => openNoteModal(),
+  "qa-add-apikey": () => openApikeyModal(),
+  "qa-add-event": () => openCalendarEventModal(),
+};
+Object.entries(qaActions).forEach(([id, fn]) => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener("click", fn);
+});
+
+// Terminal toggle (collapsible)
+const terminalToggle = document.getElementById("terminal-toggle-header");
+if (terminalToggle) {
+  terminalToggle.addEventListener("click", (e) => {
+    // Don't collapse if clicking the clear button
+    if (e.target.closest("#terminal-clear")) return;
+    const widget = document.getElementById("terminal-widget");
+    if (widget) widget.classList.toggle("collapsed");
+  });
+}
 
 // Section add buttons
 document.getElementById("add-contact-btn").addEventListener("click", () => openContactModal());
@@ -1229,6 +1251,30 @@ document.getElementById("fab-add-link").addEventListener("click", () => {
   quickFab.classList.remove("open");
   gotoSection("links");
   openLinkModal();
+});
+
+document.getElementById("fab-add-todo").addEventListener("click", () => {
+  quickFab.classList.remove("open");
+  gotoSection("todos");
+  openTodoModal();
+});
+
+document.getElementById("fab-add-note").addEventListener("click", () => {
+  quickFab.classList.remove("open");
+  gotoSection("notes");
+  openNoteModal();
+});
+
+document.getElementById("fab-add-apikey").addEventListener("click", () => {
+  quickFab.classList.remove("open");
+  gotoSection("apikeys");
+  openApikeyModal();
+});
+
+document.getElementById("fab-add-event").addEventListener("click", () => {
+  quickFab.classList.remove("open");
+  gotoSection("calendar");
+  openCalendarEventModal();
 });
 
 document.addEventListener("click", (e) => {
@@ -2295,6 +2341,7 @@ document.querySelector('#apikey-modal .toggle-visibility')?.addEventListener('cl
 // EXPOSE FUNCTIONS TO WINDOW (for inline onclick handlers)
 // ============================================================
 window.datadock = {
+  gotoSection,
   viewContact,
   viewTeam,
   viewLink,
