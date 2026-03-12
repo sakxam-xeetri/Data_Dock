@@ -259,6 +259,7 @@ function renderAll() {
   renderCalendar();
   renderDashCalendar();
   renderTodoDualDate();
+  updateItemCounts();
 }
 
 // ============================================================
@@ -1205,6 +1206,52 @@ if (terminalToggle) {
   });
 }
 
+// ============================================================
+// SCROLLABLE LIST CONTAINERS
+// ============================================================
+(function initScrollableContainers() {
+  const containers = document.querySelectorAll(".scrollable-list-container");
+  containers.forEach((container) => {
+    const btn = container.querySelector(".scroll-to-top-btn");
+
+    container.addEventListener("scroll", () => {
+      const scrollTop = container.scrollTop;
+      const atBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 40;
+
+      // Show/hide scroll-to-top button
+      if (btn) {
+        btn.classList.toggle("hidden", scrollTop < 200);
+      }
+
+      // Toggle bottom fade
+      container.classList.toggle("scrolled-bottom", atBottom);
+    });
+
+    // Click scroll-to-top
+    if (btn) {
+      btn.addEventListener("click", () => {
+        container.scrollTo({ top: 0, behavior: "smooth" });
+      });
+    }
+  });
+})();
+
+// Item count badges — update after each render
+function updateItemCounts() {
+  const counts = {
+    "contacts-count": userData.contacts?.length || 0,
+    "teams-count": userData.teams?.length || 0,
+    "links-count": userData.links?.length || 0,
+    "todos-count": userData.todos?.length || 0,
+    "apikeys-count": userData.apikeys?.length || 0,
+    "notes-count": userData.notes?.length || 0,
+  };
+  Object.entries(counts).forEach(([id, count]) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = count > 0 ? count : "";
+  });
+}
+
 // Section add buttons
 document.getElementById("add-contact-btn").addEventListener("click", () => openContactModal());
 document.getElementById("add-first-contact-btn").addEventListener("click", () => openContactModal());
@@ -1751,28 +1798,75 @@ function renderNotes(filterText = '') {
   }).join('');
 }
 
+// ============================================================
+// FULLSCREEN NOTE EDITOR
+// ============================================================
+const noteEditorOverlay = document.getElementById('note-editor-overlay');
+const noteEditorTextarea = document.getElementById('note-body');
+const noteEditorGutter = document.getElementById('note-editor-gutter');
+const noteEditorCharcount = document.getElementById('note-editor-charcount');
+const noteEditorLinecount = document.getElementById('note-editor-linecount');
+const noteEditorPreview = document.getElementById('note-editor-preview');
+const noteEditorModified = document.getElementById('note-editor-modified');
+const noteEditorStatus = document.getElementById('note-editor-status');
+let noteEditorOriginal = '';
+let noteEditorPreviewMode = false;
+
 function openNoteModal(index = -1) {
-  const form = document.getElementById('note-form');
-  form.reset();
   document.getElementById('note-edit-index').value = index;
-  document.getElementById('note-modal-title').textContent = index >= 0 ? 'Edit Note' : 'Add Note';
+  document.getElementById('note-title').value = '';
+  document.getElementById('note-body').value = '';
+  document.getElementById('note-tag').value = '';
+  noteEditorOriginal = '';
+  noteEditorPreviewMode = false;
+  noteEditorPreview.classList.add('hidden');
+  noteEditorTextarea.classList.remove('hidden');
+  noteEditorGutter.style.display = '';
+  document.getElementById('note-editor-preview-btn').classList.remove('active');
 
   if (index >= 0) {
     const n = userData.notes[index];
     document.getElementById('note-title').value = n.title || '';
     document.getElementById('note-body').value = n.body || '';
     document.getElementById('note-tag').value = n.tag || '';
+    noteEditorOriginal = n.body || '';
   }
-  openModal('note-modal');
+
+  noteEditorOverlay.classList.remove('hidden');
+  noteEditorStatus.textContent = index >= 0 ? 'Editing' : 'New note';
+  updateNoteEditorInfo();
+  updateNoteEditorGutter();
+  noteEditorTextarea.focus();
 }
 
-document.getElementById('note-form').addEventListener('submit', async (e) => {
-  e.preventDefault();
+function closeNoteEditor() {
+  const body = noteEditorTextarea.value;
+  const title = document.getElementById('note-title').value.trim();
+  if ((body !== noteEditorOriginal || title) && body.trim()) {
+    if (!confirm('Discard unsaved changes?')) return;
+  }
+  noteEditorOverlay.classList.add('hidden');
+}
+
+async function saveNoteFromEditor() {
+  const title = document.getElementById('note-title').value.trim();
+  const body = noteEditorTextarea.value.trim();
+  const tag = document.getElementById('note-tag').value.trim();
   const index = parseInt(document.getElementById('note-edit-index').value);
+
+  if (!title) {
+    showToast('Please enter a title.', 'error');
+    document.getElementById('note-title').focus();
+    return;
+  }
+  if (!body) {
+    showToast('Please write some content.', 'error');
+    noteEditorTextarea.focus();
+    return;
+  }
+
   const note = {
-    title: document.getElementById('note-title').value.trim(),
-    body: document.getElementById('note-body').value.trim(),
-    tag: document.getElementById('note-tag').value.trim(),
+    title, body, tag,
     createdAt: index >= 0 ? (userData.notes[index]?.createdAt || new Date().toISOString()) : new Date().toISOString()
   };
 
@@ -1786,26 +1880,151 @@ document.getElementById('note-form').addEventListener('submit', async (e) => {
     }
     cacheData(userData);
     renderAll();
-    closeModal('note-modal');
+    noteEditorOriginal = body;
+    noteEditorOverlay.classList.add('hidden');
   } catch (err) {
     showToast('Failed to save note.', 'error');
   }
+}
+
+function updateNoteEditorInfo() {
+  const text = noteEditorTextarea.value;
+  noteEditorCharcount.textContent = `${text.length} chars`;
+  const pos = noteEditorTextarea.selectionStart;
+  const before = text.substring(0, pos);
+  const line = (before.match(/\n/g) || []).length + 1;
+  const col = pos - before.lastIndexOf('\n');
+  noteEditorLinecount.textContent = `Ln ${line}, Col ${col}`;
+  noteEditorModified.textContent = text !== noteEditorOriginal ? '\u25cf Unsaved' : '';
+}
+
+function updateNoteEditorGutter() {
+  const lines = noteEditorTextarea.value.split('\n').length;
+  const pos = noteEditorTextarea.selectionStart;
+  const currentLine = (noteEditorTextarea.value.substring(0, pos).match(/\n/g) || []).length + 1;
+  let html = '';
+  for (let i = 1; i <= lines; i++) {
+    html += `<span${i === currentLine ? ' class="active-line"' : ''}>${i}</span>`;
+  }
+  noteEditorGutter.innerHTML = html;
+}
+
+function syncGutterScroll() {
+  noteEditorGutter.scrollTop = noteEditorTextarea.scrollTop;
+}
+
+function updateNotePreview() {
+  if (!noteEditorPreviewMode) return;
+  const text = noteEditorTextarea.value;
+  let html = formatNoteContent(text);
+  // Convert line-level markdown
+  html = html.split('\n').map(line => {
+    if (line.startsWith('## ')) return `<h2>${line.slice(3)}</h2>`;
+    if (line.startsWith('- ')) return `<li>${line.slice(2)}</li>`;
+    return line;
+  }).join('\n');
+  html = html.replace(/\n/g, '<br>');
+  noteEditorPreview.innerHTML = html;
+}
+
+// Event listeners
+noteEditorTextarea.addEventListener('input', () => {
+  updateNoteEditorInfo();
+  updateNoteEditorGutter();
+  if (noteEditorPreviewMode) updateNotePreview();
 });
 
-// Note formatting toolbar
-document.querySelectorAll('.note-fmt-btn').forEach(btn => {
+noteEditorTextarea.addEventListener('scroll', syncGutterScroll);
+noteEditorTextarea.addEventListener('click', () => { updateNoteEditorInfo(); updateNoteEditorGutter(); });
+noteEditorTextarea.addEventListener('keyup', (e) => {
+  if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Home','End'].includes(e.key)) {
+    updateNoteEditorInfo();
+    updateNoteEditorGutter();
+  }
+});
+
+document.getElementById('note-editor-save').addEventListener('click', saveNoteFromEditor);
+document.getElementById('note-editor-cancel').addEventListener('click', closeNoteEditor);
+
+// Preview toggle
+document.getElementById('note-editor-preview-btn').addEventListener('click', () => {
+  noteEditorPreviewMode = !noteEditorPreviewMode;
+  document.getElementById('note-editor-preview-btn').classList.toggle('active', noteEditorPreviewMode);
+  if (noteEditorPreviewMode) {
+    updateNotePreview();
+    noteEditorPreview.classList.remove('hidden');
+    noteEditorTextarea.classList.add('hidden');
+    noteEditorGutter.style.display = 'none';
+  } else {
+    noteEditorPreview.classList.add('hidden');
+    noteEditorTextarea.classList.remove('hidden');
+    noteEditorGutter.style.display = '';
+    noteEditorTextarea.focus();
+  }
+});
+
+// Word wrap toggle
+document.getElementById('note-editor-wordwrap').addEventListener('click', function() {
+  noteEditorTextarea.classList.toggle('no-wrap');
+  this.classList.toggle('active', noteEditorTextarea.classList.contains('no-wrap'));
+});
+
+// Keyboard shortcuts inside editor
+noteEditorOverlay.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    e.preventDefault();
+    closeNoteEditor();
+    return;
+  }
+  if (e.ctrlKey && e.key === 's') {
+    e.preventDefault();
+    saveNoteFromEditor();
+    return;
+  }
+  if (e.ctrlKey && e.key === 'b') {
+    e.preventDefault();
+    applyNoteFormat('bold');
+    return;
+  }
+  if (e.ctrlKey && e.key === 'i') {
+    e.preventDefault();
+    applyNoteFormat('italic');
+    return;
+  }
+  // Tab key inserts spaces
+  if (e.key === 'Tab' && document.activeElement === noteEditorTextarea) {
+    e.preventDefault();
+    const start = noteEditorTextarea.selectionStart;
+    const end = noteEditorTextarea.selectionEnd;
+    noteEditorTextarea.setRangeText('    ', start, end, 'end');
+    updateNoteEditorInfo();
+    updateNoteEditorGutter();
+  }
+});
+
+// Formatting helper
+function applyNoteFormat(fmt) {
+  const textarea = noteEditorTextarea;
+  const start = textarea.selectionStart;
+  const end = textarea.selectionEnd;
+  const selected = textarea.value.substring(start, end);
+  let wrap = '';
+  if (fmt === 'bold') wrap = `**${selected || 'bold text'}**`;
+  else if (fmt === 'italic') wrap = `*${selected || 'italic text'}*`;
+  else if (fmt === 'code') wrap = '`' + (selected || 'code') + '`';
+  else if (fmt === 'heading') wrap = `## ${selected || 'Heading'}`;
+  else if (fmt === 'list') wrap = `- ${selected || 'List item'}`;
+  else if (fmt === 'link') wrap = `[${selected || 'text'}](url)`;
+  textarea.setRangeText(wrap, start, end, 'end');
+  textarea.focus();
+  updateNoteEditorInfo();
+  updateNoteEditorGutter();
+}
+
+// Toolbar format buttons
+document.querySelectorAll('.note-editor-toolbar .note-fmt-btn[data-fmt]').forEach(btn => {
   btn.addEventListener('click', () => {
-    const textarea = document.getElementById('note-body');
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const selected = textarea.value.substring(start, end);
-    const fmt = btn.getAttribute('data-fmt');
-    let wrap = '';
-    if (fmt === 'bold') wrap = `**${selected || 'bold text'}**`;
-    else if (fmt === 'italic') wrap = `*${selected || 'italic text'}*`;
-    else if (fmt === 'code') wrap = '`' + (selected || 'code') + '`';
-    textarea.setRangeText(wrap, start, end, 'end');
-    textarea.focus();
+    applyNoteFormat(btn.getAttribute('data-fmt'));
   });
 });
 
