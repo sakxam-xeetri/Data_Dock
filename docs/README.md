@@ -393,7 +393,8 @@ You are free to use, modify, and distribute it with attribution.
 
 <div align="center">
 
-Built with ❤️ and a love for retro terminals.
+Built with passion and need  
+come one if you came to the last buy me a coffe plz!!!
 
 **[landing.html](../landing.html) · [auth.html](../auth.html) · [dashboard.html](../dashboard.html)**
 
