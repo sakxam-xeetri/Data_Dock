@@ -1,0 +1,2024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DataDock — Retro Data Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Fira+Code:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ============================================================
+       DATADOCK — IMMERSIVE RETRO CONSOLE LANDING PAGE
+       ============================================================ */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --red:       #e52521;
+      --dark-red:  #9b1a17;
+      --gold:      #f7b731;
+      --dark-gold: #b88a20;
+      --blue:      #5b8dd9;
+      --sky:       #92c0e8;
+      --green:     #00a800;
+      --bg:        #0a0112;
+      --bg2:       #12031a;
+      --bg3:       #1a0520;
+      --dark:      #08010e;
+      --white:     #fcfcfc;
+      --cream:     #f8d8a0;
+      --muted:     #9a7080;
+      --neon-pink: #ff2d95;
+      --neon-cyan: #00fff7;
+    }
+
+    html { font-size: 14px; scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Fira Code', monospace;
+      background: var(--bg);
+      color: var(--white);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── CRT Scanline Overlay ────────────────────── */
+    .crt-overlay {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9999;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent, transparent 2px,
+        rgba(0,0,0,0.15) 2px, rgba(0,0,0,0.15) 4px
+      );
+    }
+    .crt-overlay::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.55) 100%);
+      pointer-events: none;
+    }
+    .crt-overlay::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(229,37,33,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(229,37,33,0.02) 1px, transparent 1px);
+      background-size: 4px 4px;
+      pointer-events: none;
+      animation: crt-flicker 0.15s infinite alternate;
+    }
+
+    @keyframes crt-flicker {
+      0% { opacity: 0.97; }
+      100% { opacity: 1; }
+    }
+
+    /* ── Pixel Grid Background ───────────────────── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 20% 50%, rgba(229,37,33,0.04) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(0,168,0,0.03) 0%, transparent 50%),
+        radial-gradient(circle at 50% 80%, rgba(247,183,49,0.03) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    a { color: var(--gold); text-decoration: none; transition: all .15s; }
+    a:hover { color: var(--white); text-shadow: 0 0 8px var(--gold); }
+
+    /* ── Containers ──────────────────────────────── */
+    .wrap { width: min(1140px, 93vw); margin: 0 auto; }
+
+    /* ── Pixel Buttons ───────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: .55rem;
+      padding: 11px 20px;
+      cursor: pointer;
+      text-decoration: none;
+      letter-spacing: .5px;
+      position: relative;
+      top: 0;
+      transition: top .08s, box-shadow .08s, background .1s;
+      border: none;
+      line-height: 1;
+      user-select: none;
+    }
+    .btn:active { top: 4px !important; }
+    .btn:hover { text-decoration: none; }
+
+    .btn-red {
+      background: var(--red);
+      color: var(--white);
+      border: 2px solid #ff6b65;
+      box-shadow: 0 4px 0 var(--dark-red), 0 0 0 transparent;
+    }
+    .btn-red:hover {
+      background: #ff3a35;
+      color: var(--white);
+      box-shadow: 0 4px 0 var(--dark-red), 0 0 20px rgba(229,37,33,.55);
+      text-shadow: 0 0 6px rgba(255,255,255,.5);
+    }
+    .btn-red:active { box-shadow: 0 0 0 var(--dark-red), 0 0 20px rgba(229,37,33,.55); }
+
+    .btn-gold {
+      background: var(--gold);
+      color: #1a0800;
+      border: 2px solid #ffd560;
+      box-shadow: 0 4px 0 var(--dark-gold);
+    }
+    .btn-gold:hover {
+      background: #ffc940;
+      color: #1a0800;
+      box-shadow: 0 4px 0 var(--dark-gold), 0 0 20px rgba(247,183,49,.5);
+    }
+    .btn-gold:active { box-shadow: 0 0 0 var(--dark-gold); }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--white);
+      border: 2px solid rgba(255,255,255,.3);
+      box-shadow: 0 4px 0 rgba(0,0,0,.5);
+    }
+    .btn-ghost:hover {
+      background: rgba(255,255,255,.06);
+      color: var(--white);
+      border-color: rgba(255,255,255,.6);
+      text-shadow: none;
+    }
+    .btn-ghost:active { box-shadow: 0 0 0 rgba(0,0,0,.5); }
+
+    .btn-green {
+      background: var(--green);
+      color: var(--white);
+      border: 2px solid #44dd44;
+      box-shadow: 0 4px 0 #005800;
+    }
+    .btn-green:hover {
+      box-shadow: 0 4px 0 #005800, 0 0 18px rgba(0,168,0,.5);
+    }
+    .btn-green:active { box-shadow: 0 0 0 #005800; }
+
+    /* ── Section Helpers ─────────────────────────── */
+    section { position: relative; z-index: 1; }
+    .section-header { text-align: center; margin-bottom: 50px; }
+
+    .section-tag {
+      display: inline-block;
+      font-family: 'Press Start 2P', monospace;
+      font-size: .45rem;
+      color: var(--green);
+      text-shadow: 0 0 12px var(--green);
+      letter-spacing: 3px;
+      margin-bottom: 14px;
+    }
+    .section-tag::before { content: '★ '; }
+    .section-tag::after  { content: ' ★'; }
+
+    .section-title {
+      font-family: 'Press Start 2P', monospace;
+      font-size: clamp(.68rem, 2vw, .95rem);
+      line-height: 2;
+      color: var(--white);
+      text-shadow: 2px 2px 0 rgba(229,37,33,.3);
+      margin-bottom: 10px;
+    }
+    .section-sub { font-size: .78rem; color: var(--muted); }
+
+    /* ── Animations ──────────────────────────────── */
+    @keyframes blink      { 50% { opacity: 0; } }
+    @keyframes pulse-glow { 0%,100% { filter: brightness(1); } 50% { filter: brightness(1.25); } }
+    @keyframes float      { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+    @keyframes slide-up   { from { opacity:0; transform: translateY(20px); } to { opacity:1; transform: translateY(0); } }
+    @keyframes coin-spin  { 0%,100% { transform: scaleX(1); } 50% { transform: scaleX(.2); } }
+    @keyframes shake      { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-3px)} 75%{transform:translateX(3px)} }
+    @keyframes scanline-move { 0% { background-position: 0 0; } 100% { background-position: 0 4px; } }
+    @keyframes neon-flicker { 0%,19%,21%,23%,25%,54%,56%,100% { text-shadow: 0 0 8px var(--neon-cyan), 0 0 20px var(--neon-cyan); } 20%,24%,55% { text-shadow: none; } }
+
+    /* ============================================================
+       HEADER — Console Top Bar
+       ============================================================ */
+    .console-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: linear-gradient(180deg, #0e0218 0%, var(--dark) 100%);
+      border-bottom: 3px solid var(--red);
+      box-shadow: 0 3px 0 var(--dark-red), 0 8px 30px rgba(229,37,33,.25);
+    }
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 64px;
+      gap: 12px;
+    }
+    .console-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: .82rem;
+      color: var(--gold);
+      text-shadow: 2px 2px 0 var(--dark-red), 0 0 18px rgba(247,183,49,.35);
+      text-decoration: none;
+    }
+    .logo-icon {
+      width: 40px; height: 40px;
+      background: var(--red);
+      border: 2px solid var(--gold);
+      box-shadow: 2px 2px 0 var(--dark-red), 0 0 12px rgba(229,37,33,.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      animation: pulse-glow 3s ease-in-out infinite;
+    }
+    .console-logo:hover { color: var(--white); text-shadow: 2px 2px 0 var(--red), 0 0 20px rgba(247,183,49,.5); }
+
+    .header-actions { display: flex; gap: 10px; align-items: center; }
+
+    .sound-toggle {
+      width: 38px; height: 38px;
+      background: rgba(255,255,255,.05);
+      border: 2px solid rgba(255,255,255,.15);
+      color: var(--gold);
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .15s;
+      font-family: inherit;
+    }
+    .sound-toggle:hover { background: rgba(255,255,255,.1); border-color: var(--gold); }
+    .sound-toggle.muted { color: var(--muted); border-color: rgba(255,255,255,.08); }
+
+    /* ============================================================
+       SCORE BAR — HUD Strip
+       ============================================================ */
+    .score-bar {
+      background: linear-gradient(90deg, var(--bg3) 0%, #1a0818 50%, var(--bg3) 100%);
+      border-bottom: 2px solid rgba(247,183,49,.12);
+      padding: 8px 0;
+    }
+    .score-bar-inner {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      flex-wrap: wrap;
+      font-family: 'Press Start 2P', monospace;
+      font-size: .44rem;
+      letter-spacing: 1px;
+    }
+    .s-item { color: var(--cream); white-space: nowrap; }
+    .s-item span { color: var(--gold); }
+    .s-item .blink { animation: blink 1s step-end infinite; }
+    .s-right { margin-left: auto; }
+    .s-item .status-dot {
+      display: inline-block;
+      width: 6px; height: 6px;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+      border-radius: 50%;
+      margin-right: 4px;
+      vertical-align: middle;
+    }
+
+    /* ============================================================
+       HERO SECTION
+       ============================================================ */
+    .hero {
+      padding: 40px 0 30px;
+      overflow: hidden;
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 30px;
+      align-items: start;
+    }
+
+    /* ── Hero Text ── */
+    .hero-text { padding-top: 10px; }
+    .term-prompt {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: .46rem;
+      color: var(--green);
+      text-shadow: 0 0 12px var(--green);
+      margin-bottom: 16px;
+      letter-spacing: 1px;
+    }
+    .term-prompt::before { content: '> '; color: var(--gold); }
+    .hero-title {
+      font-family: 'Press Start 2P', monospace;
+      font-size: clamp(.9rem, 2.8vw, 1.6rem);
+      line-height: 1.75;
+      margin-bottom: 22px;
+    }
+    .t-red  { color: var(--red);  text-shadow: 2px 2px 0 var(--dark-red), 0 0 15px rgba(229,37,33,.3); }
+    .t-gold { color: var(--gold); text-shadow: 2px 2px 0 var(--dark-gold), 0 0 15px rgba(247,183,49,.3); }
+    .t-blue { color: var(--sky);  text-shadow: 2px 2px 0 #2a5c99; }
+    .t-dim  { font-size: .6em; color: var(--muted); }
+
+    .hero-sub {
+      font-size: .8rem;
+      color: #c8a0b0;
+      line-height: 1.9;
+      margin-bottom: 26px;
+      max-width: 460px;
+      border-left: 3px solid var(--red);
+      padding-left: 16px;
+    }
+    .hero-sub-cursor::after {
+      content: '█';
+      color: var(--gold);
+      animation: blink .7s step-end infinite;
+    }
+
+    .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 28px; }
+
+    .hero-stats { display: flex; gap: 10px; flex-wrap: wrap; }
+    .stat-box {
+      padding: 10px 14px;
+      background: var(--bg3);
+      border: 2px solid rgba(247,183,49,.12);
+      border-left: 3px solid var(--gold);
+      min-width: 110px;
+      transition: all .2s;
+    }
+    .stat-box:hover {
+      border-color: rgba(247,183,49,.3);
+      box-shadow: 0 0 15px rgba(247,183,49,.1);
+    }
+    .stat-box strong {
+      display: block;
+      font-family: 'Press Start 2P', monospace;
+      font-size: .58rem;
+      color: var(--gold);
+      margin-bottom: 4px;
+    }
+    .stat-box span { font-size: .55rem; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+
+    /* ── NES Monitor Frame ── */
+    .monitor-frame {
+      background: #08020f;
+      border: 4px solid #4a2a20;
+      border-radius: 6px;
+      box-shadow:
+        0 0 0 2px #1a0808,
+        0 0 0 7px #2a1410,
+        inset 0 0 40px rgba(229,37,33,.06),
+        0 0 50px rgba(229,37,33,.12),
+        0 20px 50px rgba(0,0,0,.6);
+      overflow: hidden;
+      transition: box-shadow .3s;
+    }
+    .monitor-frame:hover {
+      box-shadow:
+        0 0 0 2px #1a0808,
+        0 0 0 7px #2a1410,
+        inset 0 0 40px rgba(229,37,33,.08),
+        0 0 70px rgba(229,37,33,.2),
+        0 20px 50px rgba(0,0,0,.6);
+    }
+
+    .monitor-bar {
+      background: linear-gradient(90deg, #1a0808, #2a1010, #1a0808);
+      height: 32px;
+      display: flex;
+      align-items: center;
+      padding: 0 14px;
+      gap: 8px;
+      border-bottom: 2px solid #2a1515;
+    }
+    .m-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .m-dot-r { background: var(--red);   box-shadow: 0 0 6px var(--red); }
+    .m-dot-y { background: var(--gold);  box-shadow: 0 0 6px var(--gold); }
+    .m-dot-g { background: var(--green); box-shadow: 0 0 6px var(--green); }
+    .m-dot-title {
+      margin-left: auto;
+      font-family: 'Press Start 2P', monospace;
+      font-size: .38rem;
+      color: #9a6070;
+      letter-spacing: 1.5px;
+    }
+
+    /* ── Game Canvas Area ── */
+    .game-area { position: relative; background: #000; }
+    #game-canvas {
+      display: block;
+      width: 100%;
+      aspect-ratio: 16/9;
+      image-rendering: pixelated;
+      background: #6b8cff;
+    }
+    .game-hud {
+      position: absolute; top: 0; left: 0; right: 0;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 7px 12px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: .4rem;
+      color: #fff;
+      text-shadow: 1px 1px 0 #000, 0 0 6px rgba(0,0,0,.5);
+      pointer-events: none;
+      z-index: 5;
+      background: linear-gradient(180deg, rgba(0,0,0,.35) 0%, transparent 100%);
+    }
+    .game-hud span { white-space: nowrap; }
+
+    /* ── Game Overlay ── */
+    .game-overlay {
+      position: absolute; inset: 0; z-index: 10;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      background: rgba(0,0,0,.8);
+      font-family: 'Press Start 2P', monospace;
+      color: #fff; text-align: center;
+      cursor: pointer;
+      backdrop-filter: blur(2px);
+    }
+    .game-overlay.hidden { display: none; }
+    .go-title {
+      font-size: .85rem;
+      color: var(--gold);
+      text-shadow: 2px 2px 0 var(--dark-red), 0 0 20px rgba(247,183,49,.4);
+      margin-bottom: 14px;
+    }
+    .go-sub { font-size: .4rem; color: #c8a0a8; margin-bottom: 7px; line-height: 1.8; }
+    .go-blink { font-size: .42rem; color: var(--green); animation: blink 1s step-end infinite; margin-top: 12px; text-shadow: 0 0 8px var(--green); }
+
+    /* ── Game Controls (touch/mobile) ── */
+    .game-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 12px;
+      background: linear-gradient(180deg, #12040a, #0a0208);
+      border-top: 2px solid #2a1515;
+      gap: 8px;
+    }
+    .gc-group { display: flex; gap: 6px; }
+    .gc-btn {
+      font-family: 'Press Start 2P', monospace;
+      font-size: .5rem;
+      color: #fff;
+      background: #2a1218;
+      border: 2px solid #4a2228;
+      padding: 10px 16px;
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+      transition: background .06s, box-shadow .06s;
+      line-height: 1;
+    }
+    .gc-btn:active, .gc-btn.active {
+      background: var(--red);
+      border-color: #ff6b65;
+      box-shadow: 0 0 12px rgba(229,37,33,.5), inset 0 0 6px rgba(255,255,255,.15);
+    }
+    .gc-btn.gc-jump { background: #1a1a08; border-color: #3a3a15; }
+    .gc-btn.gc-jump:active, .gc-btn.gc-jump.active {
+      background: var(--gold);
+      color: #1a0800;
+      border-color: #ffe060;
+      box-shadow: 0 0 12px rgba(247,183,49,.5);
+    }
+    .gc-btn.gc-action { background: var(--green); border-color: #44cc44; font-size: .42rem; }
+    .gc-btn.gc-action:active { background: #00cc00; box-shadow: 0 0 12px rgba(0,204,0,.5); }
+
+    /* ── Unlock Progress Bar ── */
+    .unlock-bar-wrap {
+      padding: 12px 14px;
+      background: #0e0310;
+      border-top: 1px solid rgba(247,183,49,.08);
+    }
+    .unlock-bar-label {
+      font-family: 'Press Start 2P', monospace;
+      font-size: .36rem;
+      color: var(--cream);
+      margin-bottom: 6px;
+      letter-spacing: 1px;
+    }
+    .unlock-bar-label span { color: var(--gold); }
+    .unlock-bar-bg {
+      height: 8px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.06);
+      overflow: hidden;
+    }
+    .unlock-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--red), var(--gold));
+      box-shadow: 0 0 8px rgba(229,37,33,.5);
+      width: 0%;
+      transition: width .5s ease;
+    }
+
+    /* ── Coin Divider ── */
+    .coin-divider {
+      text-align: center;
+      padding: 20px 0;
+      font-size: .85rem;
+      letter-spacing: 14px;
+      color: var(--gold);
+      opacity: .2;
+      animation: coin-spin 2s ease-in-out infinite;
+    }
+
+    /* ============================================================
+       FEATURES — Unlockable Power-Ups
+       ============================================================ */
+    .features-section {
+      padding: 70px 0;
+      background: linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);
+      border-top: 2px dashed rgba(247,183,49,.08);
+      border-bottom: 2px dashed rgba(247,183,49,.08);
+    }
+
+    .powerups-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 24px;
+    }
+
+    .powerup-card {
+      padding: 26px 22px 22px;
+      background: var(--bg3);
+      border: 2px solid rgba(247,183,49,.08);
+      border-top: 3px solid var(--red);
+      position: relative;
+      transition: all .3s ease;
+      overflow: hidden;
+    }
+    .powerup-card::before {
+      content: '?';
+      position: absolute;
+      top: -16px;
+      left: 16px;
+      width: 30px;
+      height: 30px;
+      background: var(--gold);
+      color: #1a0800;
+      font-family: 'Press Start 2P', monospace;
+      font-size: .55rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 2px 2px 0 var(--dark-gold);
+      border: 1px solid #ffe080;
+      line-height: 1;
+      transition: all .3s;
+    }
+    .powerup-card:hover {
+      border-color: rgba(229,37,33,.25);
+      box-shadow: 0 0 25px rgba(229,37,33,.1), 0 6px 20px rgba(0,0,0,.4);
+      transform: translateY(-4px);
+    }
+
+    .powerup-card.locked {
+      opacity: .45;
+      filter: grayscale(.5);
+    }
+    .powerup-card.locked::before {
+      content: '🔒';
+      background: #4a3a3a;
+      border-color: #6a5a5a;
+    }
+    .powerup-card.locked .pu-icon { filter: grayscale(1) brightness(.5); }
+    .powerup-card.locked h3,
+    .powerup-card.locked p { color: #5a4a50; }
+
+    .powerup-card.just-unlocked {
+      animation: shake .3s ease;
+      border-color: var(--gold) !important;
+      box-shadow: 0 0 30px rgba(247,183,49,.3), 0 0 60px rgba(247,183,49,.1) !important;
+    }
+    .powerup-card.just-unlocked::before {
+      content: '★';
+      background: var(--green);
+      border-color: #66ff66;
+      box-shadow: 0 0 12px var(--green);
+    }
+
+    .pu-icon {
+      font-size: 1.6rem;
+      margin-bottom: 14px;
+      display: block;
+      filter: drop-shadow(0 0 8px rgba(229,37,33,.4));
+      transition: filter .3s;
+    }
+    .powerup-card h3 {
+      font-family: 'Press Start 2P', monospace;
+      font-size: .52rem;
+      color: var(--gold);
+      margin-bottom: 10px;
+      line-height: 1.6;
+      transition: color .3s;
+    }
+    .powerup-card p {
+      font-size: .72rem;
+      color: var(--muted);
+      line-height: 1.8;
+      transition: color .3s;
+    }
+
+    /* ============================================================
+       LEVEL SELECT — How It Works
+       ============================================================ */
+    .how-section { padding: 70px 0; }
+
+    .levels-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+    }
+    .level-card {
+      padding: 30px 24px;
+      background: var(--bg2);
+      border: 2px solid rgba(247,183,49,.08);
+      text-align: center;
+      position: relative;
+      transition: all .25s;
+    }
+    .level-card:hover {
+      border-color: var(--red);
+      box-shadow: 0 0 25px rgba(229,37,33,.12);
+      transform: translateY(-4px);
+    }
+    .level-card:not(:last-child)::after {
+      content: '▶';
+      position: absolute;
+      right: -20px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gold);
+      font-size: .7rem;
+      z-index: 2;
+      text-shadow: 0 0 8px rgba(247,183,49,.4);
+    }
+    .lvl-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 54px; height: 54px;
+      background: var(--red);
+      border: 2px solid #ff6b65;
+      box-shadow: 3px 3px 0 var(--dark-red), 0 0 15px rgba(229,37,33,.25);
+      font-family: 'Press Start 2P', monospace;
+      font-size: .5rem;
+      color: var(--white);
+      margin-bottom: 20px;
+      animation: pulse-glow 4s ease-in-out infinite;
+    }
+    .level-card h3 {
+      font-family: 'Press Start 2P', monospace;
+      font-size: .52rem;
+      color: var(--white);
+      margin-bottom: 12px;
+      line-height: 1.7;
+    }
+    .level-card p { font-size: .74rem; color: var(--muted); line-height: 1.8; }
+
+    /* ============================================================
+       CTA Section
+       ============================================================ */
+    .cta-section {
+      padding: 80px 0;
+      background: linear-gradient(180deg, var(--bg) 0%, var(--bg3) 100%);
+    }
+    .cta-box {
+      text-align: center;
+      padding: 56px 44px;
+      background: var(--bg3);
+      border: 3px solid var(--red);
+      box-shadow:
+        0 0 0 1px var(--dark-red),
+        0 0 60px rgba(229,37,33,.1),
+        inset 0 0 80px rgba(229,37,33,.02);
+      position: relative;
+    }
+    .cta-box::before,
+    .cta-box::after {
+      content: '★';
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.5rem;
+      color: var(--gold);
+      opacity: .4;
+      animation: blink 1.5s step-end infinite;
+    }
+    .cta-box::before { left: 24px; }
+    .cta-box::after  { right: 24px; }
+
+    .cta-tag {
+      display: inline-block;
+      font-family: 'Press Start 2P', monospace;
+      font-size: .42rem;
+      color: var(--green);
+      letter-spacing: 3px;
+      text-shadow: 0 0 12px var(--green);
+      margin-bottom: 18px;
+      animation: blink 1s step-end infinite;
+    }
+    .cta-title {
+      font-family: 'Press Start 2P', monospace;
+      font-size: clamp(.65rem, 2.2vw, .95rem);
+      line-height: 1.85;
+      color: var(--white);
+      margin-bottom: 14px;
+    }
+    .cta-sub { font-size: .78rem; color: var(--muted); margin-bottom: 30px; }
+    .cta-hint {
+      font-family: 'Press Start 2P', monospace;
+      font-size: .38rem;
+      color: var(--muted);
+      margin-top: 22px;
+      letter-spacing: 2px;
+    }
+
+    /* ============================================================
+       FOOTER
+       ============================================================ */
+    .console-footer {
+      background: var(--dark);
+      border-top: 3px solid var(--red);
+      box-shadow: 0 -3px 0 var(--dark-red);
+      padding: 22px 0;
+    }
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .footer-inner p {
+      font-family: 'Press Start 2P', monospace;
+      font-size: .36rem;
+      color: #5a2a30;
+    }
+    .footer-link {
+      font-family: 'Press Start 2P', monospace;
+      font-size: .38rem;
+      color: var(--gold);
+      padding: 7px 14px;
+      border: 1px solid rgba(247,183,49,.2);
+      transition: all .15s;
+    }
+    .footer-link:hover { background: rgba(247,183,49,.06); color: var(--gold); box-shadow: 0 0 10px rgba(247,183,49,.15); text-shadow: none; }
+
+    /* ── Notification Toast ── */
+    .notification {
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      z-index: 10000;
+      font-family: 'Press Start 2P', monospace;
+      font-size: .42rem;
+      padding: 14px 20px;
+      background: linear-gradient(135deg, #1a0520, #2a0830);
+      border: 2px solid var(--gold);
+      color: var(--gold);
+      box-shadow: 0 0 20px rgba(247,183,49,.3), 0 8px 30px rgba(0,0,0,.5);
+      animation: slide-up .35s ease-out;
+      pointer-events: none;
+      max-width: 320px;
+      line-height: 1.8;
+    }
+    .notification.feat { border-color: var(--green); color: var(--green); box-shadow: 0 0 20px rgba(0,168,0,.3), 0 8px 30px rgba(0,0,0,.5); }
+
+    /* ============================================================
+       RESPONSIVE
+       ============================================================ */
+    @media (max-width: 860px) {
+      .hero-grid { grid-template-columns: 1fr; }
+      .hero-text { order: 2; text-align: center; }
+      .hero-text .hero-sub { margin-left: auto; margin-right: auto; border-left: none; border-top: 3px solid var(--red); padding-left: 0; padding-top: 14px; }
+      .hero-btns { justify-content: center; }
+      .hero-stats { justify-content: center; }
+      .monitor-frame { order: 1; max-width: 560px; margin: 0 auto; }
+      .levels-grid { grid-template-columns: 1fr; }
+      .level-card::after { display: none; }
+      .hero-title { font-size: .9rem; }
+      .header-actions .btn-ghost { display: none; }
+    }
+    @media (max-width: 520px) {
+      .powerups-grid { grid-template-columns: 1fr; }
+      .cta-box { padding: 36px 18px; }
+      .cta-box::before, .cta-box::after { display: none; }
+      .score-bar-inner { font-size: .38rem; gap: 12px; }
+      .gc-btn { padding: 12px 14px; font-size: .46rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CRT Overlay -->
+  <div class="crt-overlay"></div>
+
+  <!-- ═══════════ HEADER ═══════════ -->
+  <header class="console-header">
+    <div class="wrap header-inner">
+      <a href="index.html" class="console-logo">
+        <div class="logo-icon">🗄️</div>
+        DataDock
+      </a>
+      <div class="header-actions">
+        <button class="sound-toggle" id="sound-toggle" title="Toggle Sound">🔊</button>
+        <a class="btn btn-ghost" href="auth.html">LOGIN</a>
+        <a class="btn btn-red" href="auth.html">▶ START</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ═══════════ SCORE BAR ═══════════ -->
+  <div class="score-bar">
+    <div class="wrap score-bar-inner">
+      <div class="s-item">SCORE <span id="bar-score">000000</span></div>
+      <div class="s-item">★ × <span id="bar-coins">00</span></div>
+      <div class="s-item">WORLD <span id="bar-world">1-1</span></div>
+      <div class="s-item">LIVES <span id="bar-lives">♥♥♥</span></div>
+      <div class="s-item">TIME <span class="blink">∞</span></div>
+      <div class="s-item s-right"><span class="status-dot"></span>FEATURES <span id="bar-unlocked">0</span>/6</div>
+    </div>
+  </div>
+
+  <main>
+
+    <!-- ═══════════ HERO ═══════════ -->
+    <section class="hero">
+      <div class="wrap hero-grid">
+
+        <!-- Left: Product Info -->
+        <div class="hero-text">
+          <div class="term-prompt">DATADOCK v2.0 — SYSTEM READY</div>
+          <h1 class="hero-title">
+            <span class="t-red">ORGANIZE</span><br>
+            <span class="t-gold">CONTACTS</span>,<br>
+            <span class="t-blue">TEAMS</span> &amp; LINKS<br>
+            <span class="t-dim">IN ONE DASHBOARD</span>
+          </h1>
+          <p class="hero-sub hero-sub-cursor">
+            Secure Firebase workspace with personal auth, real-time sync, and a developer-first interface. Play the game to discover features
+          </p>
+          <div class="hero-btns">
+            <a class="btn btn-red" href="auth.html">🚀 LAUNCH APP</a>
+            <a class="btn btn-gold" href="#features">★ EXPLORE</a>
+          </div>
+          <div class="hero-stats">
+            <div class="stat-box"><strong>6</strong><span>Power-Ups</span></div>
+            <div class="stat-box"><strong>100%</strong><span>Frontend</span></div>
+            <div class="stat-box"><strong>1UP</strong><span>Private Space</span></div>
+          </div>
+        </div>
+
+        <!-- Right: Game Monitor -->
+        <div>
+          <div class="monitor-frame">
+            <div class="monitor-bar">
+              <div class="m-dot m-dot-r"></div>
+              <div class="m-dot m-dot-y"></div>
+              <div class="m-dot m-dot-g"></div>
+              <div class="m-dot-title">DATADOCK.EXE — WORLD <span id="monitor-world">1-1</span></div>
+            </div>
+            <div class="game-area">
+              <div class="game-hud">
+                <span id="hud-score">SCORE 0</span>
+                <span id="hud-coins">★ 0</span>
+                <span id="hud-level">W1-1</span>
+                <span id="hud-lives">♥♥♥</span>
+              </div>
+              <canvas id="game-canvas" width="640" height="360"></canvas>
+              <div class="game-overlay" id="game-overlay">
+                <div class="go-title">DATADOCK WORLD</div>
+                <div class="go-sub">COLLECT COINS TO UNLOCK FEATURES</div>
+                <div class="go-sub">ARROW KEYS / WASD + SPACE</div>
+                <div class="go-blink">► PRESS SPACE OR TAP TO PLAY</div>
+              </div>
+            </div>
+            <div class="game-controls">
+              <div class="gc-group">
+                <button class="gc-btn" id="btn-left">◀</button>
+                <button class="gc-btn" id="btn-right">▶</button>
+              </div>
+              <button class="gc-btn gc-action" id="btn-restart">↺</button>
+              <button class="gc-btn gc-jump" id="btn-jump">JUMP</button>
+            </div>
+            <div class="unlock-bar-wrap">
+              <div class="unlock-bar-label">FEATURES UNLOCKED: <span id="unlock-count">0</span>/6 — Collect <span id="coins-next">5</span> more ★</div>
+              <div class="unlock-bar-bg">
+                <div class="unlock-bar-fill" id="unlock-bar-fill"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="coin-divider">● ● ● ● ● ● ● ● ●</div>
+
+    <!-- ═══════════ FEATURES ═══════════ -->
+    <section id="features" class="features-section">
+      <div class="wrap">
+        <div class="section-header">
+          <div class="section-tag">POWER-UPS</div>
+          <h2 class="section-title">EVERYTHING YOU NEED FOR<br>PERSONAL DATA MANAGEMENT</h2>
+          <p class="section-sub">// collect coins in-game to unlock each feature</p>
+        </div>
+        <div class="powerups-grid" id="powerups-grid">
+          <article class="powerup-card locked" id="feat-0">
+            <span class="pu-icon">🔐</span>
+            <h3>SECURE AUTH</h3>
+            <p>Email/password and Google login with isolated per-user workspace and Firebase protection.</p>
+          </article>
+          <article class="powerup-card locked" id="feat-1">
+            <span class="pu-icon">👤</span>
+            <h3>CONTACT HUB</h3>
+            <p>Store complete profiles with role, social links, and personal notes. Full CRUD support.</p>
+          </article>
+          <article class="powerup-card locked" id="feat-2">
+            <span class="pu-icon">👥</span>
+            <h3>TEAM ORGANIZER</h3>
+            <p>Build team groups, add members, and keep collaboration details organized in one place.</p>
+          </article>
+          <article class="powerup-card locked" id="feat-3">
+            <span class="pu-icon">🔗</span>
+            <h3>LINK VAULT</h3>
+            <p>Save important URLs with quick copy actions and contextual notes for instant access.</p>
+          </article>
+          <article class="powerup-card locked" id="feat-4">
+            <span class="pu-icon">📦</span>
+            <h3>IMPORT &amp; EXPORT</h3>
+            <p>Backup your workspace as JSON and restore data with merge support anytime you need.</p>
+          </article>
+          <article class="powerup-card locked" id="feat-5">
+            <span class="pu-icon">⚡</span>
+            <h3>PRODUCTIVE UX</h3>
+            <p>Command palette, quick add, responsive layout, dark mode, and terminal-grade speed.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <div class="coin-divider">● ● ● ● ● ● ● ● ●</div>
+
+    <!-- ═══════════ LEVEL SELECT ═══════════ -->
+    <section class="how-section">
+      <div class="wrap">
+        <div class="section-header">
+          <div class="section-tag">LEVEL SELECT</div>
+          <h2 class="section-title">HOW DATADOCK WORKS</h2>
+        </div>
+        <div class="levels-grid">
+          <div class="level-card">
+            <div class="lvl-badge">1-1</div>
+            <h3>CREATE ACCOUNT</h3>
+            <p>Sign up with email/password or Google auth. Your private workspace is instantly ready.</p>
+          </div>
+          <div class="level-card">
+            <div class="lvl-badge">1-2</div>
+            <h3>BUILD DATA SPACE</h3>
+            <p>Add contacts, build team structures, save important links, notes, and API keys.</p>
+          </div>
+          <div class="level-card">
+            <div class="lvl-badge">1-3</div>
+            <h3>SEARCH &amp; EXPORT</h3>
+            <p>Find data instantly, copy details, and export full backups in JSON format anytime.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ CTA ═══════════ -->
+    <section class="cta-section">
+      <div class="wrap">
+        <div class="cta-box">
+          <div class="cta-tag">◀ PRESS START ▶</div>
+          <h2 class="cta-title">READY TO BUILD YOUR<br>PERSONAL DATA DOCK?</h2>
+          <p class="cta-sub">// start managing your information in a secure modern workspace</p>
+          <a class="btn btn-red" href="auth.html" style="font-size:.62rem;padding:14px 34px;">▶ START NOW</a>
+          <p class="cta-hint">© INSERT COIN TO CONTINUE</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="console-footer">
+    <div class="wrap footer-inner">
+      <p>© 2026 DATADOCK — BUILT WITH FIREBASE &amp; VANILLA JS</p>
+      <a class="footer-link" href="auth.html">▶ OPEN APP</a>
+    </div>
+  </footer>
+
+  <!-- Notification container -->
+  <div id="notif-container"></div>
+
+<script>
+/* ================================================================
+   DATADOCK — IMMERSIVE RETRO PLATFORMER + SOUND ENGINE
+   ================================================================ */
+(function(){
+  'use strict';
+
+  /* ────────────────────────────────────────────────────────────────
+     SOUND ENGINE — Web Audio API Procedural Chiptune
+     ──────────────────────────────────────────────────────────────── */
+  const Sound = {
+    ctx: null,
+    muted: false,
+    musicGain: null,
+    musicPlaying: false,
+    musicNodes: [],
+
+    init() {
+      if (this.ctx) return;
+      this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+      this.musicGain = this.ctx.createGain();
+      this.musicGain.gain.value = 0.12;
+      this.musicGain.connect(this.ctx.destination);
+    },
+
+    _tone(freq, dur, type, vol, delay) {
+      if (this.muted || !this.ctx) return;
+      const t = this.ctx.currentTime + (delay || 0);
+      const osc = this.ctx.createOscillator();
+      const g = this.ctx.createGain();
+      osc.type = type || 'square';
+      osc.frequency.setValueAtTime(freq, t);
+      g.gain.setValueAtTime(vol || 0.1, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+      osc.connect(g);
+      g.connect(this.ctx.destination);
+      osc.start(t);
+      osc.stop(t + dur);
+    },
+
+    _sweep(f1, f2, dur, type, vol) {
+      if (this.muted || !this.ctx) return;
+      const t = this.ctx.currentTime;
+      const osc = this.ctx.createOscillator();
+      const g = this.ctx.createGain();
+      osc.type = type || 'square';
+      osc.frequency.setValueAtTime(f1, t);
+      osc.frequency.linearRampToValueAtTime(f2, t + dur);
+      g.gain.setValueAtTime(vol || 0.08, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+      osc.connect(g);
+      g.connect(this.ctx.destination);
+      osc.start(t);
+      osc.stop(t + dur);
+    },
+
+    jump()     { this._sweep(300, 600, 0.15, 'square', 0.08); },
+    coin()     { this._tone(988, 0.07, 'square', 0.08); this._tone(1319, 0.12, 'square', 0.08, 0.07); },
+    stomp()    { this._sweep(400, 80, 0.12, 'square', 0.09); },
+    bump()     { this._tone(200, 0.06, 'triangle', 0.06); this._tone(260, 0.06, 'triangle', 0.06, 0.05); },
+    brick()    { this._sweep(500, 100, 0.1, 'sawtooth', 0.06); },
+    powerup()  { const n=[523,659,784,1047]; n.forEach((f,i)=>this._tone(f,0.12,'square',0.07,i*0.09)); },
+    death()    { const n=[494,466,440,392,349,330]; n.forEach((f,i)=>this._tone(f,0.18,'triangle',0.09,i*0.15)); },
+    levelClear(){ const n=[523,587,659,784,880,1047,1175,1319]; n.forEach((f,i)=>this._tone(f,0.1,'square',0.06,i*0.07)); },
+    uiClick()  { this._tone(800, 0.04, 'square', 0.04); },
+    unlock()   { const n=[659,784,988,1319]; n.forEach((f,i)=>this._tone(f,0.15,'square',0.08,i*0.1)); },
+
+    startMusic() {
+      if (this.muted || !this.ctx || this.musicPlaying) return;
+      this.musicPlaying = true;
+      this._playMusicLoop();
+    },
+
+    stopMusic() {
+      this.musicPlaying = false;
+      this.musicNodes.forEach(n => { try { n.stop(); } catch(e){} });
+      this.musicNodes = [];
+    },
+
+    _playMusicLoop() {
+      if (!this.musicPlaying || this.muted) return;
+      const t = this.ctx.currentTime;
+      // Simple bass line (C-C-F-F-G-G-C-C pattern, 2 bars)
+      const bass = [131,131,175,175,196,196,131,131, 131,131,175,175,196,196,131,131];
+      // Melody (catchy 8-bit tune)
+      const melody = [523,523,0,523,0,415,523,659, 0,330,0,392,0,330,0,262];
+      const bpm = 150;
+      const beat = 60 / bpm;
+      const half = beat / 2;
+      const loopLen = bass.length * half;
+
+      bass.forEach((f, i) => {
+        if (!f) return;
+        const osc = this.ctx.createOscillator();
+        const g = this.ctx.createGain();
+        osc.type = 'square';
+        osc.frequency.value = f;
+        g.gain.setValueAtTime(0.04, t + i * half);
+        g.gain.exponentialRampToValueAtTime(0.001, t + i * half + half * 0.9);
+        osc.connect(g);
+        g.connect(this.musicGain);
+        osc.start(t + i * half);
+        osc.stop(t + i * half + half * 0.95);
+        this.musicNodes.push(osc);
+      });
+
+      melody.forEach((f, i) => {
+        if (!f) return;
+        const osc = this.ctx.createOscillator();
+        const g = this.ctx.createGain();
+        osc.type = 'pulse' in OscillatorNode.prototype ? 'pulse' : 'square';
+        osc.frequency.value = f;
+        g.gain.setValueAtTime(0.025, t + i * half);
+        g.gain.exponentialRampToValueAtTime(0.001, t + i * half + half * 0.85);
+        osc.connect(g);
+        g.connect(this.musicGain);
+        osc.start(t + i * half);
+        osc.stop(t + i * half + half * 0.9);
+        this.musicNodes.push(osc);
+      });
+
+      setTimeout(() => {
+        this.musicNodes = [];
+        if (this.musicPlaying) this._playMusicLoop();
+      }, loopLen * 1000);
+    },
+
+    toggle() {
+      this.muted = !this.muted;
+      const btn = document.getElementById('sound-toggle');
+      if (this.muted) {
+        btn.textContent = '🔇';
+        btn.classList.add('muted');
+        this.stopMusic();
+      } else {
+        btn.textContent = '🔊';
+        btn.classList.remove('muted');
+      }
+    }
+  };
+
+  document.getElementById('sound-toggle').addEventListener('click', () => {
+    Sound.init();
+    Sound.toggle();
+  });
+
+  // UI click sounds on buttons
+  document.querySelectorAll('.btn, .footer-link').forEach(el => {
+    el.addEventListener('click', () => { Sound.init(); Sound.uiClick(); });
+  });
+
+  /* ────────────────────────────────────────────────────────────────
+     FEATURE UNLOCK SYSTEM
+     ──────────────────────────────────────────────────────────────── */
+  const featureNames = ['SECURE AUTH','CONTACT HUB','TEAM ORGANIZER','LINK VAULT','IMPORT & EXPORT','PRODUCTIVE UX'];
+  const COINS_PER_FEAT = 5;
+  let unlockedCount = 0;
+  let totalCoinsEver = 0;
+
+  function checkFeatureUnlock(totalCoins) {
+    totalCoinsEver = totalCoins;
+    const shouldUnlock = Math.min(6, Math.floor(totalCoins / COINS_PER_FEAT));
+    while (unlockedCount < shouldUnlock) {
+      unlockFeature(unlockedCount);
+      unlockedCount++;
+    }
+    updateUnlockUI(totalCoins);
+  }
+
+  function unlockFeature(idx) {
+    const card = document.getElementById('feat-' + idx);
+    if (!card) return;
+    card.classList.remove('locked');
+    card.classList.add('just-unlocked');
+    setTimeout(() => card.classList.remove('just-unlocked'), 1500);
+    Sound.unlock();
+    showNotification('★ UNLOCKED: ' + featureNames[idx] + ' ★', true);
+  }
+
+  function updateUnlockUI(totalCoins) {
+    const unlocked = Math.min(6, Math.floor(totalCoins / COINS_PER_FEAT));
+    const pct = Math.min(100, (totalCoins / (COINS_PER_FEAT * 6)) * 100);
+    document.getElementById('unlock-count').textContent = unlocked;
+    document.getElementById('bar-unlocked').textContent = unlocked;
+    document.getElementById('unlock-bar-fill').style.width = pct + '%';
+    const next = Math.max(0, (unlocked + 1) * COINS_PER_FEAT - totalCoins);
+    document.getElementById('coins-next').textContent = unlocked >= 6 ? '0' : next;
+  }
+
+  function showNotification(msg, isFeat) {
+    const c = document.getElementById('notif-container');
+    const el = document.createElement('div');
+    el.className = 'notification' + (isFeat ? ' feat' : '');
+    el.textContent = msg;
+    c.appendChild(el);
+    setTimeout(() => el.remove(), 3000);
+  }
+
+  /* ────────────────────────────────────────────────────────────────
+     GAME ENGINE — Enhanced Mario Platformer
+     ──────────────────────────────────────────────────────────────── */
+  const cvs = document.getElementById('game-canvas');
+  const ctx = cvs.getContext('2d');
+  const W = cvs.width, H = cvs.height;
+  const T = 16;
+
+  /* ── Palette ── */
+  const CL = {
+    sky:'#6b8cff', sky2:'#5070cc',
+    ground:'#c84c0c', groundTop:'#e09060', dirt:'#9c3800',
+    brick:'#c84c0c', brickLine:'#7a2800',
+    qBlock:'#f7b731', qHit:'#8a6a30', qDot:'#1a0800',
+    pipe:'#00a800', pipeDk:'#007800', pipeHi:'#44cc44',
+    coin:'#f7b731', coinHi:'#ffe080', coinDk:'#b88a20',
+    goomba:'#c84c0c', goombaDk:'#6b4400',
+    mRed:'#e52521', mSkin:'#ffa040', mHair:'#6b2900', mShoe:'#6b2900',
+    flag:'#00a800', flagPole:'#aaa', castle:'#9a7080', castleDk:'#6a5060',
+    cloud:'rgba(255,255,255,.65)', hill:'#00a800', hillDk:'#007800',
+    bush:'#00a800', bushDk:'#005800',
+    star:'#f7b731', white:'#fff', black:'#000',
+    mushroom:'#e52521', mushroomDot:'#fff'
+  };
+
+  /* ── Level Data ── */
+  // Legend: .=air g=ground B=brick ?=coin-block P=pipe-left p=pipe-right
+  //   1/2=pipe-bottom C=coin E=enemy F=flag *=castle |=flagpole M=mushroom-block S=star-coin
+  const LEVELS = [
+    // Level 1-1: Tutorial — easy, lots of coins
+    [
+      '...............................................................................................................................F...*',
+      '...............................................................................................................................|...*',
+      '...............................................................................................................................|...*',
+      '....................????...........C.C.C..........B??B...............????..........C.C.C.............B??B.........C..C..........|...*',
+      '....................C..C....................C.C..................C..C..C..C.....C.C.................C..C..C.....C..C...............|...*',
+      '.....................................BBB.................Pp...............BBB..............Pp.................BBB..................|...*',
+      '..........C.C.......................C.C.C......E...12.........E..........C.C.C......E...12........E.........C.C.C......E........|...*',
+      '......E.........Pp...........E......................E.........................................E.........Pp.......................E|...*',
+      '..............12.......................................................E.................................................12......|...*',
+      'ggggggggggggggggggggggggggg....gggggggggggggggggggggggggggg...ggggggggggggggggggggggggggggg....ggggggggggggggggggggggggggggggggggggg',
+      'ggggggggggggggggggggggggggg....gggggggggggggggggggggggggggg...ggggggggggggggggggggggggggggg....ggggggggggggggggggggggggggggggggggggg',
+    ],
+    // Level 1-2: Moderate — more gaps, more enemies
+    [
+      '...............................................................................................................................F...*',
+      '...............................................................................................................................|...*',
+      '...............................................................................................................................|...*',
+      '..............????..........BBB???BBB..........C.C.C............????BBB..........C.C...BB??BB............????...................|...*',
+      '..............C..C.....C.C...........C.C.......................................C..C.C.C.............C.C..C..C....................|...*',
+      '............................BBB..........Pp........Pp..........BBB...........Pp..........BBB...........Pp....BBB................|...*',
+      '..........C.C......E.........E.....12....E...12......E..........E......E......12...E.........E.......12........E...............|...*',
+      '......E.......Pp.....E.................E.............E......E............E..............E.....E....Pp........E..................|...*',
+      '...........12.......E.......E.......................................................E.......E..12.........E.....................|...*',
+      'ggggggggggggggggg...gggggg...gggggggggggggggggg...gggggg...gggggggggggg....ggggggggggggggggggg...gggggg...ggggggggggggggggggggggggggg',
+      'ggggggggggggggggg...gggggg...gggggggggggggggggg...gggggg...gggggggggggg....ggggggggggggggggggg...gggggg...ggggggggggggggggggggggggggg',
+    ],
+    // Level 1-3: Challenge — many enemies, tricky jumps
+    [
+      '...............................................................................................................................F...*',
+      '...............................................................................................................................|...*',
+      '...............................................................................................................................|...*',
+      '.............B??B??B..........C.C.C.C......BBB???BBB..........????..........BBB???BBB........C.C.C......BB????BB................|...*',
+      '.............C.C.C..C........C...........C.C.C............C..C..C..C..C.C.C...C..C.....C.C.C..........C.C.C..C..C..............|...*',
+      '..........................Pp...........Pp.........Pp......BBB.........Pp.........Pp...........Pp..........BBB.BBB..................|...*',
+      '......C.C..E...E.....12..E..E..E..12..E...E.12....E..E........E..E..12..E..E..12...E..E..12...E..E.........E..E..E....E.......|...*',
+      '...E.......E.Pp...E.........E............E..........E...E..E....E..........E...........E......E.Pp...E.........E...............|...*',
+      '.........12.......E..E...E...E.......E...E......E.....E......E..E...E...E.......E......E..12.......E..E...E....................|...*',
+      'gggggggggggggg....ggggg...ggggggggggg...ggggg...gggggg...ggggg...ggggggggggg...ggggg...ggggg....gggggggg...ggggggggggggggggggggggggg',
+      'gggggggggggggg....ggggg...ggggggggggg...ggggg...gggggg...ggggg...ggggggggggg...ggggg...ggggg....gggggggg...ggggggggggggggggggggggggg',
+    ]
+  ];
+
+  const ROWS = LEVELS[0].length;
+  const GROUND_Y = (ROWS - 2) * T;
+
+  /* ── Game State ── */
+  let platforms, coins, enemies, pipes, qBlocks, bricks, flagX, castleX;
+  let mario, cam, score, coinCount, lives, gameSt, winT, dieT, levelIdx, particles;
+  let totalCoinsCollected = 0;
+
+  function getCols() { return LEVELS[levelIdx][0].length; }
+  function getWorldW() { return getCols() * T; }
+
+  function parseLevel() {
+    const rows = LEVELS[levelIdx];
+    const cols = rows[0].length;
+    platforms=[]; coins=[]; enemies=[]; pipes=[]; qBlocks=[]; bricks=[];
+    flagX=0; castleX=0;
+    for (let r=0; r<ROWS; r++) {
+      for (let c=0; c<cols; c++) {
+        const ch=rows[r][c], x=c*T, y=r*T;
+        if (ch==='g') platforms.push({x,y,w:T,h:T,type:'ground'});
+        else if (ch==='B') { platforms.push({x,y,w:T,h:T,type:'brick'}); bricks.push({x,y,w:T,h:T,alive:true}); }
+        else if (ch==='?') { platforms.push({x,y,w:T,h:T,type:'qblock'}); qBlocks.push({x,y,w:T,h:T,hit:false,bounceT:0}); }
+        else if (ch==='C') coins.push({x:x+4,y:y+4,w:8,h:8,alive:true,t:Math.random()*6.28});
+        else if (ch==='E') enemies.push({x,y,w:T,h:T,vx:-0.6-(levelIdx*0.15),alive:true,squishT:0,type:'goomba'});
+        else if (ch==='P') pipes.push({x,y,part:'tl'});
+        else if (ch==='p') pipes.push({x,y,part:'tr'});
+        else if (ch==='1') pipes.push({x,y,part:'bl'});
+        else if (ch==='2') pipes.push({x,y,part:'br'});
+        else if (ch==='F') flagX=x;
+        else if (ch==='*') castleX=x;
+        if ('Pp12'.includes(ch)) platforms.push({x,y,w:T,h:T,type:'pipe'});
+      }
+    }
+  }
+
+  /* ── Mario ── */
+  function resetMario() {
+    mario = {
+      x:32, y:GROUND_Y-T, w:14, h:16,
+      vx:0, vy:0,
+      ax:0,
+      onGround:false, dir:1,
+      frame:0, frameT:0,
+      dead:false, invT:0,
+      jumpHeld:false, jumpTime:0
+    };
+  }
+
+  function initGame() {
+    levelIdx = 0;
+    parseLevel();
+    resetMario();
+    cam = {x:0, targetX:0};
+    score = 0; coinCount = 0; lives = 3;
+    particles = []; gameSt = 'title'; winT = 0; dieT = 0;
+    totalCoinsCollected = 0;
+    unlockedCount = 0;
+    // Reset feature cards to locked
+    for (let i=0;i<6;i++) {
+      const c = document.getElementById('feat-'+i);
+      if (c) { c.classList.add('locked'); c.classList.remove('just-unlocked'); }
+    }
+    updateHud();
+    updateUnlockUI(0);
+  }
+
+  function startLevel(idx) {
+    levelIdx = idx;
+    parseLevel();
+    resetMario();
+    cam = {x:0, targetX:0};
+    particles = [];
+    gameSt = 'play';
+    updateHud();
+    Sound.startMusic();
+  }
+
+  /* ── Input ── */
+  const keys = {left:false, right:false, jump:false, jumpPressed:false};
+
+  document.addEventListener('keydown', e => {
+    Sound.init();
+    if (e.key==='ArrowLeft'||e.key==='a') keys.left=true;
+    if (e.key==='ArrowRight'||e.key==='d') keys.right=true;
+    if (e.key==='ArrowUp'||e.key==='w'||e.key===' ') {
+      if (e.key===' ') e.preventDefault();
+      if (!keys.jump) keys.jumpPressed = true;
+      keys.jump = true;
+      if (gameSt==='title'||gameSt==='dead'||gameSt==='win') {
+        if (gameSt==='dead') initGame();
+        if (gameSt==='win') { /* after final level win, restart */ initGame(); }
+        gameSt='play'; hideOverlay();
+        Sound.startMusic();
+      }
+    }
+  });
+  document.addEventListener('keyup', e => {
+    if (e.key==='ArrowLeft'||e.key==='a') keys.left=false;
+    if (e.key==='ArrowRight'||e.key==='d') keys.right=false;
+    if (e.key==='ArrowUp'||e.key==='w'||e.key===' ') keys.jump=false;
+  });
+
+  // Touch/button controls
+  function bindBtn(id, key) {
+    const el = document.getElementById(id);
+    const on = () => { Sound.init(); keys[key]=true; if(key==='jump') keys.jumpPressed=true; el.classList.add('active'); };
+    const off = () => { keys[key]=false; el.classList.remove('active'); };
+    el.addEventListener('mousedown', on);
+    el.addEventListener('touchstart', e => { e.preventDefault(); on(); }, {passive:false});
+    document.addEventListener('mouseup', off);
+    document.addEventListener('touchend', off);
+  }
+  bindBtn('btn-left','left');
+  bindBtn('btn-right','right');
+  bindBtn('btn-jump','jump');
+
+  document.getElementById('btn-restart').addEventListener('click', () => {
+    Sound.init(); initGame(); gameSt='play'; hideOverlay(); Sound.startMusic();
+  });
+  document.getElementById('game-overlay').addEventListener('click', () => {
+    Sound.init();
+    if (gameSt==='title'||gameSt==='dead'||gameSt==='win') {
+      if (gameSt!=='title') initGame();
+      gameSt='play'; hideOverlay(); Sound.startMusic();
+    }
+  });
+
+  function hideOverlay() { document.getElementById('game-overlay').classList.add('hidden'); }
+  function showOverlay(title, sub) {
+    const o = document.getElementById('game-overlay');
+    o.classList.remove('hidden');
+    o.innerHTML = '<div class="go-title">'+title+'</div><div class="go-sub">'+sub+'</div><div class="go-blink">► PRESS SPACE OR TAP</div>';
+  }
+  function updateHud() {
+    document.getElementById('hud-score').textContent = 'SCORE '+score;
+    document.getElementById('hud-coins').textContent = '★ '+coinCount;
+    document.getElementById('hud-level').textContent = 'W1-'+(levelIdx+1);
+    document.getElementById('hud-lives').textContent = '♥'.repeat(Math.max(0,lives));
+    document.getElementById('bar-score').textContent = String(score).padStart(6,'0');
+    document.getElementById('bar-coins').textContent = String(coinCount).padStart(2,'0');
+    document.getElementById('bar-world').textContent = '1-'+(levelIdx+1);
+    document.getElementById('bar-lives').textContent = '♥'.repeat(Math.max(0,lives));
+    document.getElementById('monitor-world').textContent = '1-'+(levelIdx+1);
+  }
+
+  /* ── Collision ── */
+  function aabb(a,b) { return a.x<b.x+b.w && a.x+a.w>b.x && a.y<b.y+b.h && a.y+a.h>b.y; }
+
+  function resolveY() {
+    mario.onGround = false;
+    for (const p of platforms) {
+      if (!aabb(mario,p)) continue;
+      if (mario.vy >= 0) {
+        if (mario.y + mario.h - mario.vy*1.2 <= p.y+2) {
+          mario.y = p.y - mario.h;
+          mario.vy = 0;
+          mario.onGround = true;
+        }
+      } else {
+        if (mario.y - mario.vy*1.2 >= p.y + p.h - 2) {
+          mario.y = p.y + p.h;
+          mario.vy = 0;
+          headHit(p);
+        }
+      }
+    }
+  }
+
+  function resolveX() {
+    for (const p of platforms) {
+      if (!aabb(mario,p)) continue;
+      if (mario.vx > 0) mario.x = p.x - mario.w;
+      else if (mario.vx < 0) mario.x = p.x + p.w;
+      mario.vx = 0;
+    }
+  }
+
+  function headHit(p) {
+    for (const q of qBlocks) {
+      if (q.x===p.x && q.y===p.y && !q.hit) {
+        q.hit = true;
+        q.bounceT = 10;
+        score += 100;
+        coinCount++;
+        totalCoinsCollected++;
+        spawnCoinPop(q.x+4, q.y-14);
+        Sound.coin();
+        checkFeatureUnlock(totalCoinsCollected);
+        updateHud();
+        return;
+      }
+    }
+    for (const b of bricks) {
+      if (b.x===p.x && b.y===p.y && b.alive) {
+        b.alive = false;
+        const idx = platforms.indexOf(p);
+        if (idx>=0) platforms.splice(idx,1);
+        score += 50;
+        Sound.brick();
+        for (let i=0;i<6;i++) particles.push({
+          x:b.x+8, y:b.y+8,
+          vx:(Math.random()-0.5)*3.5, vy:-Math.random()*4.5-2,
+          life:28, color:CL.brick, size:4
+        });
+        updateHud();
+        return;
+      }
+    }
+    Sound.bump();
+  }
+
+  function spawnCoinPop(x,y) {
+    particles.push({x,y,vx:0,vy:-3.5,life:24,color:CL.coin,size:7,isCoin:true});
+    // "+100" text
+    particles.push({x:x-8,y:y-4,vx:0,vy:-1.2,life:35,isText:true,text:'+100',color:CL.white,size:0});
+  }
+
+  /* ── Update ── */
+  function update() {
+    if (gameSt!=='play') return;
+
+    // --- Smooth acceleration/deceleration ---
+    const accel = 0.35;
+    const maxSpd = 2.6 + levelIdx * 0.15;
+    const friction = 0.82;
+
+    if (keys.left) { mario.vx -= accel; mario.dir = -1; }
+    else if (keys.right) { mario.vx += accel; mario.dir = 1; }
+    else mario.vx *= friction;
+
+    if (mario.vx > maxSpd) mario.vx = maxSpd;
+    if (mario.vx < -maxSpd) mario.vx = -maxSpd;
+    if (Math.abs(mario.vx) < 0.15) mario.vx = 0;
+
+    // --- Variable jump height ---
+    if (keys.jumpPressed && mario.onGround) {
+      mario.vy = -6.2;
+      mario.onGround = false;
+      mario.jumpHeld = true;
+      mario.jumpTime = 0;
+      Sound.jump();
+    }
+    keys.jumpPressed = false;
+
+    if (mario.jumpHeld && keys.jump && mario.jumpTime < 12) {
+      mario.vy -= 0.35;
+      mario.jumpTime++;
+    }
+    if (!keys.jump) mario.jumpHeld = false;
+
+    // Gravity
+    mario.vy += 0.32;
+    if (mario.vy > 7) mario.vy = 7;
+
+    // Move X
+    mario.x += mario.vx;
+    if (mario.x < 0) mario.x = 0;
+    if (mario.x > getWorldW() - mario.w) mario.x = getWorldW() - mario.w;
+    resolveX();
+
+    // Move Y
+    mario.y += mario.vy;
+    resolveY();
+
+    // Fell into pit
+    if (mario.y > H + 50) { marioDie(); return; }
+
+    // Coins
+    for (const c of coins) {
+      if (c.alive && aabb(mario,c)) {
+        c.alive=false;
+        score+=200; coinCount++; totalCoinsCollected++;
+        spawnCoinPop(c.x, c.y-10);
+        Sound.coin();
+        checkFeatureUnlock(totalCoinsCollected);
+        updateHud();
+      }
+    }
+
+    // Enemies
+    for (const e of enemies) {
+      if (!e.alive) continue;
+      e.x += e.vx;
+      for (const p of platforms) {
+        if (aabb(e,p)) { e.vx *= -1; e.x += e.vx*2; break; }
+      }
+      let onPlat=false;
+      for (const p of platforms) {
+        if (e.x+e.w>p.x && e.x<p.x+p.w && Math.abs((e.y+e.h)-p.y)<3) {
+          onPlat=true; e.y=p.y-e.h;
+        }
+      }
+      if (!onPlat) e.y += 2.5;
+      // Mario vs enemy
+      if (aabb(mario,e)) {
+        if (mario.vy>0 && mario.y+mario.h-5<e.y+e.h/2) {
+          e.alive=false; e.squishT=18;
+          mario.vy=-5;
+          score+=100;
+          Sound.stomp();
+          particles.push({x:e.x,y:e.y,vx:0,vy:-1,life:22,isText:true,text:'+100',color:CL.white,size:0});
+          updateHud();
+        } else if (mario.invT<=0) {
+          marioDie(); return;
+        }
+      }
+    }
+
+    // Q-block bounce anim
+    for (const q of qBlocks) if (q.bounceT>0) q.bounceT--;
+    // Enemy squish timer
+    for (const e of enemies) if (e.squishT>0) e.squishT--;
+
+    // Flag reached
+    if (mario.x+mario.w>flagX && flagX>0 && gameSt==='play') {
+      score += 1000;
+      Sound.levelClear();
+      Sound.stopMusic();
+      updateHud();
+      if (levelIdx < LEVELS.length-1) {
+        gameSt='levelTransition';
+        winT=90;
+      } else {
+        gameSt='win'; winT=90;
+      }
+    }
+
+    // Camera (smooth follow)
+    cam.targetX = mario.x - W/3;
+    if (cam.targetX<0) cam.targetX=0;
+    if (cam.targetX>getWorldW()-W) cam.targetX=getWorldW()-W;
+    cam.x += (cam.targetX - cam.x) * 0.12;
+
+    // Sprite anim
+    if (mario.vx !== 0) {
+      mario.frameT++;
+      if (mario.frameT>5) { mario.frameT=0; mario.frame=(mario.frame+1)%4; }
+    } else {
+      mario.frame=0; mario.frameT=0;
+    }
+
+    // Invincibility
+    if (mario.invT>0) mario.invT--;
+
+    // Particles
+    for (const p of particles) {
+      p.x+=p.vx; p.y+=p.vy;
+      if (!p.isCoin && !p.isText) p.vy+=0.22;
+      p.life--;
+    }
+    particles=particles.filter(p=>p.life>0);
+
+    // Coin animation
+    for (const c of coins) if (c.alive) c.t += 0.08;
+  }
+
+  function marioDie() {
+    lives--;
+    Sound.death();
+    Sound.stopMusic();
+    updateHud();
+    if (lives<=0) {
+      gameSt='dead'; dieT=80;
+      setTimeout(() => showOverlay('GAME OVER','FINAL SCORE: '+score+' — ★ '+totalCoinsCollected+' collected'), 500);
+    } else {
+      resetMario();
+      mario.invT=100;
+      Sound.startMusic();
+    }
+  }
+
+  function updateTimers() {
+    if (gameSt==='win') {
+      winT--;
+      if (winT<=0) showOverlay('★ YOU WIN! ★','ALL WORLDS CLEARED! — SCORE: '+score);
+    }
+    if (gameSt==='levelTransition') {
+      winT--;
+      if (winT<=0) {
+        startLevel(levelIdx+1);
+        hideOverlay();
+      } else if (winT===60) {
+        showNotification('WORLD 1-'+(levelIdx+2)+' STARTING...', false);
+      }
+    }
+  }
+
+  /* ── Draw Helpers ── */
+  function dRect(x,y,w,h,c) { ctx.fillStyle=c; ctx.fillRect(Math.round(x-cam.x),Math.round(y),w,h); }
+
+  function drawBrick(bx,by) {
+    dRect(bx,by,T,T,CL.brick);
+    const sx=Math.round(bx-cam.x), sy=Math.round(by);
+    ctx.strokeStyle=CL.brickLine; ctx.lineWidth=1;
+    ctx.strokeRect(sx+.5,sy+.5,T-1,T-1);
+    ctx.beginPath();
+    ctx.moveTo(sx,sy+T/2); ctx.lineTo(sx+T,sy+T/2);
+    ctx.moveTo(sx+T/2,sy); ctx.lineTo(sx+T/2,sy+T/2);
+    ctx.moveTo(sx+T/4,sy+T/2); ctx.lineTo(sx+T/4,sy+T);
+    ctx.moveTo(sx+T*3/4,sy+T/2); ctx.lineTo(sx+T*3/4,sy+T);
+    ctx.stroke();
+  }
+
+  function drawQBlock(q) {
+    const by = q.bounceT>5 ? q.y-4 : q.bounceT>2 ? q.y-2 : q.y;
+    const c = q.hit ? CL.qHit : CL.qBlock;
+    dRect(q.x,by,T,T,c);
+    const sx=Math.round(q.x-cam.x), sy=Math.round(by);
+    ctx.strokeStyle=CL.coinDk; ctx.lineWidth=1;
+    ctx.strokeRect(sx+.5,sy+.5,T-1,T-1);
+    // Inner highlight
+    ctx.fillStyle = q.hit ? '#6a5020' : '#ffe880';
+    ctx.fillRect(sx+1,sy+1,T-2,2);
+    ctx.fillRect(sx+1,sy+1,2,T-2);
+    if (!q.hit) {
+      ctx.fillStyle=CL.qDot;
+      ctx.font='bold 10px "Press Start 2P"';
+      ctx.textAlign='center';
+      ctx.fillText('?',sx+T/2,sy+12);
+      ctx.textAlign='start';
+    }
+  }
+
+  function drawPipe(px,py,part) {
+    const sx=Math.round(px-cam.x), sy=Math.round(py);
+    if (part==='tl'||part==='tr') {
+      ctx.fillStyle=CL.pipe; ctx.fillRect(sx,sy,T,T);
+      ctx.fillStyle=CL.pipeHi; ctx.fillRect(sx,sy,T,3);
+      if (part==='tl') { ctx.fillStyle=CL.pipeDk; ctx.fillRect(sx,sy,3,T); }
+      if (part==='tr') { ctx.fillStyle=CL.pipeDk; ctx.fillRect(sx+T-3,sy,3,T); }
+    } else {
+      ctx.fillStyle=CL.pipe; ctx.fillRect(sx+2,sy,T-4,T);
+      ctx.fillStyle=CL.pipeDk; ctx.fillRect(sx+2,sy,2,T); ctx.fillRect(sx+T-4,sy,2,T);
+    }
+  }
+
+  function drawMario() {
+    if (mario.invT>0 && mario.invT%4<2) return;
+    const sx=Math.round(mario.x-cam.x), sy=Math.round(mario.y);
+    const d=mario.dir, f=mario.onGround?mario.frame:1;
+    // Hat
+    ctx.fillStyle=CL.mRed;
+    ctx.fillRect(sx+2,sy,10,5);
+    if (d>0) ctx.fillRect(sx,sy+2,14,3);
+    else ctx.fillRect(sx,sy+2,14,3);
+    // Face
+    ctx.fillStyle=CL.mSkin;
+    ctx.fillRect(sx+(d>0?10:0),sy+3,4,5);
+    ctx.fillRect(sx+4,sy+5,6,3);
+    // Eye
+    ctx.fillStyle=CL.black;
+    ctx.fillRect(sx+(d>0?11:2),sy+4,2,2);
+    // Body/overalls
+    ctx.fillStyle=CL.mRed;
+    ctx.fillRect(sx+2,sy+8,10,5);
+    // Belt
+    ctx.fillStyle=CL.gold;
+    ctx.fillRect(sx+4,sy+8,6,1);
+    // Legs
+    ctx.fillStyle=CL.mSkin;
+    const legOffset = f===2 ? 2 : f===3 ? -1 : 0;
+    ctx.fillRect(sx+2+legOffset,sy+12,4,3);
+    ctx.fillRect(sx+8-legOffset,sy+12,4,3);
+    // Shoes
+    ctx.fillStyle=CL.mShoe;
+    ctx.fillRect(sx+1+legOffset,sy+14,5,2);
+    ctx.fillRect(sx+8-legOffset,sy+14,5,2);
+  }
+
+  function drawGoomba(e) {
+    const sx=Math.round(e.x-cam.x), sy=Math.round(e.y);
+    if (!e.alive && e.squishT>0) {
+      ctx.fillStyle=CL.goomba; ctx.fillRect(sx,sy+T-4,T,4);
+      return;
+    }
+    if (!e.alive) return;
+    // Head
+    ctx.fillStyle=CL.goomba;
+    ctx.fillRect(sx+2,sy,12,8);
+    ctx.fillRect(sx,sy+4,T,6);
+    // Feet
+    ctx.fillStyle=CL.goombaDk;
+    const walk = Math.floor(Date.now()/200)%2;
+    ctx.fillRect(sx+1-(walk?1:0),sy+10,5,6);
+    ctx.fillRect(sx+10+(walk?1:0),sy+10,5,6);
+    // Eyes
+    ctx.fillStyle=CL.white;
+    ctx.fillRect(sx+3,sy+3,4,4);
+    ctx.fillRect(sx+9,sy+3,4,4);
+    ctx.fillStyle=CL.black;
+    ctx.fillRect(sx+4+(e.vx>0?1:0),sy+4,2,3);
+    ctx.fillRect(sx+10+(e.vx>0?1:0),sy+4,2,3);
+    // Angry brows
+    ctx.fillStyle=CL.goombaDk;
+    ctx.fillRect(sx+3,sy+2,4,1);
+    ctx.fillRect(sx+9,sy+2,4,1);
+  }
+
+  /* ── Parallax Background ── */
+  function drawBg() {
+    // Sky gradient
+    const grad = ctx.createLinearGradient(0,0,0,H);
+    grad.addColorStop(0, levelIdx===0?'#6b8cff':levelIdx===1?'#4a3880':'#1a1040');
+    grad.addColorStop(1, levelIdx===0?'#92c0e8':levelIdx===1?'#6b5090':'#2a1855');
+    ctx.fillStyle=grad; ctx.fillRect(0,0,W,H);
+
+    // Stars (for levels 2,3)
+    if (levelIdx>0) {
+      ctx.fillStyle='rgba(255,255,255,.6)';
+      for (let i=0;i<30;i++) {
+        const sx=((i*73+17)%W + cam.x*0.02*((i%3)+1))%W;
+        const sy=(i*47+23)%((GROUND_Y-20));
+        ctx.fillRect(sx,sy,Math.sin(Date.now()/500+i)>0?2:1,Math.sin(Date.now()/500+i)>0?2:1);
+      }
+    }
+
+    // Hills (parallax layer 1)
+    const p1 = cam.x * 0.2;
+    ctx.fillStyle = levelIdx===0?CL.hill:levelIdx===1?'#3a2860':'#1a1030';
+    drawHill(120-p1%(W+200),GROUND_Y,100,50);
+    drawHill(380-p1%(W+200),GROUND_Y,70,35);
+    drawHill(580-p1%(W+200),GROUND_Y,90,42);
+    drawHill(800-p1%(W+200),GROUND_Y,65,30);
+
+    // Bushes (parallax layer 2)
+    const p2 = cam.x * 0.35;
+    ctx.fillStyle = levelIdx===0?CL.bushDk:levelIdx===1?'#2a1850':'#120828';
+    drawBush(60-p2%(W+150),GROUND_Y,50,18);
+    drawBush(250-p2%(W+150),GROUND_Y,35,12);
+    drawBush(450-p2%(W+150),GROUND_Y,45,15);
+    drawBush(650-p2%(W+150),GROUND_Y,40,14);
+
+    // Clouds (parallax layer 0)
+    const cp = cam.x * 0.08;
+    ctx.fillStyle = levelIdx===0?CL.cloud:'rgba(200,180,220,.3)';
+    drawCloud(90-cp%(W+100), 30);
+    drawCloud(240-cp%(W+100), 55);
+    drawCloud(420-cp%(W+100), 22);
+    drawCloud(590-cp%(W+100), 48);
+
+    // Ground fill below tiles
+    ctx.fillStyle = levelIdx===0?CL.ground:levelIdx===1?'#4a3070':'#2a1840';
+    ctx.fillRect(0,GROUND_Y,W,H-GROUND_Y);
+  }
+
+  function drawHill(x,gy,w,h) {
+    ctx.beginPath();
+    ctx.moveTo(x-w/2,gy);
+    ctx.quadraticCurveTo(x,gy-h*2,x+w/2,gy);
+    ctx.fill();
+  }
+  function drawBush(x,gy,w,h) {
+    ctx.beginPath();
+    ctx.ellipse(x,gy,w/2,h,0,Math.PI,0);
+    ctx.fill();
+  }
+  function drawCloud(x,y) {
+    ctx.beginPath();
+    ctx.arc(x,y,14,0,Math.PI*2);
+    ctx.arc(x+16,y-5,11,0,Math.PI*2);
+    ctx.arc(x+30,y,14,0,Math.PI*2);
+    ctx.fill();
+  }
+
+  /* ── Main Draw ── */
+  function draw() {
+    drawBg();
+
+    // Ground tiles
+    for (const p of platforms) {
+      if (p.x+p.w<cam.x-T||p.x>cam.x+W+T) continue;
+      if (p.type==='ground') {
+        dRect(p.x,p.y,p.w,p.h, levelIdx===0?CL.ground:levelIdx===1?'#4a3070':'#2a1840');
+        dRect(p.x,p.y,p.w,3, levelIdx===0?CL.groundTop:levelIdx===1?'#7a5090':'#4a2860');
+        // Dirt pattern
+        const sx=Math.round(p.x-cam.x), sy=Math.round(p.y);
+        ctx.fillStyle = levelIdx===0?CL.dirt:levelIdx===1?'#3a2058':'#1a0830';
+        if ((Math.floor(p.x/T)+Math.floor(p.y/T))%3===0) ctx.fillRect(sx+4,sy+8,3,3);
+        if ((Math.floor(p.x/T)+Math.floor(p.y/T))%5===0) ctx.fillRect(sx+10,sy+6,2,2);
+      }
+    }
+
+    // Bricks
+    for (const b of bricks) {
+      if (!b.alive||b.x+b.w<cam.x-T||b.x>cam.x+W+T) continue;
+      drawBrick(b.x,b.y);
+    }
+
+    // Q-blocks
+    for (const q of qBlocks) {
+      if (q.x+q.w<cam.x-T||q.x>cam.x+W+T) continue;
+      drawQBlock(q);
+    }
+
+    // Pipes
+    for (const p of pipes) {
+      if (p.x+T<cam.x-T||p.x>cam.x+W+T) continue;
+      drawPipe(p.x,p.y,p.part);
+    }
+
+    // Coins (animated spinning)
+    for (const c of coins) {
+      if (!c.alive||c.x<cam.x-T||c.x>cam.x+W+T) continue;
+      const sx=Math.round(c.x-cam.x), sy=Math.round(c.y);
+      const scaleX = Math.abs(Math.cos(c.t));
+      const cw = Math.max(2, Math.round(c.w * scaleX));
+      const cx = sx + (c.w - cw)/2;
+      ctx.fillStyle=CL.coin;
+      ctx.fillRect(cx, sy, cw, c.h);
+      if (scaleX > 0.5) {
+        ctx.fillStyle=CL.coinHi;
+        ctx.fillRect(cx+1,sy+1,Math.max(1,cw-3),3);
+      }
+    }
+
+    // Flag
+    if (flagX>0 && flagX>cam.x-T*2 && flagX<cam.x+W+T) {
+      const fx=Math.round(flagX-cam.x)+7;
+      ctx.fillStyle=CL.flagPole;
+      ctx.fillRect(fx,14,3,GROUND_Y-14);
+      // Flag cloth with wave
+      ctx.fillStyle=CL.flag;
+      const wave = Math.sin(Date.now()/300)*2;
+      ctx.beginPath();
+      ctx.moveTo(fx,22);
+      ctx.lineTo(fx-14+wave,27);
+      ctx.lineTo(fx-12,32);
+      ctx.lineTo(fx,32);
+      ctx.fill();
+      // Ball on top
+      ctx.fillStyle=CL.gold;
+      ctx.beginPath();
+      ctx.arc(fx+1,14,3,0,Math.PI*2);
+      ctx.fill();
+    }
+
+    // Castle
+    if (castleX>0 && castleX>cam.x-T*4 && castleX<cam.x+W+T) {
+      const cx=Math.round(castleX-cam.x);
+      ctx.fillStyle=CL.castle;
+      ctx.fillRect(cx,GROUND_Y-42,42,42);
+      ctx.fillRect(cx+11,GROUND_Y-58,20,20);
+      // Battlements
+      ctx.fillStyle=CL.castleDk;
+      for (let i=0;i<4;i++) ctx.fillRect(cx+i*12,GROUND_Y-48,6,6);
+      ctx.fillRect(cx+11,GROUND_Y-64,6,6);
+      ctx.fillRect(cx+25,GROUND_Y-64,6,6);
+      // Door
+      ctx.fillStyle='#2a1020';
+      ctx.fillRect(cx+15,GROUND_Y-20,12,20);
+      ctx.beginPath();
+      ctx.arc(cx+21,GROUND_Y-20,6,Math.PI,0);
+      ctx.fill();
+      // Window
+      ctx.fillStyle=CL.gold;
+      ctx.fillRect(cx+18,GROUND_Y-52,6,6);
+    }
+
+    // Enemies
+    for (const e of enemies) {
+      if ((e.squishT>0||e.alive) && e.x+e.w>=cam.x-T && e.x<=cam.x+W+T) drawGoomba(e);
+    }
+
+    // Mario
+    drawMario();
+
+    // Particles
+    for (const p of particles) {
+      if (p.isText) {
+        ctx.fillStyle=p.color;
+        ctx.font='bold 8px "Press Start 2P"';
+        ctx.textAlign='center';
+        ctx.globalAlpha=Math.min(1,p.life/15);
+        ctx.fillText(p.text, Math.round(p.x-cam.x), Math.round(p.y));
+        ctx.globalAlpha=1;
+        ctx.textAlign='start';
+      } else if (p.isCoin) {
+        ctx.fillStyle=CL.coin;
+        ctx.fillRect(Math.round(p.x-cam.x),Math.round(p.y),p.size,p.size);
+        ctx.fillStyle=CL.coinHi;
+        ctx.fillRect(Math.round(p.x-cam.x)+1,Math.round(p.y)+1,3,3);
+      } else {
+        ctx.globalAlpha=Math.min(1,p.life/10);
+        ctx.fillStyle=p.color;
+        ctx.fillRect(Math.round(p.x-cam.x),Math.round(p.y),p.size,p.size);
+        ctx.globalAlpha=1;
+      }
+    }
+
+    // Level transition overlay
+    if (gameSt==='levelTransition' && winT>30) {
+      ctx.fillStyle='rgba(0,0,0,'+(1-(winT-30)/60)+')';
+      ctx.fillRect(0,0,W,H);
+      if (winT<60) {
+        ctx.fillStyle=CL.white;
+        ctx.font='10px "Press Start 2P"';
+        ctx.textAlign='center';
+        ctx.fillText('WORLD 1-'+(levelIdx+2), W/2, H/2);
+        ctx.textAlign='start';
+      }
+    }
+  }
+
+  /* ── Game Loop ── */
+  function loop() {
+    update();
+    updateTimers();
+    draw();
+    requestAnimationFrame(loop);
+  }
+
+  initGame();
+  loop();
+
+})();
+</script>
+
+</body>
+</html>
