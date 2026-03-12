@@ -637,6 +637,39 @@
     .dash-recent-icon { width: 26px !important; height: 26px !important; font-size: 0.72rem !important; }
     .dash-recent-name { font-size: 0.78rem !important; }
     .dash-recent-detail { font-size: 0.68rem !important; }
+
+    /* ── Scrollable list container (professional override) ── */
+    .scrollable-list-container {
+      max-height: 75vh;
+      border-radius: var(--pro-radius, 12px);
+    }
+    .scrollable-list-container::-webkit-scrollbar-thumb {
+      background: rgba(99, 102, 241, 0.25) !important;
+    }
+    .scrollable-list-container::-webkit-scrollbar-thumb:hover {
+      background: rgba(99, 102, 241, 0.45) !important;
+    }
+    .scrollable-list-container {
+      scrollbar-color: rgba(99, 102, 241, 0.25) rgba(255, 255, 255, 0.03) !important;
+    }
+    .scrollable-list-container::after {
+      background: linear-gradient(to top, var(--pro-bg-primary, #0f1219), transparent) !important;
+    }
+    .scroll-to-top-btn {
+      border-color: rgba(99, 102, 241, 0.3) !important;
+      color: var(--pro-accent, #818cf8) !important;
+      background: rgba(15, 18, 25, 0.92) !important;
+    }
+    .scroll-to-top-btn:hover {
+      background: rgba(99, 102, 241, 0.12) !important;
+      border-color: rgba(99, 102, 241, 0.5) !important;
+    }
+    .item-count-badge {
+      background: rgba(99, 102, 241, 0.1) !important;
+      color: var(--pro-accent, #818cf8) !important;
+      font-family: var(--pro-font) !important;
+    }
+
     /* Calendar widget optimised size */
     .dash-cal-day { padding: 4px 1px !important; font-size: 0.68rem !important; }
     .dash-cal-wday { font-size: 0.58rem !important; padding: 2px 0 !important; }
@@ -817,6 +850,290 @@
       background: #0c0e14;
       border-radius: 0 0 12px 12px;
       flex-shrink: 0;
+    }
+
+    /* ── Fullscreen Note Editor ── */
+    .note-editor-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      background: rgba(5, 7, 12, 0.92);
+      backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: noteEditorFadeIn 0.25s ease;
+    }
+    .note-editor-overlay.hidden { display: none; }
+
+    @keyframes noteEditorFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .note-editor {
+      width: 94vw;
+      height: 92vh;
+      max-width: 1200px;
+      display: flex;
+      flex-direction: column;
+      background: var(--pro-bg-primary, #0f1219);
+      border: 1px solid var(--pro-border, #1e2030);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(99, 102, 241, 0.08);
+    }
+
+    /* Title bar */
+    .note-editor-titlebar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--pro-border, #1e2030);
+      background: rgba(15, 18, 25, 0.8);
+      gap: 12px;
+      flex-shrink: 0;
+    }
+    .note-editor-titlebar-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      min-width: 0;
+    }
+    .note-editor-icon {
+      color: var(--pro-accent, #818cf8);
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+    .note-editor-title-input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--pro-text-primary, #e2e4ed);
+      font-family: var(--pro-font) !important;
+      font-size: 1.1rem;
+      font-weight: 600;
+      flex: 1;
+      min-width: 0;
+      padding: 4px 0;
+    }
+    .note-editor-title-input::placeholder {
+      color: var(--pro-text-muted, #4a4e66);
+    }
+    .note-editor-tag-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(99, 102, 241, 0.06);
+      border: 1px solid rgba(99, 102, 241, 0.15);
+      border-radius: 6px;
+      padding: 4px 10px;
+      flex-shrink: 0;
+    }
+    .note-editor-tag-wrapper i {
+      color: var(--pro-accent, #818cf8);
+      font-size: 0.7rem;
+    }
+    .note-editor-tag-input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--pro-accent, #818cf8);
+      font-family: var(--pro-font) !important;
+      font-size: 0.75rem;
+      width: 120px;
+    }
+    .note-editor-tag-input::placeholder {
+      color: rgba(129, 140, 248, 0.4);
+    }
+    .note-editor-titlebar-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-family: var(--pro-font) !important;
+      font-size: 0.72rem;
+      color: var(--pro-text-muted, #5e6380);
+      flex-shrink: 0;
+    }
+    .note-editor-status {
+      color: var(--pro-success, #34d399);
+    }
+
+    /* Toolbar */
+    .note-editor-toolbar {
+      display: flex;
+      align-items: center;
+      padding: 6px 16px;
+      border-bottom: 1px solid var(--pro-border, #1e2030);
+      background: rgba(15, 18, 25, 0.5);
+      gap: 4px;
+      flex-shrink: 0;
+    }
+    .note-editor-toolbar .note-fmt-btn {
+      background: transparent !important;
+      border: 1px solid transparent !important;
+      color: var(--pro-text-secondary, #9499b0) !important;
+      padding: 6px 10px !important;
+      border-radius: 6px !important;
+      font-size: 0.78rem !important;
+      transition: all 0.15s !important;
+    }
+    .note-editor-toolbar .note-fmt-btn:hover {
+      background: rgba(99, 102, 241, 0.08) !important;
+      color: var(--pro-accent, #818cf8) !important;
+      border-color: rgba(99, 102, 241, 0.2) !important;
+    }
+    .note-editor-toolbar .note-fmt-btn.active {
+      background: rgba(99, 102, 241, 0.12) !important;
+      color: var(--pro-accent, #818cf8) !important;
+    }
+    .note-editor-toolbar-group {
+      display: flex;
+      gap: 2px;
+    }
+    .note-editor-toolbar-separator {
+      width: 1px;
+      height: 20px;
+      background: var(--pro-border, #1e2030);
+      margin: 0 8px;
+    }
+    .note-editor-toolbar-actions {
+      margin-left: auto;
+      display: flex;
+      gap: 8px;
+    }
+
+    /* Editor body */
+    .note-editor-body {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+      position: relative;
+    }
+    .note-editor-gutter {
+      width: 52px;
+      flex-shrink: 0;
+      background: rgba(10, 12, 18, 0.6);
+      border-right: 1px solid var(--pro-border, #1e2030);
+      padding: 16px 0;
+      overflow: hidden;
+      user-select: none;
+      font-family: 'IBM Plex Mono', 'Fira Code', monospace;
+      font-size: 0.72rem;
+      color: var(--pro-text-muted, #3a3e56);
+      text-align: right;
+      line-height: 1.7;
+    }
+    .note-editor-gutter span {
+      display: block;
+      padding-right: 12px;
+    }
+    .note-editor-gutter span.active-line {
+      color: var(--pro-accent, #818cf8);
+    }
+    .note-editor-textarea {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      resize: none;
+      color: var(--pro-text-primary, #e2e4ed);
+      font-family: 'IBM Plex Mono', 'Fira Code', monospace;
+      font-size: 0.88rem;
+      line-height: 1.7;
+      padding: 16px 20px;
+      tab-size: 4;
+      white-space: pre-wrap;
+      word-break: break-word;
+      overflow-y: auto;
+    }
+    .note-editor-textarea::placeholder {
+      color: var(--pro-text-muted, #3a3e56);
+    }
+    .note-editor-textarea.no-wrap {
+      white-space: pre;
+      overflow-x: auto;
+    }
+    /* Scrollbar */
+    .note-editor-textarea::-webkit-scrollbar { width: 6px; }
+    .note-editor-textarea::-webkit-scrollbar-track { background: transparent; }
+    .note-editor-textarea::-webkit-scrollbar-thumb {
+      background: rgba(99, 102, 241, 0.2);
+      border-radius: 3px;
+    }
+    .note-editor-textarea::-webkit-scrollbar-thumb:hover {
+      background: rgba(99, 102, 241, 0.4);
+    }
+
+    /* Preview pane */
+    .note-editor-preview {
+      flex: 1;
+      padding: 20px 24px;
+      overflow-y: auto;
+      font-family: var(--pro-font) !important;
+      font-size: 0.88rem;
+      line-height: 1.8;
+      color: var(--pro-text-primary, #e2e4ed);
+    }
+    .note-editor-preview.hidden { display: none; }
+    .note-editor-preview strong { color: var(--pro-accent, #818cf8); }
+    .note-editor-preview em { color: #c084fc; }
+    .note-editor-preview code {
+      background: rgba(99, 102, 241, 0.08);
+      color: var(--pro-accent, #818cf8);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.82rem;
+    }
+    .note-editor-preview h2 {
+      font-size: 1.1rem;
+      color: var(--pro-text-primary, #e2e4ed);
+      border-bottom: 1px solid var(--pro-border, #1e2030);
+      padding-bottom: 6px;
+      margin: 16px 0 8px;
+    }
+
+    /* Status bar */
+    .note-editor-statusbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 20px;
+      border-top: 1px solid var(--pro-border, #1e2030);
+      background: rgba(10, 12, 18, 0.6);
+      font-family: var(--pro-font) !important;
+      font-size: 0.68rem;
+      color: var(--pro-text-muted, #5e6380);
+      flex-shrink: 0;
+    }
+    .note-editor-statusbar kbd {
+      display: inline-block;
+      padding: 1px 5px;
+      border: 1px solid var(--pro-border, #1e2030);
+      border-radius: 3px;
+      background: rgba(30, 32, 48, 0.5);
+      font-family: var(--pro-font) !important;
+      font-size: 0.62rem;
+      color: var(--pro-text-secondary, #9499b0);
+      margin: 0 2px;
+    }
+    #note-editor-modified {
+      color: #fbbf24;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .note-editor {
+        width: 100vw;
+        height: 100vh;
+        border-radius: 0;
+      }
+      .note-editor-gutter { display: none; }
+      .note-editor-titlebar-right { display: none; }
+      .note-editor-tag-wrapper { display: none; }
     }
   </style>
 </head>
@@ -1093,7 +1410,7 @@
     <!-- ==================== CONTACTS SECTION ==================== -->
     <section id="section-contacts" class="content-section">
       <div class="section-header">
-        <h1><i class="fas fa-address-book"></i> Contacts</h1>
+        <h1><i class="fas fa-address-book"></i> Contacts <span class="item-count-badge" id="contacts-count"></span></h1>
         <div class="header-actions">
           <div class="search-bar">
             <i class="fas fa-search"></i>
@@ -1112,7 +1429,10 @@
           </button>
         </div>
       </div>
-      <div id="contacts-list" class="cards-grid"></div>
+      <div class="scrollable-list-container" id="contacts-scroll-container">
+        <div id="contacts-list" class="cards-grid"></div>
+        <button class="scroll-to-top-btn hidden" aria-label="Scroll to top"><i class="fas fa-chevron-up"></i></button>
+      </div>
       <div id="contacts-empty" class="empty-state hidden">
         <i class="fas fa-address-book"></i>
         <h3>No contacts yet</h3>
@@ -1126,7 +1446,7 @@
     <!-- ==================== TEAMS SECTION ==================== -->
     <section id="section-teams" class="content-section">
       <div class="section-header">
-        <h1><i class="fas fa-users"></i> Teams</h1>
+        <h1><i class="fas fa-users"></i> Teams <span class="item-count-badge" id="teams-count"></span></h1>
         <div class="header-actions">
           <div class="search-bar">
             <i class="fas fa-search"></i>
@@ -1145,7 +1465,10 @@
           </button>
         </div>
       </div>
-      <div id="teams-list" class="cards-grid"></div>
+      <div class="scrollable-list-container" id="teams-scroll-container">
+        <div id="teams-list" class="cards-grid"></div>
+        <button class="scroll-to-top-btn hidden" aria-label="Scroll to top"><i class="fas fa-chevron-up"></i></button>
+      </div>
       <div id="teams-empty" class="empty-state hidden">
         <i class="fas fa-users"></i>
         <h3>No teams yet</h3>
@@ -1159,7 +1482,7 @@
     <!-- ==================== LINKS SECTION ==================== -->
     <section id="section-links" class="content-section">
       <div class="section-header">
-        <h1><i class="fas fa-link"></i> Links</h1>
+        <h1><i class="fas fa-link"></i> Links <span class="item-count-badge" id="links-count"></span></h1>
         <div class="header-actions">
           <div class="search-bar">
             <i class="fas fa-search"></i>
@@ -1178,7 +1501,10 @@
           </button>
         </div>
       </div>
-      <div id="links-list" class="cards-grid"></div>
+      <div class="scrollable-list-container" id="links-scroll-container">
+        <div id="links-list" class="cards-grid"></div>
+        <button class="scroll-to-top-btn hidden" aria-label="Scroll to top"><i class="fas fa-chevron-up"></i></button>
+      </div>
       <div id="links-empty" class="empty-state hidden">
         <i class="fas fa-link"></i>
         <h3>No links yet</h3>
@@ -1193,7 +1519,7 @@
     <section id="section-todos" class="content-section">
       <div class="section-header">
         <div>
-          <h1><i class="fas fa-check-square"></i> To-Do</h1>
+          <h1><i class="fas fa-check-square"></i> To-Do <span class="item-count-badge" id="todos-count"></span></h1>
           <div class="todo-dual-date" id="todo-dual-date"></div>
         </div>
         <div class="header-actions">
@@ -1206,7 +1532,10 @@
           </button>
         </div>
       </div>
-      <div id="todos-list" class="todo-list-full"></div>
+      <div class="scrollable-list-container" id="todos-scroll-container">
+        <div id="todos-list" class="todo-list-full"></div>
+        <button class="scroll-to-top-btn hidden" aria-label="Scroll to top"><i class="fas fa-chevron-up"></i></button>
+      </div>
       <div id="todos-empty" class="empty-state hidden">
         <i class="fas fa-check-square"></i>
         <h3>No tasks yet</h3>
@@ -1220,7 +1549,7 @@
     <!-- ==================== API KEYS SECTION ==================== -->
     <section id="section-apikeys" class="content-section">
       <div class="section-header">
-        <h1><i class="fas fa-key"></i> API Keys &amp; Passwords</h1>
+        <h1><i class="fas fa-key"></i> API Keys &amp; Passwords <span class="item-count-badge" id="apikeys-count"></span></h1>
         <div class="header-actions">
           <div class="search-bar">
             <i class="fas fa-search"></i>
@@ -1235,7 +1564,10 @@
         <i class="fas fa-shield-alt"></i>
         <span>Sensitive data is masked by default. Click the eye icon to reveal.</span>
       </div>
-      <div id="apikeys-list" class="cards-grid"></div>
+      <div class="scrollable-list-container" id="apikeys-scroll-container">
+        <div id="apikeys-list" class="cards-grid"></div>
+        <button class="scroll-to-top-btn hidden" aria-label="Scroll to top"><i class="fas fa-chevron-up"></i></button>
+      </div>
       <div id="apikeys-empty" class="empty-state hidden">
         <i class="fas fa-key"></i>
         <h3>No API keys or passwords yet</h3>
@@ -1249,7 +1581,7 @@
     <!-- ==================== NOTES SECTION ==================== -->
     <section id="section-notes" class="content-section">
       <div class="section-header">
-        <h1><i class="fas fa-sticky-note"></i> Notes</h1>
+        <h1><i class="fas fa-sticky-note"></i> Notes <span class="item-count-badge" id="notes-count"></span></h1>
         <div class="header-actions">
           <div class="search-bar">
             <i class="fas fa-search"></i>
@@ -1260,7 +1592,10 @@
           </button>
         </div>
       </div>
-      <div id="notes-list" class="cards-grid"></div>
+      <div class="scrollable-list-container" id="notes-scroll-container">
+        <div id="notes-list" class="cards-grid"></div>
+        <button class="scroll-to-top-btn hidden" aria-label="Scroll to top"><i class="fas fa-chevron-up"></i></button>
+      </div>
       <div id="notes-empty" class="empty-state hidden">
         <i class="fas fa-sticky-note"></i>
         <h3>No notes yet</h3>
@@ -1668,38 +2003,60 @@
   </div>
 
   <!-- Note Modal -->
-  <div id="note-modal" class="modal-overlay hidden">
-    <div class="modal modal-large">
-      <div class="modal-header">
-        <h2 id="note-modal-title">Add Note</h2>
-        <button class="modal-close" data-modal="note-modal"><i class="fas fa-times"></i></button>
+  <!-- Fullscreen Note Editor -->
+  <div id="note-editor-overlay" class="note-editor-overlay hidden">
+    <div class="note-editor">
+      <!-- Title Bar -->
+      <div class="note-editor-titlebar">
+        <div class="note-editor-titlebar-left">
+          <i class="fas fa-sticky-note note-editor-icon"></i>
+          <input type="text" id="note-title" class="note-editor-title-input" placeholder="Untitled note..." required />
+          <span class="note-editor-tag-wrapper">
+            <i class="fas fa-tag"></i>
+            <input type="text" id="note-tag" class="note-editor-tag-input" placeholder="Add tag..." />
+          </span>
+        </div>
+        <div class="note-editor-titlebar-right">
+          <span class="note-editor-status" id="note-editor-status"></span>
+          <span class="note-editor-charcount" id="note-editor-charcount">0 chars</span>
+          <span class="note-editor-linecount" id="note-editor-linecount">Ln 1, Col 1</span>
+        </div>
       </div>
-      <form id="note-form" class="modal-form">
-        <input type="hidden" id="note-edit-index" value="-1" />
-        <div class="form-group">
-          <label for="note-title">Title *</label>
-          <input type="text" id="note-title" required placeholder="Note title" />
+
+      <!-- Toolbar -->
+      <div class="note-editor-toolbar">
+        <div class="note-editor-toolbar-group">
+          <button type="button" class="note-fmt-btn" data-fmt="bold" title="Bold (Ctrl+B)"><i class="fas fa-bold"></i></button>
+          <button type="button" class="note-fmt-btn" data-fmt="italic" title="Italic (Ctrl+I)"><i class="fas fa-italic"></i></button>
+          <button type="button" class="note-fmt-btn" data-fmt="code" title="Inline Code"><i class="fas fa-code"></i></button>
+          <button type="button" class="note-fmt-btn" data-fmt="heading" title="Heading"><i class="fas fa-heading"></i></button>
+          <button type="button" class="note-fmt-btn" data-fmt="list" title="Bullet List"><i class="fas fa-list-ul"></i></button>
+          <button type="button" class="note-fmt-btn" data-fmt="link" title="Link"><i class="fas fa-link"></i></button>
         </div>
-        <div class="form-group">
-          <label for="note-body">Content *</label>
-          <div class="note-toolbar">
-            <button type="button" class="note-fmt-btn" data-fmt="bold" title="Bold"><i class="fas fa-bold"></i></button>
-            <button type="button" class="note-fmt-btn" data-fmt="italic" title="Italic"><i class="fas fa-italic"></i></button>
-            <button type="button" class="note-fmt-btn" data-fmt="code" title="Code"><i class="fas fa-code"></i></button>
-          </div>
-          <textarea id="note-body" rows="8" required placeholder="Write your note... (supports **bold**, *italic*, `code`)"></textarea>
+        <div class="note-editor-toolbar-separator"></div>
+        <div class="note-editor-toolbar-group">
+          <button type="button" class="note-fmt-btn" id="note-editor-wordwrap" title="Toggle word wrap"><i class="fas fa-text-width"></i></button>
+          <button type="button" class="note-fmt-btn" id="note-editor-preview-btn" title="Preview"><i class="fas fa-eye"></i></button>
         </div>
-        <div class="form-group">
-          <label for="note-tag">Tag</label>
-          <input type="text" id="note-tag" placeholder="e.g. work, personal, snippet" />
+        <div class="note-editor-toolbar-actions">
+          <button type="button" class="btn btn-secondary btn-sm" id="note-editor-cancel"><i class="fas fa-times"></i> Discard</button>
+          <button type="button" class="btn btn-primary btn-sm" id="note-editor-save"><i class="fas fa-save"></i> Save</button>
         </div>
-        <div class="modal-actions">
-          <button type="button" class="btn btn-secondary modal-cancel" data-modal="note-modal">Cancel</button>
-          <button type="submit" class="btn btn-primary">
-            <i class="fas fa-save"></i> Save Note
-          </button>
-        </div>
-      </form>
+      </div>
+
+      <!-- Editor Body -->
+      <input type="hidden" id="note-edit-index" value="-1" />
+      <div class="note-editor-body">
+        <div class="note-editor-gutter" id="note-editor-gutter"></div>
+        <textarea id="note-body" class="note-editor-textarea" placeholder="Start writing...&#10;&#10;Supports **bold**, *italic*, `code`, ## headings, - lists" spellcheck="true"></textarea>
+        <div id="note-editor-preview" class="note-editor-preview hidden"></div>
+      </div>
+
+      <!-- Status Bar -->
+      <div class="note-editor-statusbar">
+        <span><i class="fas fa-keyboard"></i> <kbd>Ctrl+S</kbd> Save &nbsp; <kbd>Esc</kbd> Close &nbsp; <kbd>Ctrl+B</kbd> Bold &nbsp; <kbd>Ctrl+I</kbd> Italic</span>
+        <span id="note-editor-modified"></span>
+      </div>
     </div>
   </div>
 
