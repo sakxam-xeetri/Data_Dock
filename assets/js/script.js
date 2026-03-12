@@ -1440,9 +1440,10 @@ const BS_MONTHS = ['Baisakh','Jestha','Ashadh','Shrawan','Bhadra','Ashwin','Kart
 
 function adToBS(adYear, adMonth, adDay) {
   // Reference: 2000-01-01 BS = 1943-04-14 AD
-  const refAD = new Date(1943, 3, 14);
-  const target = new Date(adYear, adMonth - 1, adDay);
-  let totalDays = Math.floor((target - refAD) / 86400000);
+  // Use UTC to avoid DST off-by-one errors across timezones
+  const refDays = Date.UTC(1943, 3, 14) / 86400000;
+  const targetDays = Date.UTC(adYear, adMonth - 1, adDay) / 86400000;
+  let totalDays = Math.round(targetDays - refDays);
   if (totalDays < 0) return null;
 
   let bsY = 2000, bsM = 0, bsD = 1;
@@ -2046,7 +2047,7 @@ let calendarState = { year: 2081, month: 1, selectedDate: null };
 // Reverse conversion: BS to AD
 function bsToAD(bsYear, bsMonth, bsDay) {
   // Reference: 2000-01-01 BS = 1943-04-14 AD
-  const refAD = new Date(1943, 3, 14); // April 14, 1943
+  // Use UTC to avoid DST off-by-one errors
   let totalDays = 0;
 
   for (const row of BS_CALENDAR) {
@@ -2058,7 +2059,7 @@ function bsToAD(bsYear, bsMonth, bsDay) {
     for (let m = 1; m <= 12; m++) totalDays += row[m];
   }
 
-  const result = new Date(refAD.getTime() + totalDays * 86400000);
+  const result = new Date(Date.UTC(1943, 3, 14) + totalDays * 86400000);
   return result;
 }
 
