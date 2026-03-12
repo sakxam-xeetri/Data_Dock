@@ -6,6 +6,81 @@
   <title>DataDock — Login</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <style>
+    /* =====================================================
+       DATADOCK — MARIO TERMINAL OVERRIDE (auth)
+       ===================================================== */
+
+    /* ── Auth card ── */
+    .auth-card {
+      border: 2px solid rgba(229,37,33,.35) !important;
+      border-top: 4px solid #e52521 !important;
+      border-radius: 0 !important;
+      box-shadow: 0 0 0 1px #9b1a17, 0 0 50px rgba(229,37,33,.1), 4px 4px 0 #9b1a17 !important;
+    }
+
+    /* ── Logo ── */
+    .auth-logo {
+      font-family: 'Press Start 2P', monospace !important;
+      font-size: .8rem !important;
+      color: #f7b731 !important;
+      text-shadow: 2px 2px 0 #9b1a17 !important;
+      gap: 12px !important;
+    }
+    .auth-logo i { color: #e52521 !important; filter: drop-shadow(0 0 6px rgba(229,37,33,.5)) !important; }
+    .auth-subtitle { font-family: 'Press Start 2P', monospace !important; font-size: .43rem !important; color: #9a5060 !important; }
+
+    /* ── Tabs ── */
+    .auth-tabs { border-bottom-color: rgba(229,37,33,.2) !important; }
+    .auth-tab {
+      font-family: 'Press Start 2P', monospace !important;
+      font-size: .46rem !important;
+      border-radius: 0 !important;
+      letter-spacing: .5px !important;
+    }
+    .auth-tab.active { color: #f7b731 !important; border-bottom-color: #e52521 !important; }
+
+    /* ── Form labels ── */
+    .auth-form .form-group label { font-family: 'Press Start 2P', monospace !important; font-size: .44rem !important; color: #f8d8a0 !important; letter-spacing: .4px !important; }
+
+    /* ── Buttons ── */
+    .btn-primary.btn-block {
+      font-family: 'Press Start 2P', monospace !important;
+      font-size: .52rem !important;
+      background: #e52521 !important;
+      color: #fff !important;
+      border: 2px solid #ff6b65 !important;
+      border-radius: 0 !important;
+      box-shadow: 0 4px 0 #9b1a17 !important;
+      position: relative !important;
+      top: 0 !important;
+      letter-spacing: .5px !important;
+      transition: top .08s, box-shadow .08s !important;
+    }
+    .btn-primary.btn-block:hover { box-shadow: 0 4px 0 #9b1a17, 0 0 18px rgba(229,37,33,.35) !important; }
+    .btn-primary.btn-block:active { top: 4px !important; box-shadow: 0 0 0 #9b1a17 !important; }
+    .btn-google {
+      font-family: 'Press Start 2P', monospace !important;
+      font-size: .46rem !important;
+      border-radius: 0 !important;
+      border: 2px solid rgba(255,255,255,.2) !important;
+      box-shadow: 0 4px 0 rgba(0,0,0,.5) !important;
+      position: relative !important;
+      top: 0 !important;
+      letter-spacing: .5px !important;
+      transition: top .08s, box-shadow .08s !important;
+    }
+    .btn-google:active { top: 4px !important; box-shadow: 0 0 0 rgba(0,0,0,.5) !important; }
+
+    /* ── Divider ── */
+    .auth-divider span { font-family: 'Press Start 2P', monospace !important; font-size: .42rem !important; color: #9a5060 !important; }
+    .auth-footer { font-family: 'Press Start 2P', monospace !important; font-size: .38rem !important; color: #6a3a40 !important; }
+
+    /* ── Loading ── */
+    .loading-text { font-family: 'Press Start 2P', monospace !important; color: #f7b731 !important; font-size: .52rem !important; }
+    .spinner { border-top-color: #e52521 !important; box-shadow: 0 0 8px rgba(229,37,33,.3) !important; }
+  </style>
 </head>
 <body class="auth-page">
   <!-- Matrix Background -->
@@ -134,7 +209,7 @@
       function draw() {
         ctx.fillStyle = 'rgba(10, 10, 15, 0.06)';
         ctx.fillRect(0, 0, w, h);
-        ctx.fillStyle = '#00ff9930';
+        ctx.fillStyle = '#e5252118';
         ctx.font = '14px monospace';
         for (let i = 0; i < cols; i++) {
           const char = chars[Math.floor(Math.random() * chars.length)];
