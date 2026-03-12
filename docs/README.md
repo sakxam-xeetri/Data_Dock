@@ -206,7 +206,9 @@ npx serve .
 
 ---
 
-## ☁️ Deployment (GitHub Pages)
+## ☁️ Deployment
+
+### GitHub Pages
 
 1. Push the project to a GitHub repository
 2. Go to **Settings → Pages**
@@ -219,6 +221,12 @@ npx serve .
 ```
 https://<your-username>.github.io/<repository-name>/
 ```
+
+### Netlify (Recommended)
+
+For a faster, more reliable deployment with automatic SSL and preview deploys, see the full guide:
+
+📄 **[DEPLOY\_NETLIFY.md](DEPLOY_NETLIFY.md)** — covers Netlify setup, Google Authentication configuration, authorized domain setup, API key restrictions, and troubleshooting.
 
 ---
 
