@@ -15,284 +15,387 @@
 
 ---
 
-## Features
+## ✨ Features
 
-- Email/password signup and login
-- Google OAuth login
-- Per-user workspace in Firestore under `users/{uid}`
-- Automatic workspace initialization for new users
-- Dashboard with summary stats and recent items
-- Full CRUD for contacts, teams, and links
-- Dynamic team member management
-- Search (global + section-level)
-- Copy-to-clipboard actions (email, phone, links)
-- JSON export and JSON import (merge behavior)
-- Dark mode toggle with persistent preference
-- Responsive sidebar layout (desktop + mobile)
-- Real-time Firestore sync using `onSnapshot`
-- Local cache fallback using `localStorage`
-- Toast notifications and confirmation modals
+### 🔐 Authentication
+- Email / password signup and login
+- Google OAuth one-click login
+- Automatic per-user workspace initialization in Firestore
+- Protected routes — unauthenticated users redirected to login
 
-## Tech Stack
+### 📋 Data Modules
+| Module | Description |
+|---|---|
+| **Contacts** | Full profiles — name, email, phone, GitHub, LinkedIn, role, notes |
+| **Teams** | Groups with members, social links, contact numbers, and notes |
+| **Links** | URL vault with title, URL, quick-copy, and notes |
+| **To-Do** | Tasks with priority levels, due dates, and completion tracking |
+| **API Keys** | Masked credential store for API keys and passwords |
+| **Notes** | Rich text notes with tags, bold/italic/code formatting |
+| **Calendar** | Nepali BS calendar with event management and daily detail view |
 
-- Frontend: HTML, CSS, Vanilla JavaScript (ES modules)
-- Authentication: Firebase Authentication
-- Database: Cloud Firestore
-- Hosting: GitHub Pages
+### 🖥️ Dashboard
+- Summary stat cards per module
+- Recent items panels (contacts, teams, links)
+- Embedded mini-calendar widget
+- System terminal log console
+- Global search across all data
 
-## Project Structure
+### ⚙️ Core UX
+- Command palette (`Ctrl + K`) for keyboard-driven navigation
+- Quick-add floating action button
+- Card and list view toggle per section
+- JSON export (full workspace backup)
+- JSON import with merge support
+- Delete all data with confirmation
+- Real-time Firestore sync via `onSnapshot`
+- Local `localStorage` cache fallback
+- Toast notifications and confirm modals
+- Responsive sidebar — collapsible on desktop, drawer on mobile
 
-```text
+### 🎨 Theme
+- Mario terminal aesthetic — Press Start 2P pixel font, NES color palette, CRT scanlines
+- Fully interactive Mario platformer game embedded in the landing hero
+- Retro cyberpunk dark palette for the dashboard
+
+---
+
+## 🗂️ Project Structure
+
+```
 Data_Dock/
-├── index.html          # Default landing page
-├── auth.html           # Login / signup page
-├── dashboard.html      # Main app dashboard
-├── style.css           # Shared styling and responsive UI
-├── firebase-config.js  # Firebase app/auth/db initialization
-├── auth.js             # Auth logic for index page
-├── storage.js          # Firestore data access and CRUD helpers
-├── script.js           # Dashboard UI and interaction logic
-├── SECURITY.md         # Security policy file
-└── README.md           # Project documentation
+├── index.html              # Original landing page
+├── landing.html            # Mario-themed landing page with game
+├── auth.html               # Login / signup page
+├── dashboard.html          # Main app dashboard
+├── assets/
+│   ├── css/
+│   │   ├── style.css       # Shared styles (retro terminal theme)
+│   │   └── style.css.bak   # Style backup
+│   └── js/
+│       ├── firebase-config.js  # Firebase app initialization
+│       ├── auth.js             # Authentication logic
+│       ├── storage.js          # Firestore CRUD helpers
+│       └── script.js           # Dashboard UI and interactions
+└── docs/
+    ├── README.md           # Project documentation
+    └── SECURITY.md         # Security policy
 ```
 
-## Data Model
+---
 
-Firestore collection/document layout:
+## 🛠️ Tech Stack
 
-```text
-users/
-  {uid}/
-    contacts: [Contact]
-    teams: [Team]
-    links: [Link]
-```
+| Layer | Technology |
+|---|---|
+| Frontend | HTML5, CSS3, Vanilla JavaScript (ES Modules) |
+| Authentication | Firebase Authentication (Email + Google OAuth) |
+| Database | Cloud Firestore (NoSQL, real-time) |
+| Fonts | Press Start 2P, Fira Code, IBM Plex Mono (Google Fonts) |
+| Icons | Font Awesome 6 |
+| Hosting | GitHub Pages (static) |
 
-### Contact
+---
 
-```json
-{
-  "name": "Full Name",
-  "email": "example@gmail.com",
-  "phone": "9800000000",
-  "github": "github.com/username",
-  "linkedin": "linkedin.com/in/username",
-  "role": "Developer",
-  "notes": "Extra notes"
-}
-```
+## 🚀 Getting Started
 
-### Team
+### Prerequisites
 
-```json
-{
-  "teamName": "Team Alpha",
-  "members": [
-    {
-      "name": "Sakshyam",
-      "role": "Leader",
-      "email": "example@gmail.com"
-    }
-  ],
-  "notes": "Team project info"
-}
-```
+- A [Firebase](https://firebase.google.com) project with Authentication and Firestore enabled
+- A local HTTP server (ES modules do not work with `file://` URLs)
 
-### Link
+---
 
-```json
-{
-  "title": "GitHub",
-  "url": "https://github.com/username",
-  "notes": "Personal profile"
-}
-```
-
-## Local Development
-
-Because this project uses JavaScript modules, run it through a local server (do not open `index.html` or `auth.html` directly with `file://`).
-
-### Option 1: VS Code Live Server
-
-1. Install the Live Server extension.
-2. Open `index.html` for landing, then click `Get Started` to open `auth.html`.
-3. Click `Go Live`.
-
-### Option 2: Python HTTP Server
+### 1. Clone the Repository
 
 ```bash
-python -m http.server 5500
+git clone https://github.com/<your-username>/DataDock.git
+cd DataDock
 ```
 
-Then open `http://localhost:5500`.
+---
 
-## Firebase Setup
+### 2. Configure Firebase
 
-### 1. Create Firebase Project
+Open `assets/js/firebase-config.js` and replace the config values with your own from the [Firebase Console](https://console.firebase.google.com):
 
-1. Go to Firebase Console.
-2. Create/select a project.
-3. Add a Web App.
-4. Copy the config values.
+```js
+const firebaseConfig = {
+  apiKey:            "YOUR_API_KEY",
+  authDomain:        "YOUR_PROJECT.firebaseapp.com",
+  projectId:         "YOUR_PROJECT_ID",
+  storageBucket:     "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId:             "YOUR_APP_ID"
+};
+```
 
-### 2. Configure `firebase-config.js`
+> **Note:** Firebase web API keys are safe to include in frontend code. Security is enforced via Firestore Rules and Authentication, not by keeping the key secret. Optionally restrict the key by HTTP referrer in [Google Cloud Console](https://console.cloud.google.com).
 
-Open `firebase-config.js` and verify these values are correct for your Firebase project:
+---
 
-- `apiKey`
-- `authDomain`
-- `projectId`
-- `storageBucket`
-- `messagingSenderId`
-- `appId`
+### 3. Enable Firebase Services
 
-### 3. Enable Authentication Providers
+**Authentication** → Firebase Console → Authentication → Sign-in method:
+- ✅ Email/Password
+- ✅ Google
 
-In Firebase Console -> Authentication -> Sign-in method:
+**Firestore** → Firebase Console → Firestore Database:
+- Click **Create database**
+- Choose your preferred region
+- Start in **production mode**
 
-- Enable `Email/Password`
-- Enable `Google`
+---
 
-### 4. Create Firestore Database
+### 4. Apply Firestore Security Rules
 
-In Firebase Console -> Firestore Database:
+In Firebase Console → Firestore → **Rules**, paste:
 
-- Create database
-- Pick your region
-
-### 5. Apply Firestore Security Rules
-
-Use rules that isolate each user to only their own data:
-
-```txt
+```
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read, write: if request.auth != null
+                         && request.auth.uid == userId;
     }
   }
 }
 ```
 
-## GitHub Pages Deployment
+This enforces strict per-user data isolation — no user can read or write another user's data.
 
-1. Push this project to a GitHub repository.
-2. Go to repository `Settings` -> `Pages`.
-3. Under `Build and deployment`, select:
+---
+
+### 5. Run Locally
+
+**Option A — VS Code Live Server**
+1. Install the [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) extension
+2. Right-click `landing.html` → **Open with Live Server**
+
+**Option B — Python**
+```bash
+python -m http.server 5500
+```
+Then open `http://localhost:5500/landing.html`
+
+**Option C — Node.js**
+```bash
+npx serve .
+```
+
+---
+
+## ☁️ Deployment (GitHub Pages)
+
+1. Push the project to a GitHub repository
+2. Go to **Settings → Pages**
+3. Under **Build and deployment**, set:
    - Source: `Deploy from a branch`
-   - Branch: `main` (or `master`), root folder
-4. Save and wait for deployment.
-5. Access your app at:
+   - Branch: `main`, directory: `/ (root)`
+4. Save — GitHub will build and deploy automatically
+5. Your app will be live at:
 
-```text
-https://<your-username>.github.io/<repository-name>/
+```
+https://<your-username>.github.io/<repository-name>/landing.html
 ```
 
-If your repository name is `datadock`:
+> Set `landing.html` as your default page, or rename it to `index.html` if you do not need the original `index.html`.
 
-```text
-https://<your-username>.github.io/datadock/
+---
+
+## 🗃️ Data Model
+
+All user data lives in a single Firestore document under `users/{uid}`:
+
+```
+users/
+  {uid}/
+    contacts:       Contact[]
+    teams:          Team[]
+    links:          Link[]
+    todos:          Todo[]
+    apikeys:        ApiKey[]
+    notes:          Note[]
+    calendarEvents: CalendarEvent[]
 ```
 
-## Authentication Flow
+### Contact
+```json
+{
+  "name":     "Full Name",
+  "email":    "user@example.com",
+  "phone":    "9800000000",
+  "github":   "github.com/username",
+  "linkedin": "linkedin.com/in/username",
+  "role":     "Developer",
+  "notes":    "Additional notes"
+}
+```
 
-- User signs up with email/password or Google OAuth.
-- App checks whether `users/{uid}` exists.
-- If missing, app creates an empty workspace:
-  - `contacts: []`
-  - `teams: []`
-  - `links: []`
-- Authenticated users are redirected to `dashboard.html`.
-- Unauthenticated users are redirected to `auth.html`.
+### Team
+```json
+{
+  "teamName": "Team Alpha",
+  "phone":    "9800000000",
+  "socials":  [{ "platform": "GitHub", "url": "github.com/team" }],
+  "members":  [{ "name": "Alice", "role": "Lead", "email": "alice@example.com" }],
+  "notes":    "Project context"
+}
+```
 
-## CRUD and Real-Time Sync
+### Link
+```json
+{
+  "title": "GitHub",
+  "url":   "https://github.com/username",
+  "notes": "Personal profile"
+}
+```
 
-`storage.js` centralizes Firestore operations:
+### Todo
+```json
+{
+  "text":      "Finish deployment",
+  "priority":  "high",
+  "due":       "2026-03-15",
+  "completed": false
+}
+```
 
-- Load user data
-- Add/update/delete contacts, teams, links
-- Import/merge JSON data
-- Reset all data to empty arrays
-- Subscribe to live document updates with `onSnapshot`
+### API Key
+```json
+{
+  "label":    "GitHub Token",
+  "value":    "ghp_XXXXXXXXXX",
+  "category": "API",
+  "notes":    "Personal access token"
+}
+```
 
-`script.js` handles:
+### Note
+```json
+{
+  "title": "Project Ideas",
+  "body":  "Supports **bold**, *italic*, `code`",
+  "tag":   "work"
+}
+```
 
-- Rendering all sections
-- Modals and form submissions
-- Search filtering
-- Clipboard actions
-- Export/import interactions
+### Calendar Event
+```json
+{
+  "title":  "Sprint Review",
+  "bsDate": "2082-12-01",
+  "color":  "green",
+  "notes":  "Q4 sprint review meeting"
+}
+```
 
-## JSON Import/Export
+---
+
+## 🔄 Import / Export
 
 ### Export
-
-- Exports full workspace (`contacts`, `teams`, `links`) as formatted JSON.
+- Click **Settings → Export All Data (JSON)**
+- Downloads a `.json` file containing all contacts, teams, links, todos, API keys, notes, and events
 
 ### Import
+- Click **Settings → Import Data (JSON)**
+- Accepts a previously exported `.json` file
+- **Merge behavior** — imported items are appended; existing data is preserved
+- The shape of the JSON is validated before importing
 
-- Validates imported JSON shape.
-- Merges with existing data (does not replace whole workspace by default).
+---
 
-## Security Notes
+## 🧩 Module Architecture
 
-- Firebase web config (`apiKey`, etc.) is not a secret for frontend apps.
-- Security must be enforced by Firestore Rules and Authentication.
-- Never commit Firebase Admin SDK service account keys.
-- Restrict API key by referrer in Google Cloud Console when possible.
-- Review and update `SECURITY.md` to match your maintenance policy.
+### `firebase-config.js`
+- Initializes the Firebase app
+- Exports `auth`, `db`, and `googleProvider`
 
-## Browser Compatibility
+### `auth.js`
+- Handles login, signup, and Google OAuth flows
+- Redirects authenticated users to `dashboard.html`
+- Redirects unauthenticated users to `auth.html`
 
-Modern browsers are recommended:
+### `storage.js`
+- All Firestore read/write operations
+- `loadUserData(uid)` — loads or initializes workspace
+- `save*` functions — update individual collections
+- `subscribeToUserData(uid, callback)` — real-time listener
+- `importData(uid, data)` — merge import
+- `deleteAllData(uid)` — reset workspace
 
-- Chrome
-- Edge
-- Firefox
-- Safari
+### `script.js`
+- Dashboard UI rendering for all modules
+- Modal and form lifecycle
+- Section navigation and search filtering
+- Clipboard copy actions
+- Command palette implementation
+- Export/import trigger handlers
+- Nepali BS calendar logic
 
-Requirements:
+---
 
-- ES modules support
-- Clipboard API support
+## 🐛 Troubleshooting
 
-## Troubleshooting
+| Problem | Solution |
+|---|---|
+| Blank page / module errors | Run through a local HTTP server, not `file://` |
+| Login works but data fails to load | Check Firestore security rules and `projectId` |
+| Google login popup blocked | Allow popups for your domain; check Firebase authorized domains |
+| GitHub Pages shows 404 | Verify all asset paths are relative (`assets/css/style.css` not `/style.css`) |
+| Import fails silently | Ensure the JSON file matches the expected shape |
+| Auth redirect loop | Clear browser `localStorage` and cookies, then reload |
 
-### Login works but data fails
+---
 
-- Check Firestore rules.
-- Confirm `projectId` and Firebase config values.
-- Verify Firestore database is created.
+## 🔮 Roadmap
 
-### Google login popup blocked
+- [ ] Type-to-confirm on "Delete All Data"
+- [ ] Duplicate detection during JSON import
+- [ ] Drag-and-drop item reordering
+- [ ] PWA support with offline cache
+- [ ] Dark / light theme toggle
+- [ ] Contact / team tagging and filtering
+- [ ] Note markdown preview mode
 
-- Allow popups for your site.
-- Ensure your domain is in Firebase Authentication authorized domains.
+---
 
-### Blank page / modules not loading
+## 🔒 Security
 
-- Use a local server for development.
-- Check browser console for module import errors.
+- Firestore rules strictly isolate each user's data by `uid`
+- Firebase web API keys are intentionally public — restrict by HTTP referrer for production
+- No admin SDK or service account keys are used or committed
+- All user inputs are sanitized before rendering to prevent XSS
+- See [SECURITY.md](SECURITY.md) for the vulnerability reporting policy
 
-### GitHub Pages path issues
+---
 
-- Confirm all script/style imports are relative (they are in this project).
-- Verify repository name in final URL.
+## 📄 License
 
-## Roadmap Ideas
+This project is licensed under the **MIT License**.
+You are free to use, modify, and distribute it with attribution.
 
-- Type-to-confirm before "Delete All Data"
-- Better duplicate detection during import
-- Optional drag-and-drop ordering
-- Optional PWA/offline enhancements
+---
 
-## License
+## 🙏 Acknowledgments
 
-Choose a license and add a `LICENSE` file (MIT is common for open-source projects).
+| Resource | Purpose |
+|---|---|
+| [Firebase](https://firebase.google.com) | Authentication & Firestore database |
+| [Font Awesome](https://fontawesome.com) | Icons throughout the UI |
+| [Google Fonts](https://fonts.google.com) | Press Start 2P, Fira Code, IBM Plex Mono |
+| [GitHub Pages](https://pages.github.com) | Free static hosting |
 
-## Acknowledgments
+---
 
-- Firebase for authentication and database services
-- Font Awesome for iconography
-- Google Fonts (Inter) for typography
+<div align="center">
+
+Built with ❤️ and a love for retro terminals.
+
+**[landing.html](../landing.html) · [auth.html](../auth.html) · [dashboard.html](../dashboard.html)**
+
+</div>
+
