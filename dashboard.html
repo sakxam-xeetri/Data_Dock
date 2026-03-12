@@ -6,206 +6,634 @@
   <title>DataDock — Dashboard</title>
   <link rel="stylesheet" href="assets/css/style.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     /* =====================================================
-       DATADOCK — MARIO TERMINAL OVERRIDE (dashboard)
+       DATADOCK — PROFESSIONAL DATA MANAGEMENT THEME
        ===================================================== */
+
+    /* ── Color Palette ── */
+    :root {
+      --pro-bg: #0c0e14;
+      --pro-surface: #12141c;
+      --pro-card: #161822;
+      --pro-border: #1e2030;
+      --pro-border-hover: #2a2d42;
+      --pro-text: #e2e4ec;
+      --pro-text-secondary: #8b8fa4;
+      --pro-text-muted: #4a4e66;
+      --pro-accent: #5b8def;
+      --pro-accent-hover: #7aa3ff;
+      --pro-accent-subtle: rgba(91, 141, 239, 0.08);
+      --pro-success: #4ade80;
+      --pro-warning: #fbbf24;
+      --pro-danger: #f87171;
+      --pro-cyan: #67e8f9;
+      --pro-purple: #a78bfa;
+      --pro-pink: #f472b6;
+    }
+
+    /* ── Global Font Override ── */
+    body.dashboard-page {
+      font-family: 'IBM Plex Mono', 'Fira Code', 'Consolas', monospace !important;
+    }
 
     /* ── Sidebar ── */
     .sidebar {
-      border-right: 3px solid #e52521 !important;
-      box-shadow: 3px 0 0 #9b1a17, 0 0 40px rgba(229,37,33,.1) !important;
-      background: #080105 !important;
+      border-right: 1px solid var(--pro-border) !important;
+      box-shadow: 1px 0 24px rgba(0,0,0,.3) !important;
+      background: var(--pro-bg) !important;
     }
     .sidebar-header {
-      background: #110205 !important;
-      border-bottom: 3px solid #e52521 !important;
-      box-shadow: 0 2px 0 #9b1a17 !important;
+      background: var(--pro-bg) !important;
+      border-bottom: 1px solid var(--pro-border) !important;
+      box-shadow: none !important;
     }
     .sidebar-logo {
-      font-family: 'Press Start 2P', monospace !important;
-      font-size: .65rem !important;
-      color: #f7b731 !important;
-      text-shadow: 2px 2px 0 #9b1a17 !important;
+      font-family: 'IBM Plex Mono', monospace !important;
+      font-size: 1rem !important;
+      font-weight: 700 !important;
+      color: var(--pro-accent) !important;
+      text-shadow: none !important;
+      letter-spacing: 0.5px !important;
+      animation: none !important;
     }
-    .sidebar-logo i { color: #f7b731 !important; filter: drop-shadow(0 0 4px rgba(247,183,49,.5)) !important; }
+    .sidebar-logo i {
+      color: var(--pro-accent) !important;
+      filter: none !important;
+      font-size: 1.1rem !important;
+    }
     .nav-item {
-      font-family: 'Press Start 2P', monospace !important;
-      font-size: .44rem !important;
-      border-left: 3px solid transparent !important;
-      transition: all .12s !important;
+      font-family: 'IBM Plex Mono', monospace !important;
+      font-size: 0.82rem !important;
+      border-left: none !important;
+      border-radius: 6px !important;
+      transition: all 0.2s ease !important;
+      color: var(--pro-text-secondary) !important;
     }
+    .nav-item::before { display: none !important; }
     .nav-item.active {
-      border-left-color: #e52521 !important;
-      background: rgba(229,37,33,.08) !important;
-      color: #f7b731 !important;
+      background: var(--pro-accent-subtle) !important;
+      color: var(--pro-accent) !important;
+      border-color: transparent !important;
+      text-shadow: none !important;
     }
     .nav-item:hover:not(.active) {
-      border-left-color: rgba(229,37,33,.45) !important;
-      background: rgba(229,37,33,.04) !important;
+      background: rgba(255,255,255,.03) !important;
+      color: var(--pro-text) !important;
     }
-    .sidebar-footer { border-top: 2px dashed rgba(229,37,33,.25) !important; }
-    .user-name { font-family: 'Press Start 2P', monospace !important; font-size: .42rem !important; color: #f7b731 !important; }
+    .sidebar-footer {
+      border-top: 1px solid var(--pro-border) !important;
+    }
+    .user-name {
+      font-family: 'IBM Plex Mono', monospace !important;
+      font-size: 0.8rem !important;
+      color: var(--pro-text) !important;
+    }
+    .user-email {
+      color: var(--pro-text-muted) !important;
+    }
+    .user-avatar {
+      background: var(--pro-accent-subtle) !important;
+      border: 1px solid rgba(91,141,239,.25) !important;
+      color: var(--pro-accent) !important;
+    }
 
-    /* ── Score bar ── */
+    /* ── Status Bar (replaces score bar) ── */
     .mario-score-bar {
-      background: #110205;
-      border-bottom: 2px solid rgba(229,37,33,.25);
-      padding: 6px 24px;
+      background: var(--pro-surface);
+      border-bottom: 1px solid var(--pro-border);
+      padding: 10px 28px;
       display: flex;
-      gap: 22px;
+      gap: 24px;
       align-items: center;
       flex-wrap: wrap;
-      font-family: 'Press Start 2P', monospace;
-      font-size: .42rem;
-      letter-spacing: 1px;
-      color: #f8d8a0;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.78rem;
+      letter-spacing: 0.3px;
+      color: var(--pro-text-secondary);
       position: sticky;
       top: 0;
       z-index: 30;
     }
-    .mario-score-bar b { color: #f7b731; }
+    .mario-score-bar b { color: var(--pro-text); font-weight: 600; }
     .msb-right { margin-left: auto; }
-    @keyframes msb-blink { 50% { opacity: 0; } }
-    .msb-blink { animation: msb-blink 1s step-end infinite; }
+    .msb-blink { animation: none; }
+    .msb-divider { width: 1px; height: 16px; background: var(--pro-border); }
 
     /* ── Buttons ── */
     .btn-primary {
-      font-family: 'Press Start 2P', monospace !important;
-      font-size: .48rem !important;
-      background: #e52521 !important;
+      font-family: 'IBM Plex Mono', monospace !important;
+      font-size: 0.8rem !important;
+      background: var(--pro-accent) !important;
       color: #fff !important;
-      border: 2px solid #ff6b65 !important;
-      box-shadow: 0 4px 0 #9b1a17 !important;
-      border-radius: 0 !important;
-      position: relative !important;
-      top: 0 !important;
-      letter-spacing: .5px !important;
-      transition: top .08s, box-shadow .08s !important;
+      border: 1px solid var(--pro-accent) !important;
+      box-shadow: none !important;
+      border-radius: 6px !important;
+      letter-spacing: 0.3px !important;
+      transition: all 0.2s ease !important;
     }
-    .btn-primary:hover { background: #ff3a35 !important; box-shadow: 0 4px 0 #9b1a17, 0 0 16px rgba(229,37,33,.35) !important; }
-    .btn-primary:active { top: 3px !important; box-shadow: 0 1px 0 #9b1a17 !important; }
+    .btn-primary:hover {
+      background: var(--pro-accent-hover) !important;
+      box-shadow: 0 2px 12px rgba(91,141,239,.25) !important;
+    }
+    .btn-primary:active { transform: scale(0.97) !important; }
     .btn-secondary {
-      font-family: 'Press Start 2P', monospace !important;
-      font-size: .48rem !important;
-      border-radius: 0 !important;
-      position: relative !important;
-      top: 0 !important;
-      letter-spacing: .5px !important;
-      transition: top .08s, box-shadow .08s !important;
+      font-family: 'IBM Plex Mono', monospace !important;
+      font-size: 0.8rem !important;
+      border-radius: 6px !important;
+      border: 1px solid var(--pro-border) !important;
+      color: var(--pro-text-secondary) !important;
     }
-    .btn-secondary:active { top: 3px !important; }
+    .btn-secondary:hover {
+      border-color: var(--pro-accent) !important;
+      color: var(--pro-accent) !important;
+    }
     .btn-danger {
-      font-family: 'Press Start 2P', monospace !important;
-      font-size: .48rem !important;
-      border-radius: 0 !important;
-      box-shadow: 0 4px 0 #7a0000 !important;
-      position: relative !important;
-      top: 0 !important;
-      transition: top .08s, box-shadow .08s !important;
+      font-family: 'IBM Plex Mono', monospace !important;
+      font-size: 0.8rem !important;
+      border-radius: 6px !important;
+      box-shadow: none !important;
     }
-    .btn-danger:active { top: 3px !important; box-shadow: 0 1px 0 #7a0000 !important; }
 
-    /* ── Section headers ── */
+    /* ── Section Headers ── */
     .section-header h1 {
-      font-family: 'Press Start 2P', monospace !important;
-      font-size: clamp(.62rem, 1.4vw, .84rem) !important;
-      color: #f8d8a0 !important;
-      text-shadow: 2px 2px 0 rgba(229,37,33,.35) !important;
-      letter-spacing: .5px !important;
+      font-family: 'IBM Plex Mono', monospace !important;
+      font-size: 1.35rem !important;
+      font-weight: 700 !important;
+      color: var(--pro-text) !important;
+      text-shadow: none !important;
+      letter-spacing: -0.2px !important;
     }
-    .section-header h1 i { color: #e52521 !important; filter: drop-shadow(0 0 4px rgba(229,37,33,.4)) !important; }
+    .section-header h1 i {
+      color: var(--pro-accent) !important;
+      filter: none !important;
+      font-size: 1.15rem !important;
+    }
 
-    /* ── Stat cards ── */
+    /* ── Stat Cards ── */
+    .stats-grid {
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important;
+      gap: 10px !important;
+      margin-bottom: 20px !important;
+    }
     .stat-card {
-      border-top: 3px solid #e52521 !important;
-      border-radius: 0 !important;
-      overflow: visible !important;
-      position: relative !important;
+      border: 1px solid var(--pro-border) !important;
+      border-top: none !important;
+      border-radius: 8px !important;
+      overflow: hidden !important;
+      background: var(--pro-card) !important;
+      padding: 12px 14px !important;
+      gap: 10px !important;
+      transition: all 0.2s ease !important;
     }
     .stat-card::before {
-      content: '?';
-      position: absolute;
-      top: -14px; right: 8px;
-      width: 22px; height: 22px;
-      background: #f7b731;
-      color: #1a0800;
-      font-family: 'Press Start 2P', monospace;
-      font-size: .38rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 1px 1px 0 #b88a20;
-      z-index: 1;
+      content: '' !important;
+      position: absolute !important;
+      top: 0 !important; left: 0 !important; right: 0 !important;
+      height: 3px !important;
+      width: 100% !important;
+      display: block !important;
+      box-shadow: none !important;
+      background: var(--pro-accent) !important;
     }
-    .stat-number { font-family: 'Press Start 2P', monospace !important; font-size: 1.15rem !important; }
-    .stat-label { font-family: 'Press Start 2P', monospace !important; font-size: .38rem !important; letter-spacing: .5px !important; }
+    .stat-card:hover {
+      border-color: var(--pro-border-hover) !important;
+      transform: translateY(-2px) !important;
+      box-shadow: 0 4px 20px rgba(0,0,0,.3) !important;
+    }
+    .stat-contacts::before { background: var(--pro-cyan) !important; }
+    .stat-teams::before { background: var(--pro-purple) !important; }
+    .stat-links::before { background: var(--pro-pink) !important; }
+    .stat-todos::before { background: var(--pro-success) !important; }
+    .stat-apikeys::before { background: var(--pro-warning) !important; }
+    .stat-notes::before { background: var(--pro-accent) !important; }
 
-    /* ── Widget headers ── */
+    .stat-icon {
+      width: 34px !important;
+      height: 34px !important;
+      border-radius: 6px !important;
+      font-size: 0.88rem !important;
+    }
+    .stat-contacts .stat-icon { background: rgba(103,232,249,.08) !important; color: var(--pro-cyan) !important; text-shadow: none !important; }
+    .stat-teams .stat-icon { background: rgba(167,139,250,.08) !important; color: var(--pro-purple) !important; text-shadow: none !important; }
+    .stat-links .stat-icon { background: rgba(244,114,182,.08) !important; color: var(--pro-pink) !important; text-shadow: none !important; }
+    .stat-todos .stat-icon { background: rgba(74,222,128,.08) !important; color: var(--pro-success) !important; text-shadow: none !important; }
+    .stat-apikeys .stat-icon { background: rgba(251,191,36,.08) !important; color: var(--pro-warning) !important; text-shadow: none !important; }
+    .stat-notes .stat-icon { background: var(--pro-accent-subtle) !important; color: var(--pro-accent) !important; text-shadow: none !important; }
+
+    .stat-number {
+      font-family: 'IBM Plex Mono', monospace !important;
+      font-size: 1.3rem !important;
+      font-weight: 700 !important;
+      color: var(--pro-text) !important;
+    }
+    .stat-label {
+      font-family: 'IBM Plex Mono', monospace !important;
+      font-size: 0.65rem !important;
+      letter-spacing: 0.4px !important;
+      color: var(--pro-text-secondary) !important;
+    }
+
+    /* ── Dashboard Widgets ── */
     .widget-header h2 {
-      font-family: 'Press Start 2P', monospace !important;
-      font-size: .52rem !important;
-      color: #f8d8a0 !important;
+      font-family: 'IBM Plex Mono', monospace !important;
+      font-size: 0.78rem !important;
+      font-weight: 600 !important;
+      color: var(--pro-text) !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.4px !important;
     }
-    .widget-header h2 i { color: #e52521 !important; }
+    .widget-header h2 i { color: var(--pro-accent) !important; font-size: 0.75rem !important; }
+    .widget-header { margin-bottom: 10px !important; }
     .dashboard-widget, .dashboard-todo-widget, .dashboard-calendar-widget {
-      border-top: 3px solid rgba(229,37,33,.4) !important;
-      border-radius: 0 !important;
+      border: 1px solid var(--pro-border) !important;
+      border-top: none !important;
+      border-radius: 8px !important;
+      background: var(--pro-card) !important;
+      overflow: hidden !important;
     }
+    .dashboard-widget::before, .dashboard-todo-widget::before, .dashboard-calendar-widget::before {
+      content: '';
+      display: block;
+      height: 2px;
+      background: linear-gradient(90deg, var(--pro-accent), transparent);
+    }
+    .dashboard-todo-widget::before {
+      background: linear-gradient(90deg, var(--pro-success), transparent);
+    }
+    .dashboard-calendar-widget::before {
+      background: linear-gradient(90deg, var(--pro-purple), transparent);
+    }
+    /* Compact inner padding - apply via the base CSS padding override */
+    .dashboard-widget { padding: 12px 14px !important; }
+    .dashboard-todo-widget { padding: 12px 14px !important; }
+    .dashboard-calendar-widget { padding: 12px 14px !important; }
 
-    /* ── Terminal console ── */
-    .terminal-console { border-radius: 0 !important; }
-    .terminal-header {
-      background: #110205 !important;
-      border-bottom: 2px solid #e52521 !important;
+    /* ── Terminal Console ── */
+    .terminal-console {
+      border-radius: 8px !important;
+      border: 1px solid var(--pro-border) !important;
+      overflow: hidden !important;
+      margin-top: 0 !important;
     }
-    .terminal-header span { font-family: 'Press Start 2P', monospace !important; font-size: .44rem !important; color: #f7b731 !important; }
-    .terminal-prompt { color: #e52521 !important; }
+    .terminal-header {
+      background: var(--pro-surface) !important;
+      border-bottom: 1px solid var(--pro-border) !important;
+      padding: 6px 12px !important;
+    }
+    .terminal-header span {
+      font-family: 'IBM Plex Mono', monospace !important;
+      font-size: 0.72rem !important;
+      color: var(--pro-text-secondary) !important;
+    }
+    .terminal-body {
+      max-height: 120px !important;
+      padding: 8px 12px !important;
+      font-size: 0.72rem !important;
+    }
+    .terminal-prompt { color: var(--pro-accent) !important; }
 
     /* ── Modals ── */
     .modal {
-      border: 2px solid rgba(229,37,33,.35) !important;
-      border-top: 3px solid #e52521 !important;
-      border-radius: 0 !important;
-      box-shadow: 0 0 0 1px #9b1a17, 0 0 40px rgba(229,37,33,.1), 0 20px 40px rgba(0,0,0,.6) !important;
+      border: 1px solid var(--pro-border) !important;
+      border-top: none !important;
+      border-radius: 10px !important;
+      box-shadow: 0 20px 60px rgba(0,0,0,.5) !important;
+      overflow: hidden !important;
+    }
+    .modal::before {
+      background: linear-gradient(90deg, var(--pro-accent), var(--pro-cyan), transparent) !important;
+      height: 3px !important;
     }
     .modal-header {
-      background: #110205 !important;
-      border-bottom: 2px solid rgba(229,37,33,.3) !important;
+      background: var(--pro-surface) !important;
+      border-bottom: 1px solid var(--pro-border) !important;
     }
-    .modal-header h2 { font-family: 'Press Start 2P', monospace !important; font-size: .56rem !important; color: #f8d8a0 !important; }
+    .modal-header h2 {
+      font-family: 'IBM Plex Mono', monospace !important;
+      font-size: 0.95rem !important;
+      font-weight: 600 !important;
+      color: var(--pro-text) !important;
+    }
 
-    /* ── Form labels ── */
-    .form-group label { font-family: 'Press Start 2P', monospace !important; font-size: .44rem !important; color: #f8d8a0 !important; letter-spacing: .5px !important; }
+    /* ── Form Labels ── */
+    .form-group label {
+      font-family: 'IBM Plex Mono', monospace !important;
+      font-size: 0.78rem !important;
+      color: var(--pro-text-secondary) !important;
+      letter-spacing: 0.3px !important;
+    }
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      border-radius: 6px !important;
+      font-size: 0.85rem !important;
+    }
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      border-color: var(--pro-accent) !important;
+      box-shadow: 0 0 0 3px rgba(91,141,239,.12) !important;
+    }
 
-    /* ── Loading overlay ── */
-    .loading-text { font-family: 'Press Start 2P', monospace !important; color: #f7b731 !important; font-size: .52rem !important; text-shadow: 0 0 10px rgba(247,183,49,.35) !important; }
-    .spinner { border-top-color: #e52521 !important; box-shadow: 0 0 8px rgba(229,37,33,.3) !important; }
+    /* ── Loading Overlay ── */
+    .loading-text {
+      font-family: 'IBM Plex Mono', monospace !important;
+      color: var(--pro-accent) !important;
+      font-size: 0.9rem !important;
+      text-shadow: none !important;
+      font-weight: 600 !important;
+      letter-spacing: 1px !important;
+    }
+    .spinner {
+      border-top-color: var(--pro-accent) !important;
+      box-shadow: 0 0 12px rgba(91,141,239,.2) !important;
+    }
+    .neon-progress-bar {
+      background: linear-gradient(90deg, var(--pro-accent), var(--pro-cyan)) !important;
+      box-shadow: 0 0 8px rgba(91,141,239,.3) !important;
+    }
 
     /* ── Quick FAB ── */
-    .quick-fab-main { background: #e52521 !important; box-shadow: 0 4px 0 #9b1a17 !important; border-radius: 0 !important; }
-    .quick-fab-item { font-family: 'Press Start 2P', monospace !important; font-size: .42rem !important; border-radius: 0 !important; }
+    .quick-fab-main {
+      background: var(--pro-accent) !important;
+      border: 1px solid var(--pro-accent) !important;
+      color: #fff !important;
+      box-shadow: 0 4px 16px rgba(91,141,239,.3) !important;
+      border-radius: 50% !important;
+    }
+    .quick-fab-main:hover {
+      background: var(--pro-accent-hover) !important;
+      border-color: var(--pro-accent-hover) !important;
+    }
+    .quick-fab-item {
+      font-family: 'IBM Plex Mono', monospace !important;
+      font-size: 0.78rem !important;
+      border-radius: 6px !important;
+      background: var(--pro-card) !important;
+      border: 1px solid var(--pro-border) !important;
+    }
+    .quick-fab-item:hover {
+      border-color: var(--pro-accent) !important;
+      color: var(--pro-accent) !important;
+    }
 
-    /* ── Command palette ── */
-    .command-palette-shell { border: 2px solid #e52521 !important; border-radius: 0 !important; box-shadow: 0 0 0 1px #9b1a17, 0 0 40px rgba(229,37,33,.12) !important; }
-    .command-palette-header { border-bottom: 2px solid rgba(229,37,33,.35) !important; background: #110205 !important; }
-    .command-palette-header i { color: #e52521 !important; }
+    /* ── Command Palette ── */
+    .command-palette-shell {
+      border: 1px solid var(--pro-border) !important;
+      border-radius: 10px !important;
+      box-shadow: 0 20px 60px rgba(0,0,0,.5) !important;
+    }
+    .command-palette-header {
+      border-bottom: 1px solid var(--pro-border) !important;
+      background: var(--pro-surface) !important;
+    }
+    .command-palette-header i { color: var(--pro-accent) !important; }
 
     /* ── Settings ── */
-    .settings-card { border-top: 3px solid rgba(229,37,33,.4) !important; border-radius: 0 !important; }
-    .settings-card h3 { font-family: 'Press Start 2P', monospace !important; font-size: .52rem !important; color: #f7b731 !important; }
-    .settings-card h3 i { color: #e52521 !important; }
+    .settings-card {
+      border: 1px solid var(--pro-border) !important;
+      border-top: none !important;
+      border-radius: 8px !important;
+      background: var(--pro-card) !important;
+      overflow: hidden !important;
+    }
+    .settings-card::before {
+      content: '';
+      display: block;
+      height: 3px;
+      background: linear-gradient(90deg, var(--pro-accent), transparent);
+    }
+    .settings-card.danger-zone::before {
+      background: linear-gradient(90deg, var(--pro-danger), transparent);
+    }
+    .settings-card h3 {
+      font-family: 'IBM Plex Mono', monospace !important;
+      font-size: 0.9rem !important;
+      font-weight: 600 !important;
+      color: var(--pro-text) !important;
+    }
+    .settings-card h3 i { color: var(--pro-accent) !important; }
+    .settings-card.danger-zone h3 i { color: var(--pro-danger) !important; }
 
-    /* ── Content cards ── */
-    .secure-warning { border-left: 3px solid #e52521 !important; border-radius: 0 !important; }
-    .mobile-menu-toggle { background: #e52521 !important; border-radius: 0 !important; box-shadow: 0 3px 0 #9b1a17 !important; }
-    .toast { border-radius: 0 !important; border-left: 3px solid #e52521 !important; }
-    .empty-state i { color: #e52521 !important; }
-    .empty-state h3 { font-family: 'Press Start 2P', monospace !important; font-size: .55rem !important; }
-    .nepali-date-display { border-color: rgba(229,37,33,.3) !important; color: #f7b731 !important; background: rgba(229,37,33,.04) !important; }
-    .calendar-weekday.sun, .calendar-weekday.sat { color: #e52521 !important; }
-    .dash-cal-wday.sun, .dash-cal-wday.sat { color: #e52521 !important; }
+    /* ── Content Cards ── */
+    .contact-card, .team-card, .link-card {
+      border-radius: 8px !important;
+      background: var(--pro-card) !important;
+      border: 1px solid var(--pro-border) !important;
+    }
+    .contact-card:hover, .team-card:hover, .link-card:hover {
+      border-color: var(--pro-border-hover) !important;
+      box-shadow: 0 4px 20px rgba(0,0,0,.3) !important;
+    }
+    .secure-warning {
+      border-left: 3px solid var(--pro-warning) !important;
+      border-radius: 6px !important;
+      background: rgba(251,191,36,.04) !important;
+    }
+    .mobile-menu-toggle {
+      background: var(--pro-accent) !important;
+      border-radius: 8px !important;
+      box-shadow: 0 2px 8px rgba(91,141,239,.2) !important;
+    }
+    .toast {
+      border-radius: 8px !important;
+      border-left: 3px solid var(--pro-accent) !important;
+      background: var(--pro-card) !important;
+    }
+    .toast.success { border-left-color: var(--pro-success) !important; }
+    .toast.error { border-left-color: var(--pro-danger) !important; }
+    .toast.warning { border-left-color: var(--pro-warning) !important; }
+
+    .empty-state i { color: var(--pro-accent) !important; opacity: 0.4 !important; }
+    .empty-state h3 {
+      font-family: 'IBM Plex Mono', monospace !important;
+      font-size: 0.95rem !important;
+      color: var(--pro-text-secondary) !important;
+    }
+    .nepali-date-display {
+      border-color: var(--pro-border) !important;
+      color: var(--pro-text-secondary) !important;
+      background: var(--pro-accent-subtle) !important;
+    }
+
+    /* ── Calendar ── */
+    .calendar-weekday.sun, .calendar-weekday.sat { color: var(--pro-danger) !important; }
+    .dash-cal-wday.sun, .dash-cal-wday.sat { color: var(--pro-danger) !important; }
+
+    /* ── Search Bar ── */
+    .search-bar input {
+      background: var(--pro-card) !important;
+      border: 1px solid var(--pro-border) !important;
+      border-radius: 6px !important;
+    }
+    .search-bar input:focus {
+      border-color: var(--pro-accent) !important;
+      box-shadow: 0 0 0 3px rgba(91,141,239,.1) !important;
+    }
+
+    /* ── View Toggle ── */
+    .view-btn.active {
+      background: var(--pro-accent-subtle) !important;
+      color: var(--pro-accent) !important;
+    }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--pro-border); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--pro-text-muted); }
+
+    /* ── Main Content Background ── */
+    .main-content { background: var(--pro-bg) !important; }
+
+    /* ── Disable retro effects ── */
+    body.dashboard-page::after { display: none !important; }
+    .grid-overlay {
+      background-image:
+        linear-gradient(rgba(91,141,239,0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(91,141,239,0.015) 1px, transparent 1px) !important;
+      background-size: 48px 48px !important;
+    }
+    #matrix-bg { opacity: 0.03 !important; }
+
+    /* ── Card header info ── */
+    .card-header-info h3 { color: var(--pro-text) !important; }
+    .card-header-info .card-role { color: var(--pro-purple) !important; }
+    .card-detail { color: var(--pro-text-secondary) !important; }
+    .card-notes { color: var(--pro-text-muted) !important; border-top-color: var(--pro-border) !important; }
+    .link-url { color: var(--pro-accent) !important; }
+
+    /* ── Dash empty msg / recent / todo ── */
+    .dash-empty-msg { color: var(--pro-text-muted) !important; font-size: 0.78rem !important; padding: 8px 0 !important; }
+    .dash-todo-list { font-size: 0.78rem !important; }
+    .dash-recent-list { font-size: 0.78rem !important; gap: 5px !important; }
+    .dash-recent-item { padding: 7px 10px !important; gap: 9px !important; }
+    .dash-recent-icon { width: 26px !important; height: 26px !important; font-size: 0.72rem !important; }
+    .dash-recent-name { font-size: 0.78rem !important; }
+    .dash-recent-detail { font-size: 0.68rem !important; }
+    /* Compact dashboard column gaps */
+    .dashboard-grid { gap: 14px !important; }
+    .dashboard-col-left, .dashboard-col-right { gap: 12px !important; }
+    /* Calendar widget optimised size */
+    .dash-cal-day { padding: 4px 1px !important; font-size: 0.68rem !important; }
+    .dash-cal-wday { font-size: 0.58rem !important; padding: 2px 0 !important; }
+    .dash-cal-month { font-size: 0.72rem !important; min-width: 110px !important; }
+    .dash-cal-weekdays { gap: 1px !important; margin-bottom: 2px !important; }
+    .dash-cal-days { gap: 1px !important; }
+
+    /* ── Logout button ── */
+    .btn-logout {
+      border-color: rgba(248,113,113,.15) !important;
+      color: var(--pro-text-muted) !important;
+    }
+    .btn-logout:hover {
+      border-color: var(--pro-danger) !important;
+      color: var(--pro-danger) !important;
+      background: rgba(248,113,113,.06) !important;
+    }
+
+    /* ── Contact View Modal ── */
+    #contact-view-modal .cv-shell {
+      width: 100%;
+      max-width: 400px;
+      background: #12141c;
+      border-radius: 12px;
+      border: 1px solid #1e2030;
+      box-shadow: 0 24px 64px rgba(0,0,0,.7);
+      overflow: hidden;
+      animation: modalSlideIn 0.25s ease;
+      font-family: 'IBM Plex Mono', 'Fira Code', monospace;
+    }
+    #contact-view-modal .cv-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 18px 14px;
+      background: #0c0e14;
+      border-bottom: 1px solid #1e2030;
+    }
+    #contact-view-modal .cv-avatar {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: rgba(91,141,239,.15);
+      border: 1.5px solid rgba(91,141,239,.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.05rem; font-weight: 700; color: #7aa3ff;
+      flex-shrink: 0;
+    }
+    #contact-view-modal .cv-name {
+      font-size: 0.95rem; font-weight: 700; color: #e2e4ec;
+    }
+    #contact-view-modal .cv-role {
+      font-size: 0.7rem; color: #6b7280; margin-top: 2px;
+    }
+    #contact-view-modal .cv-close {
+      margin-left: auto;
+      background: none; border: none; cursor: pointer;
+      color: #4a4e66; font-size: 0.85rem; padding: 4px 6px;
+      border-radius: 4px; transition: color 0.15s;
+    }
+    #contact-view-modal .cv-close:hover { color: #f87171; }
+    #contact-view-modal .cv-row {
+      display: flex; align-items: center;
+      padding: 0 14px 0 0;
+      height: 44px;
+      border-bottom: 1px solid rgba(30,32,48,.8);
+      cursor: default;
+      transition: background 0.12s;
+    }
+    #contact-view-modal .cv-row:last-child { border-bottom: none; }
+    #contact-view-modal .cv-row:hover { background: rgba(91,141,239,.04); }
+    #contact-view-modal .cv-row-icon {
+      width: 40px; text-align: center;
+      font-size: 0.75rem; color: #3d4466; flex-shrink: 0;
+    }
+    #contact-view-modal .cv-row-label {
+      font-size: 0.62rem; color: #4a4e66;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      width: 62px; flex-shrink: 0;
+    }
+    #contact-view-modal .cv-row-val {
+      flex: 1; font-size: 0.8rem; color: #c8d0e0;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;
+    }
+    #contact-view-modal .cv-row-val.em { color: #67e8f9; }
+    #contact-view-modal .cv-row-val.ph { color: #4ade80; }
+    #contact-view-modal .cv-row-val.li { color: #a78bfa; }
+    #contact-view-modal .cv-copy-btn {
+      background: none; border: 1px solid #1e2030;
+      border-radius: 5px; cursor: pointer;
+      color: #4a4e66; padding: 4px 8px;
+      font-size: 0.68rem; transition: all 0.15s;
+      display:flex; align-items:center; gap:4px;
+      font-family: 'IBM Plex Mono', monospace;
+      flex-shrink: 0;
+    }
+    #contact-view-modal .cv-copy-btn:hover {
+      color: #7aa3ff; border-color: rgba(91,141,239,.4);
+      background: rgba(91,141,239,.08);
+    }
+    #contact-view-modal .cv-notes {
+      margin: 8px 14px 12px;
+      padding: 10px 12px;
+      background: #0c0e14;
+      border: 1px solid #1e2030;
+      border-radius: 6px;
+      font-size: 0.78rem; color: #6b7280;
+      line-height: 1.6; white-space: pre-wrap; word-break: break-word;
+    }
+    #contact-view-modal .cv-notes-lbl {
+      font-size: 0.6rem; text-transform: uppercase;
+      letter-spacing: 0.5px; color: #3d4466;
+      margin-bottom: 4px; display: block;
+    }
+    #contact-view-modal .cv-foot {
+      display: flex; justify-content: flex-end;
+      padding: 10px 14px;
+      border-top: 1px solid #1e2030;
+      background: #0c0e14;
+    }
   </style>
 </head>
 <body class="dashboard-page">
@@ -218,7 +646,7 @@
 
   <!-- Loading overlay -->
   <div id="loading-overlay" class="loading-overlay">
-    <div class="loading-text">INITIALIZING DATADOCK...</div>
+    <div class="loading-text">Loading DataDock...</div>
     <div class="spinner"></div>
     <div class="neon-progress"><div class="neon-progress-bar"></div></div>
   </div>
@@ -300,20 +728,21 @@
   <!-- Main Content -->
   <main class="main-content">
 
-    <!-- Mario Score Bar -->
+    <!-- Status Bar -->
     <div class="mario-score-bar">
-      <span>SCORE <b>000000</b></span>
-      <span>★ × <b>03</b></span>
-      <span>WORLD <b>1-1</b></span>
-      <span>TIME <b class="msb-blink">∞</b></span>
-      <span class="msb-right">STATUS <b style="color:#00a800">■ ONLINE</b></span>
+      <span><i class="fas fa-database" style="color:var(--pro-accent);margin-right:4px;"></i> <b>DataDock</b></span>
+      <span class="msb-divider"></span>
+      <span>Environment <b>Production</b></span>
+      <span class="msb-divider"></span>
+      <span>Records <b id="status-total-records">0</b></span>
+      <span class="msb-right"><i class="fas fa-circle" style="color:var(--pro-success);font-size:0.5rem;margin-right:4px;"></i> <b>Connected</b></span>
     </div>
 
     <!-- ==================== DASHBOARD SECTION ==================== -->
     <section id="section-dashboard" class="content-section active">
       <div class="section-header">
         <div>
-          <h1><i class="fas fa-th-large"></i> Dashboard</h1>
+          <h1><i class="fas fa-th-large"></i> Overview</h1>
           <div class="nepali-date-display" id="nepali-date">
             <i class="fas fa-calendar-alt"></i>
             <span id="nepali-date-text">Loading BS date...</span>
@@ -446,8 +875,8 @@
               <button class="terminal-clear-btn" id="terminal-clear" title="Clear"><i class="fas fa-eraser"></i></button>
             </div>
             <div class="terminal-body" id="terminal-body">
-              <div class="terminal-line"><span class="terminal-prompt">&gt;</span> DataDock v2.0 — Retro terminal interface loaded</div>
-              <div class="terminal-line"><span class="terminal-prompt">&gt;</span> Awaiting commands...<span class="typewriter-cursor"></span></div>
+              <div class="terminal-line"><span class="terminal-prompt">&gt;</span> DataDock v2.0 — System ready</div>
+              <div class="terminal-line"><span class="terminal-prompt">&gt;</span> Monitoring data operations...<span class="typewriter-cursor"></span></div>
             </div>
           </div>
         </div>
@@ -787,6 +1216,25 @@
   </div>
 
   <!-- ==================== MODALS ==================== -->
+
+  <!-- Contact View Modal -->
+  <div id="contact-view-modal" class="modal-overlay hidden">
+    <div class="cv-shell">
+      <div class="cv-top">
+        <div class="cv-avatar" id="cv-avatar"></div>
+        <div>
+          <div class="cv-name" id="cv-name"></div>
+          <div class="cv-role" id="cv-role"></div>
+        </div>
+        <button class="cv-close" onclick="document.getElementById('contact-view-modal').classList.add('hidden')"><i class="fas fa-times"></i></button>
+      </div>
+      <div id="cv-fields"></div>
+      <div id="cv-notes" style="display:none;"></div>
+      <div class="cv-foot">
+        <button class="btn btn-primary" style="font-size:0.75rem;padding:7px 16px;" onclick="window.datadock.copyViewAll()"><i class="fas fa-copy"></i> Copy All</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Contact Modal -->
   <div id="contact-modal" class="modal-overlay hidden">
@@ -1133,7 +1581,7 @@
       function draw() {
         ctx.fillStyle = 'rgba(10, 10, 15, 0.06)';
         ctx.fillRect(0, 0, w, h);
-        ctx.fillStyle = '#e5252118';
+        ctx.fillStyle = '#5b8def12';
         ctx.font = '14px monospace';
         for (let i = 0; i < cols; i++) {
           const char = chars[Math.floor(Math.random() * chars.length)];
