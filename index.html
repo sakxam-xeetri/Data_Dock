@@ -4,203 +4,1470 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DataDock — Personal Data Dashboard</title>
-  <link rel="stylesheet" href="assets/css/style.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Fira+Code:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ===================================================
+       DATADOCK — MARIO TERMINAL THEME  (landing only)
+       =================================================== */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --red:       #e52521;
+      --dark-red:  #9b1a17;
+      --gold:      #f7b731;
+      --dark-gold: #b88a20;
+      --blue:      #5b8dd9;
+      --sky:       #92c0e8;
+      --green:     #00a800;
+      --bg:        #0d0208;
+      --bg2:       #17050e;
+      --bg3:       #210910;
+      --dark:      #110408;
+      --white:     #fcfcfc;
+      --cream:     #f8d8a0;
+      --muted:     #9a7080;
+    }
+
+    html { font-size: 14px; scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Fira Code', monospace;
+      background: var(--bg);
+      color: var(--white);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* CRT scanlines */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent, transparent 2px,
+        rgba(0,0,0,0.2) 2px, rgba(0,0,0,0.2) 4px
+      );
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* pixel grid */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(229,37,33,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(229,37,33,0.025) 1px, transparent 1px);
+      background-size: 16px 16px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    a { color: var(--gold); text-decoration: none; transition: all .15s; }
+    a:hover { color: var(--white); text-shadow: 0 0 8px var(--gold); }
+
+    /* ── containers ─────────────────────────────── */
+    .wrap { width: min(1120px, 92vw); margin: 0 auto; }
+
+    /* ── pixel buttons ───────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: .58rem;
+      padding: 10px 18px;
+      cursor: pointer;
+      text-decoration: none;
+      letter-spacing: .5px;
+      position: relative;
+      top: 0;
+      transition: top .08s, box-shadow .08s;
+      border: none;
+      line-height: 1;
+    }
+    .btn:active { top: 3px; }
+
+    .btn-red {
+      background: var(--red);
+      color: var(--white);
+      border: 2px solid #ff6b65;
+      box-shadow: 0 4px 0 var(--dark-red);
+    }
+    .btn-red:hover {
+      background: #ff3a35;
+      color: var(--white);
+      box-shadow: 0 4px 0 var(--dark-red), 0 0 18px rgba(229,37,33,.5);
+      text-shadow: none;
+    }
+    .btn-red:active { box-shadow: 0 1px 0 var(--dark-red); }
+
+    .btn-gold {
+      background: var(--gold);
+      color: #1a0800;
+      border: 2px solid #ffd560;
+      box-shadow: 0 4px 0 var(--dark-gold);
+    }
+    .btn-gold:hover {
+      background: #ffc940;
+      color: #1a0800;
+      box-shadow: 0 4px 0 var(--dark-gold), 0 0 18px rgba(247,183,49,.5);
+      text-shadow: none;
+    }
+    .btn-gold:active { box-shadow: 0 1px 0 var(--dark-gold); }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--white);
+      border: 2px solid rgba(255,255,255,.35);
+      box-shadow: 0 4px 0 rgba(0,0,0,.5);
+    }
+    .btn-ghost:hover {
+      background: rgba(255,255,255,.06);
+      color: var(--white);
+      text-shadow: none;
+      border-color: rgba(255,255,255,.6);
+    }
+    .btn-ghost:active { box-shadow: 0 1px 0 rgba(0,0,0,.5); }
+
+    /* ── shared section helpers ──────────────────── */
+    section { position: relative; z-index: 1; }
+
+    .section-header { text-align: center; margin-bottom: 46px; }
+
+    .section-tag {
+      display: inline-block;
+      font-family: 'Press Start 2P', monospace;
+      font-size: .45rem;
+      color: var(--green);
+      text-shadow: 0 0 10px var(--green);
+      letter-spacing: 2px;
+      margin-bottom: 14px;
+    }
+    .section-tag::before { content: '★ '; }
+    .section-tag::after  { content: ' ★'; }
+
+    .section-title {
+      font-family: 'Press Start 2P', monospace;
+      font-size: clamp(.72rem, 2vw, 1rem);
+      line-height: 1.8;
+      color: var(--white);
+      text-shadow: 2px 2px 0 rgba(229,37,33,.35);
+      margin-bottom: 10px;
+    }
+
+    .section-sub {
+      font-size: .78rem;
+      color: var(--muted);
+    }
+
+    /* ── animations ──────────────────────────────── */
+    @keyframes blink    { 50% { opacity: 0; } }
+    @keyframes fill-bar { from { width: 30%; } to { width: 92%; } }
+    @keyframes float    { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+
+    /* =============================================
+       HEADER
+       ============================================= */
+    .mario-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--dark);
+      border-bottom: 3px solid var(--red);
+      box-shadow: 0 3px 0 var(--dark-red), 0 6px 20px rgba(229,37,33,.2);
+    }
+
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 66px;
+    }
+
+    .mario-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: .85rem;
+      color: var(--gold);
+      text-shadow: 2px 2px 0 var(--dark-red), 0 0 20px rgba(247,183,49,.4);
+      text-decoration: none;
+    }
+    .mario-logo .logo-box {
+      width: 38px;
+      height: 38px;
+      background: var(--red);
+      border: 2px solid var(--gold);
+      box-shadow: 2px 2px 0 var(--dark-red);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+    .mario-logo:hover { color: var(--white); text-shadow: 2px 2px 0 var(--red); }
+
+    .header-nav { display: flex; gap: 10px; align-items: center; }
+
+    /* =============================================
+       SCORE BAR
+       ============================================= */
+    .score-bar {
+      background: var(--bg3);
+      border-bottom: 2px solid rgba(247,183,49,.15);
+      padding: 7px 0;
+    }
+    .score-bar-inner {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+      flex-wrap: wrap;
+      font-family: 'Press Start 2P', monospace;
+      font-size: .48rem;
+      letter-spacing: 1px;
+    }
+    .s-item { color: var(--cream); }
+    .s-item span { color: var(--gold); }
+    .s-item .blink { animation: blink 1s step-end infinite; }
+    .s-right { margin-left: auto; }
+
+    /* =============================================
+       HERO
+       ============================================= */
+    .hero {
+      padding: 44px 0 36px;
+      overflow: hidden;
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 0.88fr 1.12fr;
+      gap: 28px;
+      align-items: start;
+    }
+
+    .term-prompt {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: .5rem;
+      color: var(--green);
+      text-shadow: 0 0 10px var(--green);
+      margin-bottom: 14px;
+      letter-spacing: 1px;
+    }
+    .term-prompt::before { content: '> '; color: var(--gold); }
+
+    .hero-title {
+      font-family: 'Press Start 2P', monospace;
+      font-size: clamp(1rem, 3vw, 1.75rem);
+      line-height: 1.65;
+      margin-bottom: 22px;
+      color: var(--white);
+    }
+    .t-red  { color: var(--red);  text-shadow: 2px 2px 0 var(--dark-red); }
+    .t-gold { color: var(--gold); text-shadow: 2px 2px 0 var(--dark-gold); }
+    .t-blue { color: var(--sky);  text-shadow: 2px 2px 0 #2a5c99; }
+    .t-dim  { font-size: .62em; color: var(--muted); }
+
+    .hero-sub {
+      font-size: .82rem;
+      color: #c8a0a8;
+      line-height: 1.9;
+      margin-bottom: 28px;
+      max-width: 540px;
+      border-left: 3px solid var(--red);
+      padding-left: 16px;
+    }
+    .hero-sub::after {
+      content: '█';
+      color: var(--gold);
+      animation: blink .8s step-end infinite;
+    }
+
+    .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 34px; }
+
+    .hero-stats {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .stat-box {
+      padding: 10px 14px;
+      background: var(--bg3);
+      border: 2px solid rgba(247,183,49,.18);
+      border-left: 3px solid var(--gold);
+      min-width: 112px;
+    }
+    .stat-box strong {
+      display: block;
+      font-family: 'Press Start 2P', monospace;
+      font-size: .62rem;
+      color: var(--gold);
+      margin-bottom: 4px;
+    }
+    .stat-box span {
+      font-size: .6rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+
+    /* ── NES monitor ──────────────────────────────── */
+    .nes-monitor {
+      background: #06020b;
+      border: 4px solid #5a3a2a;
+      box-shadow:
+        0 0 0 2px #2a1010,
+        0 0 0 6px #3a1e14,
+        0 0 40px rgba(229,37,33,.15),
+        0 22px 40px rgba(0,0,0,.7);
+      overflow: hidden;
+      transition: box-shadow .3s ease;
+    }
+    .nes-monitor:hover {
+      box-shadow:
+        0 0 0 2px #2a1010,
+        0 0 0 6px #3a1e14,
+        0 0 60px rgba(229,37,33,.28),
+        0 22px 40px rgba(0,0,0,.7);
+    }
+
+    .nes-bar {
+      background: #2a1010;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      gap: 7px;
+      border-bottom: 2px solid #3a1818;
+    }
+    .nd { width: 10px; height: 10px; }
+    .nd-r { background: var(--red);   box-shadow: 0 0 6px var(--red); }
+    .nd-y { background: var(--gold);  box-shadow: 0 0 6px var(--gold); }
+    .nd-g { background: var(--green); box-shadow: 0 0 6px var(--green); }
+    .nd-title {
+      margin-left: auto;
+      font-family: 'Press Start 2P', monospace;
+      font-size: .42rem;
+      color: #c8a0a8;
+      letter-spacing: 1px;
+    }
+
+    .nes-screen {
+      padding: 14px 16px;
+      min-height: 240px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: .44rem;
+    }
+
+    .ns-row { display: flex; align-items: center; gap: 8px; margin-bottom: 9px; }
+    .ns-row.jb { justify-content: space-between; color: var(--white); }
+    .ns-row.jb span { color: var(--gold); }
+    .ns-hr { border: none; border-top: 1px dashed rgba(247,183,49,.2); margin: 9px 0; }
+
+    .ns-mod {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 8px;
+      margin-bottom: 5px;
+      background: rgba(255,255,255,.02);
+      border-left: 3px solid var(--red);
+    }
+    .ns-mod .ico { width: 16px; text-align: center; }
+    .ns-mod .lbl { color: var(--white); flex: 1; }
+    .ns-mod .val { color: var(--gold); }
+
+    .ns-prog-bg {
+      height: 8px;
+      background: rgba(255,255,255,.05);
+      margin-top: 12px;
+    }
+    .ns-prog-fill {
+      height: 100%;
+      background: var(--red);
+      box-shadow: 0 0 8px var(--red);
+      animation: fill-bar 3s ease-in-out infinite alternate;
+    }
+
+    /* ── MARIO GAME ──────────────────────────────── */
+    .game-wrap { position: relative; background: #000; }
+    #game-canvas { display: block; width: 100%; aspect-ratio: 16/9; image-rendering: pixelated; background: #6b8cff; }
+    .game-hud {
+      position: absolute; top: 0; left: 0; right: 0;
+      display: flex; justify-content: space-between;
+      padding: 6px 10px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: .42rem;
+      color: #fff;
+      text-shadow: 1px 1px 0 #000;
+      pointer-events: none;
+      z-index: 5;
+    }
+    .game-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 10px;
+      background: #1a0808;
+      border-top: 2px solid #3a1818;
+      gap: 6px;
+    }
+    .gc-group { display: flex; gap: 5px; }
+    .gc-btn {
+      font-family: 'Press Start 2P', monospace;
+      font-size: .52rem;
+      color: #fff;
+      background: #3a1a1a;
+      border: 2px solid #5a2a2a;
+      padding: 10px 16px;
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+      transition: background .06s;
+      line-height: 1;
+    }
+    .gc-btn:active, .gc-btn.active { background: var(--red); border-color: #ff6b65; box-shadow: 0 0 10px rgba(229,37,33,.4); }
+    .gc-btn.gc-jump { background: #2a2a10; border-color: #5a5a20; }
+    .gc-btn.gc-jump:active, .gc-btn.gc-jump.active { background: var(--gold); color: #1a0800; border-color: #ffe060; box-shadow: 0 0 10px rgba(247,183,49,.4); }
+    .gc-btn.gc-start { background: var(--green); border-color: #44cc44; font-size: .44rem; }
+    .gc-btn.gc-start:active { background: #00cc00; }
+    .game-overlay {
+      position: absolute; inset: 0; z-index: 10;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      background: rgba(0,0,0,.75);
+      font-family: 'Press Start 2P', monospace;
+      color: #fff; text-align: center;
+      cursor: pointer;
+    }
+    .game-overlay.hidden { display: none; }
+    .go-title { font-size: .9rem; color: var(--gold); text-shadow: 2px 2px 0 var(--dark-red); margin-bottom: 12px; }
+    .go-sub { font-size: .42rem; color: #c8a0a8; margin-bottom: 6px; }
+    .go-blink { font-size: .46rem; color: var(--green); animation: blink 1s step-end infinite; margin-top: 10px; }
+
+    /* =============================================
+       COIN DIVIDER
+       ============================================= */
+    .coin-row {
+      text-align: center;
+      padding: 16px 0;
+      font-size: .9rem;
+      letter-spacing: 12px;
+      color: var(--gold);
+      opacity: .28;
+    }
+
+    /* =============================================
+       FEATURES / POWER-UPS
+       ============================================= */
+    .features-section {
+      padding: 68px 0;
+      background: linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);
+      border-top:    2px dashed rgba(247,183,49,.1);
+      border-bottom: 2px dashed rgba(247,183,49,.1);
+    }
+
+    .powerups-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 22px;
+    }
+
+    .powerup-card {
+      padding: 24px 20px 20px;
+      background: var(--bg3);
+      border: 2px solid rgba(247,183,49,.1);
+      border-top: 3px solid var(--red);
+      position: relative;
+      transition: all .2s;
+    }
+    /* "?" block tab */
+    .powerup-card::before {
+      content: '?';
+      position: absolute;
+      top: -16px;
+      left: 16px;
+      width: 28px;
+      height: 28px;
+      background: var(--gold);
+      color: #1a0800;
+      font-family: 'Press Start 2P', monospace;
+      font-size: .55rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 2px 2px 0 var(--dark-gold);
+      border: 1px solid #ffe080;
+      line-height: 1;
+    }
+    .powerup-card:hover {
+      border-color: rgba(229,37,33,.28);
+      box-shadow: 0 0 20px rgba(229,37,33,.08), 0 4px 14px rgba(0,0,0,.45);
+      transform: translateY(-3px);
+    }
+
+    .pu-icon {
+      font-size: 1.5rem;
+      margin-bottom: 14px;
+      display: block;
+      filter: drop-shadow(0 0 6px rgba(229,37,33,.4));
+    }
+    .powerup-card h3 {
+      font-family: 'Press Start 2P', monospace;
+      font-size: .54rem;
+      color: var(--gold);
+      margin-bottom: 10px;
+      line-height: 1.55;
+    }
+    .powerup-card p {
+      font-size: .74rem;
+      color: var(--muted);
+      line-height: 1.75;
+    }
+
+    /* =============================================
+       HOW IT WORKS / LEVEL SELECT
+       ============================================= */
+    .how-section { padding: 68px 0; }
+
+    .levels-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 26px;
+    }
+
+    .level-card {
+      padding: 28px 22px;
+      background: var(--bg2);
+      border: 2px solid rgba(247,183,49,.1);
+      text-align: center;
+      position: relative;
+      transition: all .2s;
+    }
+    .level-card:hover {
+      border-color: var(--red);
+      box-shadow: 0 0 20px rgba(229,37,33,.1);
+      transform: translateY(-3px);
+    }
+    /* arrow connector */
+    .level-card:not(:last-child)::after {
+      content: '▶';
+      position: absolute;
+      right: -18px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gold);
+      font-size: .7rem;
+      z-index: 2;
+    }
+
+    .lvl-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 52px;
+      height: 52px;
+      background: var(--red);
+      border: 2px solid #ff6b65;
+      box-shadow: 3px 3px 0 var(--dark-red);
+      font-family: 'Press Start 2P', monospace;
+      font-size: .52rem;
+      color: var(--white);
+      margin-bottom: 18px;
+    }
+    .level-card h3 {
+      font-family: 'Press Start 2P', monospace;
+      font-size: .54rem;
+      color: var(--white);
+      margin-bottom: 12px;
+      line-height: 1.65;
+    }
+    .level-card p {
+      font-size: .76rem;
+      color: var(--muted);
+      line-height: 1.75;
+    }
+
+    /* =============================================
+       CTA
+       ============================================= */
+    .cta-section {
+      padding: 78px 0;
+      background: linear-gradient(180deg, var(--bg) 0%, var(--bg3) 100%);
+    }
+    .cta-box {
+      text-align: center;
+      padding: 52px 42px;
+      background: var(--bg3);
+      border: 3px solid var(--red);
+      box-shadow:
+        0 0 0 1px var(--dark-red),
+        0 0 48px rgba(229,37,33,.12),
+        inset 0 0 60px rgba(229,37,33,.02);
+      position: relative;
+    }
+    .cta-box::before,
+    .cta-box::after {
+      content: '★';
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.4rem;
+      color: var(--gold);
+      opacity: .45;
+      animation: blink 1.5s step-end infinite;
+    }
+    .cta-box::before { left: 22px; }
+    .cta-box::after  { right: 22px; }
+
+    .cta-tag {
+      display: inline-block;
+      font-family: 'Press Start 2P', monospace;
+      font-size: .45rem;
+      color: var(--green);
+      letter-spacing: 3px;
+      text-shadow: 0 0 10px var(--green);
+      margin-bottom: 16px;
+      animation: blink 1s step-end infinite;
+    }
+    .cta-title {
+      font-family: 'Press Start 2P', monospace;
+      font-size: clamp(.7rem, 2.5vw, 1rem);
+      line-height: 1.75;
+      color: var(--white);
+      margin-bottom: 12px;
+    }
+    .cta-sub {
+      font-size: .78rem;
+      color: var(--muted);
+      margin-bottom: 28px;
+    }
+    .cta-hint {
+      font-family: 'Press Start 2P', monospace;
+      font-size: .42rem;
+      color: var(--muted);
+      margin-top: 20px;
+      letter-spacing: 2px;
+    }
+
+    /* =============================================
+       FOOTER
+       ============================================= */
+    .mario-footer {
+      background: var(--dark);
+      border-top: 3px solid var(--red);
+      padding: 20px 0;
+    }
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .footer-inner p {
+      font-family: 'Press Start 2P', monospace;
+      font-size: .4rem;
+      color: #6a3a40;
+    }
+    .footer-link {
+      font-family: 'Press Start 2P', monospace;
+      font-size: .4rem;
+      color: var(--gold);
+      padding: 6px 10px;
+      border: 1px solid rgba(247,183,49,.25);
+    }
+    .footer-link:hover { background: rgba(247,183,49,.06); color: var(--gold); text-shadow: none; }
+
+    /* =============================================
+       RESPONSIVE
+       ============================================= */
+    @media (max-width: 800px) {
+      .hero-grid { grid-template-columns: 1fr; }
+      .nes-monitor { display: none; }
+      .levels-grid { grid-template-columns: 1fr; }
+      .level-card::after { display: none; }
+      .hero-title { font-size: .95rem; }
+      .header-nav .btn-ghost { display: none; }
+    }
+    @media (max-width: 480px) {
+      .powerups-grid { grid-template-columns: 1fr; }
+      .cta-box { padding: 36px 20px; }
+      .cta-box::before, .cta-box::after { display: none; }
+    }
+  </style>
 </head>
-<body class="landing-page">
-  <!-- Matrix Background -->
-  <canvas id="matrix-bg"></canvas>
-  <div class="grid-overlay"></div>
-  <header class="landing-header">
-    <div class="landing-container landing-nav">
-      <a href="index.html" class="landing-brand">
-        <i class="fas fa-database"></i>
-        <span>DataDock</span>
+<body>
+
+  <!-- HEADER -->
+  <header class="mario-header">
+    <div class="wrap header-inner">
+      <a href="index.html" class="mario-logo">
+        <div class="logo-box">🗄️</div>
+        DataDock
       </a>
-      <div class="landing-nav-actions">
-        <a class="btn btn-secondary" href="auth.html">Login</a>
-        <a class="btn btn-primary" href="auth.html">Get Started</a>
-      </div>
+      <nav class="header-nav">
+        <a class="btn btn-ghost" href="auth.html">LOGIN</a>
+        <a class="btn btn-red"   href="auth.html">▶ START</a>
+      </nav>
     </div>
   </header>
 
+  <!-- SCORE BAR -->
+  <div class="score-bar">
+    <div class="wrap score-bar-inner">
+      <div class="s-item">SCORE <span>000000</span></div>
+      <div class="s-item">★ × <span>03</span></div>
+      <div class="s-item">WORLD <span>1-1</span></div>
+      <div class="s-item">TIME <span class="blink">∞</span></div>
+      <div class="s-item s-right">STATUS <span style="color:#00a800;">■ ONLINE</span></div>
+    </div>
+  </div>
+
   <main>
-    <section class="hero-section">
-      <div class="landing-container hero-grid">
-        <div class="hero-content">
-          <span class="hero-badge"><i class="fas fa-terminal"></i> &gt;_ Secure Firebase-Powered Workspace</span>
-          <h1>Organize Contacts, Teams &amp; Links in One <span style="color:#00ff99;text-shadow:0 0 20px rgba(0,255,153,0.4)">Terminal-Grade</span> Dashboard</h1>
-          <p>
-            DataDock helps you store and manage your frequently used information with personal
-            authentication, real-time sync, and a retro coder-first interface.
+
+    <!-- ═══════════ HERO ═══════════ -->
+    <section class="hero">
+      <div class="wrap hero-grid">
+
+        <!-- left: text -->
+        <div>
+          <div class="term-prompt">DATADOCK v1.0 — SYSTEM READY</div>
+          <h1 class="hero-title">
+            <span class="t-red">ORGANIZE</span><br>
+            <span class="t-gold">CONTACTS</span>,<br>
+            <span class="t-blue">TEAMS</span> &amp; LINKS<br>
+            <span class="t-dim">IN ONE DASHBOARD</span>
+          </h1>
+          <p class="hero-sub">
+            Secure Firebase workspace. Personal auth, real-time sync, and a productivity-first interface for all your important data.
           </p>
-          <div class="hero-cta">
-            <a class="btn btn-primary" href="auth.html"><i class="fas fa-rocket"></i> Launch DataDock</a>
-            <a class="btn btn-secondary" href="#features"><i class="fas fa-circle-info"></i> Explore Features</a>
+          <div class="hero-btns">
+            <a class="btn btn-red"  href="auth.html">🚀 LAUNCH APP</a>
+            <a class="btn btn-gold" href="#features">★ EXPLORE</a>
           </div>
-          <div class="hero-metrics">
-            <div class="metric-item">
-              <strong>3</strong>
-              <span>Core Modules</span>
-            </div>
-            <div class="metric-item">
-              <strong>100%</strong>
-              <span>Frontend Only</span>
-            </div>
-            <div class="metric-item">
-              <strong>Per User</strong>
-              <span>Private Workspace</span>
-            </div>
+          <div class="hero-stats">
+            <div class="stat-box"><strong>3</strong><span>Core Modules</span></div>
+            <div class="stat-box"><strong>100%</strong><span>Frontend Only</span></div>
+            <div class="stat-box"><strong>1UP</strong><span>Private Workspace</span></div>
           </div>
         </div>
 
-        <div class="hero-preview">
-          <div class="preview-card">
-            <div class="preview-topbar">
-              <span></span><span></span><span></span>
+        <!-- right: NES game screen -->
+        <div>
+          <div class="nes-monitor">
+            <div class="nes-bar">
+              <div class="nd nd-r"></div>
+              <div class="nd nd-y"></div>
+              <div class="nd nd-g"></div>
+              <div class="nd-title">MARIO.EXE</div>
             </div>
-            <div class="preview-layout">
-              <aside class="preview-sidebar">
-                <div class="preview-logo"></div>
-                <div class="preview-menu-line active"></div>
-                <div class="preview-menu-line"></div>
-                <div class="preview-menu-line"></div>
-                <div class="preview-menu-line"></div>
-              </aside>
-              <div class="preview-main">
-                <div class="preview-stats">
-                  <div class="preview-stat"></div>
-                  <div class="preview-stat"></div>
-                  <div class="preview-stat"></div>
-                </div>
-                <div class="preview-cards">
-                  <div class="preview-row"></div>
-                  <div class="preview-row"></div>
-                  <div class="preview-row"></div>
-                </div>
+            <div class="game-wrap">
+              <div class="game-hud">
+                <span id="hud-score">SCORE 0</span>
+                <span id="hud-coins">★ 0</span>
+                <span id="hud-lives">♥ 3</span>
+              </div>
+              <canvas id="game-canvas" width="640" height="360"></canvas>
+              <div class="game-overlay" id="game-overlay">
+                <div class="go-title">DATADOCK MARIO</div>
+                <div class="go-sub">COLLECT COINS · DODGE ENEMIES</div>
+                <div class="go-sub">USE BUTTONS OR ARROW KEYS</div>
+                <div class="go-blink">PRESS SPACE TO PLAY</div>
               </div>
             </div>
+            <div class="game-controls">
+              <div class="gc-group">
+                <button class="gc-btn" id="btn-left">◀</button>
+                <button class="gc-btn" id="btn-right">▶</button>
+              </div>
+              <button class="gc-btn gc-start" id="btn-restart">↺</button>
+              <button class="gc-btn gc-jump" id="btn-jump">JUMP</button>
+            </div>
           </div>
         </div>
+
       </div>
     </section>
 
-    <section id="features" class="feature-section">
-      <div class="landing-container">
-        <div class="section-title-wrap">
-          <h2>Everything You Need for Personal Data Management</h2>
-          <p>Designed for speed, clarity, and secure cloud sync.</p>
+    <div class="coin-row">● ● ● ● ● ● ● ● ●</div>
+
+    <!-- ═══════════ POWER-UPS ═══════════ -->
+    <section id="features" class="features-section">
+      <div class="wrap">
+        <div class="section-header">
+          <div class="section-tag">POWER-UPS</div>
+          <h2 class="section-title">EVERYTHING YOU NEED FOR<br>PERSONAL DATA MANAGEMENT</h2>
+          <p class="section-sub">// designed for speed, clarity, and secure cloud sync</p>
         </div>
-        <div class="feature-grid">
-          <article class="feature-card">
-            <i class="fas fa-user-lock"></i>
-            <h3>Secure Authentication</h3>
-            <p>Email/password and Google login with isolated per-user workspace.</p>
+        <div class="powerups-grid">
+          <article class="powerup-card">
+            <span class="pu-icon">🔐</span>
+            <h3>SECURE AUTH</h3>
+            <p>Email/password and Google login with isolated per-user workspace and Firebase protection.</p>
           </article>
-          <article class="feature-card">
-            <i class="fas fa-address-book"></i>
-            <h3>Contact Hub</h3>
-            <p>Store complete profiles with role, social links, and personal notes.</p>
+          <article class="powerup-card">
+            <span class="pu-icon">👤</span>
+            <h3>CONTACT HUB</h3>
+            <p>Store complete profiles with role, social links, and personal notes. Full CRUD support.</p>
           </article>
-          <article class="feature-card">
-            <i class="fas fa-users"></i>
-            <h3>Team Organizer</h3>
-            <p>Build team groups, add members, and keep collaboration details together.</p>
+          <article class="powerup-card">
+            <span class="pu-icon">👥</span>
+            <h3>TEAM ORGANIZER</h3>
+            <p>Build team groups, add members, and keep collaboration details organized together.</p>
           </article>
-          <article class="feature-card">
-            <i class="fas fa-link"></i>
-            <h3>Link Vault</h3>
-            <p>Save important URLs with quick copy actions and contextual notes.</p>
+          <article class="powerup-card">
+            <span class="pu-icon">🔗</span>
+            <h3>LINK VAULT</h3>
+            <p>Save important URLs with quick copy actions and contextual notes. Instant access.</p>
           </article>
-          <article class="feature-card">
-            <i class="fas fa-cloud-arrow-up"></i>
-            <h3>Import & Export</h3>
-            <p>Backup your workspace as JSON and import data with merge support.</p>
+          <article class="powerup-card">
+            <span class="pu-icon">📦</span>
+            <h3>IMPORT &amp; EXPORT</h3>
+            <p>Backup your workspace as JSON and restore data with merge support anytime.</p>
           </article>
-          <article class="feature-card">
-            <i class="fas fa-bolt"></i>
-            <h3>Productive UX</h3>
-            <p>Command palette, quick add, responsive layout, and dark mode support.</p>
+          <article class="powerup-card">
+            <span class="pu-icon">⚡</span>
+            <h3>PRODUCTIVE UX</h3>
+            <p>Command palette, quick add, responsive layout, and always-dark terminal mode.</p>
           </article>
         </div>
       </div>
     </section>
 
+    <div class="coin-row">● ● ● ● ● ● ● ● ●</div>
+
+    <!-- ═══════════ LEVEL SELECT ═══════════ -->
     <section class="how-section">
-      <div class="landing-container">
-        <div class="section-title-wrap">
-          <h2>How DataDock Works</h2>
+      <div class="wrap">
+        <div class="section-header">
+          <div class="section-tag">LEVEL SELECT</div>
+          <h2 class="section-title">HOW DATADOCK WORKS</h2>
         </div>
-        <div class="steps-grid">
-          <div class="step-card">
-            <span class="step-number">1</span>
-            <h3>Create Account</h3>
-            <p>Sign up using email/password or Google authentication.</p>
+        <div class="levels-grid">
+          <div class="level-card">
+            <div class="lvl-badge">1-1</div>
+            <h3>CREATE ACCOUNT</h3>
+            <p>Sign up with email/password or Google authentication. Your workspace is instantly ready.</p>
           </div>
-          <div class="step-card">
-            <span class="step-number">2</span>
-            <h3>Build Your Data Space</h3>
-            <p>Add contacts, team structures, and your important links.</p>
+          <div class="level-card">
+            <div class="lvl-badge">1-2</div>
+            <h3>BUILD DATA SPACE</h3>
+            <p>Add contacts, build team structures, and save your important links and notes.</p>
           </div>
-          <div class="step-card">
-            <span class="step-number">3</span>
-            <h3>Search, Manage, Export</h3>
-            <p>Quickly find data, copy details, and export backups anytime.</p>
+          <div class="level-card">
+            <div class="lvl-badge">1-3</div>
+            <h3>SEARCH &amp; EXPORT</h3>
+            <p>Find data instantly, copy details, and export full backups in JSON format anytime.</p>
           </div>
         </div>
       </div>
     </section>
 
+    <!-- ═══════════ CTA ═══════════ -->
     <section class="cta-section">
-      <div class="landing-container cta-card">
-        <h2>Ready to Build Your Personal Data Dock?</h2>
-        <p>Start managing your information in a secure and modern workspace.</p>
-        <a class="btn btn-primary" href="auth.html"><i class="fas fa-arrow-right"></i> Start Now</a>
+      <div class="wrap">
+        <div class="cta-box">
+          <div class="cta-tag">◀ PRESS START ▶</div>
+          <h2 class="cta-title">READY TO BUILD YOUR<br>PERSONAL DATA DOCK?</h2>
+          <p class="cta-sub">// start managing your information in a secure and modern workspace</p>
+          <a class="btn btn-red" href="auth.html" style="font-size:.65rem;padding:14px 30px;">▶ START NOW</a>
+          <p class="cta-hint">© INSERT COIN TO CONTINUE</p>
+        </div>
       </div>
     </section>
+
   </main>
 
-  <footer class="landing-footer">
-    <div class="landing-container footer-inner">
-      <p>© 2026 DataDock. Built with Firebase and Vanilla JavaScript.</p>
-      <a href="auth.html">Open App</a>
+  <!-- FOOTER -->
+  <footer class="mario-footer">
+    <div class="wrap footer-inner">
+      <p>© 2026 DATADOCK — BUILT WITH FIREBASE &amp; VANILLA JS</p>
+      <a class="footer-link" href="auth.html">▶ OPEN APP</a>
     </div>
   </footer>
 
-  <script>
-    // Matrix rain animation
-    (function() {
-      const canvas = document.getElementById('matrix-bg');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      let w, h, cols, drops;
-      const chars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEF';
+<script>
+(function(){
+  /* ================================================================
+     DATADOCK MARIO – full click-playable platformer
+     ================================================================ */
+  const cvs = document.getElementById('game-canvas');
+  const ctx = cvs.getContext('2d');
+  const W = cvs.width, H = cvs.height;
+  const T = 16;                       // tile size in world
 
-      function resize() {
-        w = canvas.width = window.innerWidth;
-        h = canvas.height = window.innerHeight;
-        cols = Math.floor(w / 18);
-        drops = Array(cols).fill(1);
+  /* ── palette ────────────────────────── */
+  const C = {
+    sky:'#6b8cff', ground:'#c84c0c', groundTop:'#e09060',
+    brick:'#c84c0c', brickLine:'#9c3800', qBlock:'#f7b731', qDot:'#1a0800',
+    pipe:'#00a800', pipeDk:'#007800', pipeHi:'#44cc44',
+    coin:'#f7b731', coinHi:'#ffe080',
+    goomba:'#c84c0c', goombaFoot:'#6b4400',
+    marioRed:'#e52521', marioSkin:'#ffa040', marioHair:'#6b2900',
+    flag:'#00a800', flagPole:'#aaa', castle:'#9a7080',
+    cloud:'rgba(255,255,255,.7)', hill:'#00a800', hillDk:'#007800',
+    text:'#fff'
+  };
+
+  /* ── LEVEL MAP ──────────────────────── */
+  // legend: .=air g=ground B=brick ?=coin-block P=pipe-left p=pipe-right
+  //         1/2=pipe-bottom, C=coin, E=enemy, F=flag, *=castle
+  const levelRows = [
+    '...........................................................................................................................................F...*',
+    '...........................................................................................................................................|...*',
+    '...........................................................................................................................................|...*',
+    '......................????..........C.C.C.......BBB??BBB.....C.C.........????........C.C.C.C......BBB.......????....C....C....C......|...*',
+    '......................C..C.............................C.C.............C..C..C...C..C....................C..C..................C.......|...*',
+    '..............................................BBB...................BBB...............................Pp.................BBB..........Pp......|...*',
+    '..........C.C...............................C.....C.......Pp..........E....E.......BBB??BBB..........12...........E......C.....C.....12......|...*',
+    '.....E..........Pp......E......BBB.................E......12.........................................E.....E..........Pp..............E..|...*',
+    '................12.............C.C.C.........E......................................................................12......................|...*',
+    'gggggggggggggggggggggggggggg....gggggggggggggggggggggggggggggggggggg...gggggggggggggggggggggggggggggggggggggggggg....gggggggggggggggggggggggggggggg',
+    'gggggggggggggggggggggggggggg....gggggggggggggggggggggggggggggggggggg...gggggggggggggggggggggggggggggggggggggggggg....gggggggggggggggggggggggggggggg',
+  ];
+  const ROWS = levelRows.length;
+  const COLS = levelRows[0].length;
+  const WORLD_W = COLS * T;
+  const GROUND_Y = (ROWS - 2) * T;    // top of ground row
+
+  /* ── parse level ────────────────────── */
+  let platforms = [];
+  let coins = [];
+  let enemies = [];
+  let pipes = [];
+  let qBlocks = [];
+  let bricks = [];
+  let flagX = 0, castleX = 0;
+
+  function parseLevel(){
+    platforms=[]; coins=[]; enemies=[]; pipes=[]; qBlocks=[]; bricks=[];
+    for(let r=0;r<ROWS;r++){
+      for(let c=0;c<COLS;c++){
+        const ch = levelRows[r][c];
+        const x=c*T, y=r*T;
+        if(ch==='g') platforms.push({x,y,w:T,h:T,type:'ground'});
+        else if(ch==='B') { platforms.push({x,y,w:T,h:T,type:'brick'}); bricks.push({x,y,w:T,h:T,alive:true}); }
+        else if(ch==='?') { platforms.push({x,y,w:T,h:T,type:'qblock'}); qBlocks.push({x,y,w:T,h:T,hit:false,bounceT:0}); }
+        else if(ch==='C') coins.push({x:x+4,y:y+4,w:8,h:8,alive:true});
+        else if(ch==='E') enemies.push({x,y:y,w:T,h:T,vx:-0.5,alive:true,squishT:0});
+        else if(ch==='P') pipes.push({x,y,part:'tl'});
+        else if(ch==='p') pipes.push({x,y,part:'tr'});
+        else if(ch==='1') pipes.push({x,y,part:'bl'});
+        else if(ch==='2') pipes.push({x,y,part:'br'});
+        else if(ch==='F') flagX = x;
+        else if(ch==='*') castleX = x;
+        // pipe tops/bottoms are solid
+        if('Pp12'.includes(ch)) platforms.push({x,y,w:T,h:T,type:'pipe'});
+        if(ch==='|') { /* flag pole column, no platform */ }
       }
+    }
+  }
 
-      function draw() {
-        ctx.fillStyle = 'rgba(10, 10, 15, 0.06)';
-        ctx.fillRect(0, 0, w, h);
-        ctx.fillStyle = '#00ff9930';
-        ctx.font = '14px monospace';
-        for (let i = 0; i < cols; i++) {
-          const char = chars[Math.floor(Math.random() * chars.length)];
-          ctx.fillText(char, i * 18, drops[i] * 18);
-          if (drops[i] * 18 > h && Math.random() > 0.975) drops[i] = 0;
-          drops[i]++;
+  /* ── MARIO ──────────────────────────── */
+  let mario, cam, score, coinCount, lives, gameSt, winT, dieT;
+  let particles = [];
+
+  function resetMario(){
+    mario = {x:32, y:GROUND_Y-T, w:14, h:16, vx:0, vy:0, onGround:false, dir:1, frame:0, frameT:0, dead:false, invT:0};
+  }
+
+  function initGame(){
+    parseLevel();
+    resetMario();
+    cam = {x:0};
+    score = 0; coinCount = 0; lives = 3;
+    particles = [];
+    gameSt = 'title'; winT = 0; dieT = 0;
+    updateHud();
+  }
+
+  /* ── input ──────────────────────────── */
+  const keys = {left:false, right:false, jump:false};
+
+  // Keyboard support
+  document.addEventListener('keydown', e=>{
+    if(e.key==='ArrowLeft'||e.key==='a') keys.left=true;
+    if(e.key==='ArrowRight'||e.key==='d') keys.right=true;
+    if(e.key==='ArrowUp'||e.key==='w'||e.key===' '){
+      // prevent page scroll when spacebar used to jump
+      if(e.key===' ') e.preventDefault();
+      keys.jump=true;
+      // also start/restart the game with spacebar
+      if(gameSt==='title'||gameSt==='dead'||gameSt==='win'){
+        if(gameSt!=='title') initGame();
+        gameSt='play'; hideOverlay();
+      }
+    }
+  });
+  document.addEventListener('keyup', e=>{
+    if(e.key==='ArrowLeft'||e.key==='a') keys.left=false;
+    if(e.key==='ArrowRight'||e.key==='d') keys.right=false;
+    if(e.key==='ArrowUp'||e.key==='w'||e.key===' ') keys.jump=false;
+  });
+
+  // Button controls
+  function btnBind(id, key){
+    const el = document.getElementById(id);
+    const on = ()=>{ keys[key]=true; el.classList.add('active'); };
+    const off = ()=>{ keys[key]=false; el.classList.remove('active'); };
+    el.addEventListener('mousedown', on);
+    el.addEventListener('touchstart', e=>{ e.preventDefault(); on(); }, {passive:false});
+    document.addEventListener('mouseup', off);
+    document.addEventListener('touchend', off);
+  }
+  btnBind('btn-left','left');
+  btnBind('btn-right','right');
+  btnBind('btn-jump','jump');
+
+  document.getElementById('btn-restart').addEventListener('click', ()=>{ initGame(); gameSt='play'; hideOverlay(); });
+  document.getElementById('game-overlay').addEventListener('click', ()=>{ if(gameSt==='title'||gameSt==='dead'||gameSt==='win') { if(gameSt!=='title') initGame(); gameSt='play'; hideOverlay(); }});
+
+  function hideOverlay(){ document.getElementById('game-overlay').classList.add('hidden'); }
+  function showOverlay(t,s1){
+    const o=document.getElementById('game-overlay');
+    o.classList.remove('hidden');
+    o.innerHTML = '<div class="go-title">'+t+'</div><div class="go-sub">'+s1+'</div><div class="go-blink">PRESS SPACE TO PLAY</div>';
+  }
+  function updateHud(){
+    document.getElementById('hud-score').textContent = 'SCORE '+score;
+    document.getElementById('hud-coins').textContent = '★ '+coinCount;
+    document.getElementById('hud-lives').textContent = '♥ '+lives;
+  }
+
+  /* ── collision helpers ──────────────── */
+  function aabb(a,b){ return a.x<b.x+b.w && a.x+a.w>b.x && a.y<b.y+b.h && a.y+a.h>b.y; }
+
+  function resolveY(){
+    mario.onGround = false;
+    for(const p of platforms){
+      if(!aabb(mario,p)) continue;
+      if(mario.vy > 0){                  // falling
+        if(mario.y + mario.h - mario.vy*1.1 <= p.y){
+          mario.y = p.y - mario.h;
+          mario.vy = 0;
+          mario.onGround = true;
         }
-        requestAnimationFrame(draw);
+      } else if(mario.vy < 0){           // rising → head bonk
+        if(mario.y - mario.vy*1.1 >= p.y + p.h){
+          mario.y = p.y + p.h;
+          mario.vy = 0;
+          headHit(p);
+        }
       }
+    }
+  }
 
-      resize();
-      window.addEventListener('resize', resize);
-      draw();
-    })();
-  </script>
+  function resolveX(){
+    for(const p of platforms){
+      if(!aabb(mario,p)) continue;
+      if(mario.vx > 0){
+        mario.x = p.x - mario.w;
+      } else if(mario.vx < 0){
+        mario.x = p.x + p.w;
+      }
+      mario.vx = 0;
+    }
+  }
+
+  function headHit(p){
+    // ? block → spawn coin
+    for(const q of qBlocks){
+      if(q.x===p.x && q.y===p.y && !q.hit){
+        q.hit = true;
+        q.bounceT = 8;
+        score += 100;
+        coinCount++;
+        spawnCoinParticle(q.x+4, q.y-12);
+        updateHud();
+        return;
+      }
+    }
+    // brick → break
+    for(const b of bricks){
+      if(b.x===p.x && b.y===p.y && b.alive){
+        b.alive = false;
+        // remove from platforms
+        const idx = platforms.indexOf(p);
+        if(idx>=0) platforms.splice(idx,1);
+        score += 50;
+        for(let i=0;i<4;i++) particles.push({x:b.x+8, y:b.y+8, vx:(Math.random()-0.5)*3, vy:-Math.random()*4-2, life:25, color:C.brick, size:4});
+        updateHud();
+      }
+    }
+  }
+
+  function spawnCoinParticle(x,y){
+    particles.push({x,y,vx:0,vy:-3,life:20,color:C.coin,size:6,isCoin:true});
+  }
+
+  /* ── UPDATE ─────────────────────────── */
+  function update(){
+    if(gameSt!=='play') return;
+
+    // input → velocity
+    const spd = 2.2;
+    if(keys.left) { mario.vx = -spd; mario.dir = -1; }
+    else if(keys.right) { mario.vx = spd; mario.dir = 1; }
+    else mario.vx *= 0.7;
+    if(Math.abs(mario.vx)<0.1) mario.vx=0;
+
+    if(keys.jump && mario.onGround){
+      mario.vy = -5.5;
+      mario.onGround = false;
+    }
+
+    // gravity
+    mario.vy += 0.28;
+    if(mario.vy > 6) mario.vy = 6;
+
+    // move X
+    mario.x += mario.vx;
+    if(mario.x < 0) mario.x = 0;
+    if(mario.x > WORLD_W - mario.w) mario.x = WORLD_W - mario.w;
+    resolveX();
+
+    // move Y
+    mario.y += mario.vy;
+    resolveY();
+
+    // fell into pit
+    if(mario.y > H + 40){
+      marioDie();
+      return;
+    }
+
+    // coins
+    for(const c of coins){
+      if(c.alive && aabb(mario,c)){
+        c.alive=false;
+        score+=200; coinCount++;
+        spawnCoinParticle(c.x, c.y-8);
+        updateHud();
+      }
+    }
+
+    // enemies
+    for(const e of enemies){
+      if(!e.alive) continue;
+      e.x += e.vx;
+      // enemy hits wall → reverse
+      for(const p of platforms){
+        if(aabb(e,p)){
+          e.vx *= -1;
+          e.x += e.vx * 2;
+          break;
+        }
+      }
+      // enemy on ground
+      let onPlat = false;
+      for(const p of platforms){
+        if(e.x+e.w > p.x && e.x < p.x+p.w && Math.abs((e.y+e.h)-p.y)<2){
+          onPlat = true;
+          e.y = p.y - e.h;
+        }
+      }
+      if(!onPlat){
+        e.y += 2; // simple gravity for enemies
+      }
+      // Mario vs enemy
+      if(aabb(mario,e)){
+        if(mario.vy > 0 && mario.y + mario.h - 4 < e.y + e.h/2){
+          // stomp
+          e.alive = false;
+          e.squishT = 15;
+          mario.vy = -4;
+          score += 100;
+          updateHud();
+        } else if(mario.invT <= 0){
+          marioDie();
+          return;
+        }
+      }
+    }
+
+    // qblock bounce
+    for(const q of qBlocks) if(q.bounceT>0) q.bounceT--;
+
+    // flag
+    if(mario.x + mario.w > flagX && flagX > 0 && gameSt==='play'){
+      gameSt = 'win'; winT = 90;
+      score += 1000;
+      updateHud();
+    }
+
+    // camera
+    cam.x = mario.x - W/3;
+    if(cam.x < 0) cam.x = 0;
+    if(cam.x > WORLD_W - W) cam.x = WORLD_W - W;
+
+    // animation frame
+    mario.frameT++;
+    if(mario.frameT > 6){ mario.frameT=0; mario.frame = (mario.frame+1)%3; }
+
+    // invincibility timer
+    if(mario.invT > 0) mario.invT--;
+
+    // particles
+    for(const p of particles){
+      p.x += p.vx; p.y += p.vy;
+      if(!p.isCoin) p.vy += 0.2;
+      p.life--;
+    }
+    particles = particles.filter(p=>p.life>0);
+  }
+
+  function marioDie(){
+    lives--;
+    updateHud();
+    if(lives <= 0){
+      gameSt = 'dead'; dieT = 60;
+      showOverlay('GAME OVER','SCORE: '+score);
+    } else {
+      resetMario();
+      mario.invT = 90;
+    }
+  }
+
+  /* ── win/dead timers ────────────────── */
+  function updateTimers(){
+    if(gameSt==='win'){
+      winT--;
+      if(winT<=0) showOverlay('YOU WIN!','SCORE: '+score);
+    }
+  }
+
+  /* ── DRAW helpers ───────────────────── */
+  function drawRect(x,y,w,h,c){ ctx.fillStyle=c; ctx.fillRect(Math.round(x-cam.x), Math.round(y), w, h); }
+
+  function drawBrick(bx,by){
+    drawRect(bx,by,T,T,C.brick);
+    ctx.strokeStyle=C.brickLine; ctx.lineWidth=1;
+    const sx=Math.round(bx-cam.x), sy=Math.round(by);
+    ctx.strokeRect(sx+0.5, sy+0.5, T-1, T-1);
+    ctx.beginPath();
+    ctx.moveTo(sx, sy+T/2); ctx.lineTo(sx+T, sy+T/2);
+    ctx.moveTo(sx+T/2, sy); ctx.lineTo(sx+T/2, sy+T/2);
+    ctx.stroke();
+  }
+
+  function drawQBlock(q){
+    const by = q.bounceT > 4 ? q.y - 3 : q.y;
+    const c = q.hit ? '#8a6a30' : C.qBlock;
+    drawRect(q.x, by, T, T, c);
+    ctx.strokeStyle='#b88a20'; ctx.lineWidth=1;
+    const sx=Math.round(q.x-cam.x), sy=Math.round(by);
+    ctx.strokeRect(sx+0.5, sy+0.5, T-1, T-1);
+    if(!q.hit){
+      ctx.fillStyle=C.qDot;
+      ctx.font='bold 10px "Press Start 2P"';
+      ctx.fillText('?', sx+3, sy+12);
+    }
+  }
+
+  function drawPipe(px,py,part){
+    const sx=Math.round(px-cam.x), sy=Math.round(py);
+    if(part==='tl'||part==='tr'){
+      ctx.fillStyle=C.pipe; ctx.fillRect(sx,sy,T,T);
+      ctx.fillStyle=C.pipeHi; ctx.fillRect(sx,sy,T,3);
+      if(part==='tl'){ ctx.fillStyle=C.pipeDk; ctx.fillRect(sx,sy,2,T); }
+      if(part==='tr'){ ctx.fillStyle=C.pipeDk; ctx.fillRect(sx+T-2,sy,2,T); }
+    } else {
+      ctx.fillStyle=C.pipe; ctx.fillRect(sx+2,sy,T-4,T);
+      ctx.fillStyle=C.pipeDk;
+      ctx.fillRect(sx+2,sy,2,T);
+      ctx.fillRect(sx+T-4,sy,2,T);
+    }
+  }
+
+  function drawMario(){
+    if(mario.invT > 0 && mario.invT % 4 < 2) return; // blink when invincible
+    const sx=Math.round(mario.x-cam.x), sy=Math.round(mario.y);
+    const d=mario.dir;
+    const f=mario.onGround ? mario.frame : 1;
+    // body
+    ctx.fillStyle=C.marioRed;
+    ctx.fillRect(sx+2,sy,10,6);           // hat
+    ctx.fillRect(sx+1,sy+6,12,6);         // shirt
+    // skin (face)
+    ctx.fillStyle=C.marioSkin;
+    ctx.fillRect(sx+ (d>0?10:0), sy+3, 4, 5); // face
+    ctx.fillRect(sx+3, sy+12, 3, 4);      // left leg
+    ctx.fillRect(sx+8, sy+12, 3, 4);      // right leg
+    // shoes
+    ctx.fillStyle=C.marioHair;
+    if(f===0){
+      ctx.fillRect(sx+2, sy+14, 4, 2);
+      ctx.fillRect(sx+8, sy+14, 4, 2);
+    } else if(f===1){ // jump or mid
+      ctx.fillRect(sx+1, sy+13, 4, 3);
+      ctx.fillRect(sx+9, sy+13, 4, 3);
+    } else {
+      ctx.fillRect(sx+3, sy+14, 4, 2);
+      ctx.fillRect(sx+7, sy+14, 4, 2);
+    }
+    // eye
+    ctx.fillStyle='#000';
+    ctx.fillRect(sx+(d>0?11:2), sy+4, 2, 2);
+  }
+
+  function drawGoomba(e){
+    const sx=Math.round(e.x-cam.x), sy=Math.round(e.y);
+    if(!e.alive && e.squishT>0){
+      ctx.fillStyle=C.goomba;
+      ctx.fillRect(sx,sy+T-4,T,4);
+      return;
+    }
+    if(!e.alive) return;
+    ctx.fillStyle=C.goomba;
+    // head
+    ctx.fillRect(sx+2, sy, 12, 8);
+    ctx.fillRect(sx, sy+4, T, 6);
+    // feet
+    ctx.fillStyle=C.goombaFoot;
+    ctx.fillRect(sx+1, sy+10, 5, 6);
+    ctx.fillRect(sx+10, sy+10, 5, 6);
+    // eyes
+    ctx.fillStyle='#fff';
+    ctx.fillRect(sx+3, sy+3, 4, 4);
+    ctx.fillRect(sx+9, sy+3, 4, 4);
+    ctx.fillStyle='#000';
+    ctx.fillRect(sx+4+(e.vx>0?1:0), sy+4, 2, 3);
+    ctx.fillRect(sx+10+(e.vx>0?1:0), sy+4, 2, 3);
+  }
+
+  /* ── clouds & hills (parallax) ──────── */
+  function drawBg(){
+    ctx.fillStyle=C.sky; ctx.fillRect(0,0,W,H);
+    // fill ground area below tiles with solid dirt so no sky gap
+    ctx.fillStyle=C.ground; ctx.fillRect(0,GROUND_Y,W,H-GROUND_Y);
+    ctx.fillStyle=C.groundTop; ctx.fillRect(0,GROUND_Y,W,3);
+    // hills
+    const parallax = cam.x * 0.3;
+    ctx.fillStyle=C.hill;
+    drawHill(100-parallax%600, GROUND_Y, 80, 40);
+    drawHill(350-parallax%600, GROUND_Y, 55, 28);
+    drawHill(520-parallax%600, GROUND_Y, 70, 35);
+    drawHill(700-parallax%600, GROUND_Y, 65, 32);
+    // clouds
+    const cp = cam.x * 0.15;
+    ctx.fillStyle=C.cloud;
+    drawCloud(80-cp%500,  30);
+    drawCloud(220-cp%500, 60);
+    drawCloud(400-cp%500, 25);
+    drawCloud(560-cp%500, 50);
+  }
+  function drawHill(x,groundY,w,h){
+    ctx.beginPath();
+    ctx.moveTo(x-w/2, groundY);
+    ctx.quadraticCurveTo(x, groundY-h*2, x+w/2, groundY);
+    ctx.fill();
+  }
+  function drawCloud(x,y){
+    ctx.beginPath();
+    ctx.arc(x, y, 12, 0, Math.PI*2);
+    ctx.arc(x+14, y-4, 10, 0, Math.PI*2);
+    ctx.arc(x+26, y, 12, 0, Math.PI*2);
+    ctx.fill();
+  }
+
+  /* ── DRAW ───────────────────────────── */
+  function draw(){
+    drawBg();
+
+    // ground
+    for(const p of platforms){
+      if(p.x+p.w < cam.x - T || p.x > cam.x + W + T) continue; // cull
+      if(p.type==='ground'){
+        drawRect(p.x,p.y,p.w,p.h,C.ground);
+        drawRect(p.x,p.y,p.w,2,C.groundTop);
+      }
+    }
+
+    // bricks
+    for(const b of bricks){
+      if(!b.alive) continue;
+      if(b.x+b.w < cam.x-T || b.x > cam.x+W+T) continue;
+      drawBrick(b.x,b.y);
+    }
+    // qblocks
+    for(const q of qBlocks){
+      if(q.x+q.w < cam.x-T || q.x > cam.x+W+T) continue;
+      drawQBlock(q);
+    }
+    // pipes
+    for(const p of pipes){
+      if(p.x+T < cam.x-T || p.x > cam.x+W+T) continue;
+      drawPipe(p.x,p.y,p.part);
+    }
+    // coins
+    for(const c of coins){
+      if(!c.alive) continue;
+      if(c.x < cam.x-T || c.x > cam.x+W+T) continue;
+      ctx.fillStyle=C.coin;
+      ctx.fillRect(Math.round(c.x-cam.x), Math.round(c.y), c.w, c.h);
+      ctx.fillStyle=C.coinHi;
+      ctx.fillRect(Math.round(c.x-cam.x)+2, Math.round(c.y)+1, 3, 3);
+    }
+    // flag
+    if(flagX > 0 && flagX > cam.x - T && flagX < cam.x + W + T){
+      const fx = Math.round(flagX - cam.x)+7;
+      ctx.fillStyle=C.flagPole;
+      ctx.fillRect(fx, 16, 3, GROUND_Y-16);
+      ctx.fillStyle=C.flag;
+      ctx.fillRect(fx-12, 20, 12, 10);
+      // ball on top
+      ctx.fillStyle=C.gold;
+      ctx.fillRect(fx, 13, 3, 4);
+    }
+    // castle hint
+    if(castleX > 0 && castleX > cam.x - T*4 && castleX < cam.x + W + T){
+      const cx = Math.round(castleX - cam.x);
+      ctx.fillStyle=C.castle;
+      ctx.fillRect(cx, GROUND_Y-40, 40, 40);
+      ctx.fillRect(cx+10, GROUND_Y-56, 20, 20);
+      ctx.fillStyle='#3a1818';
+      ctx.fillRect(cx+14, GROUND_Y-20, 12, 20);
+      ctx.fillStyle=C.gold;
+      ctx.fillRect(cx+17, GROUND_Y-50, 6, 6);
+    }
+    // enemies
+    for(const e of enemies){
+      if(e.x+e.w < cam.x-T || e.x > cam.x+W+T) continue;
+      if(e.squishT > 0 || e.alive) drawGoomba(e);
+    }
+    for(const e of enemies) if(e.squishT > 0) e.squishT--;
+
+    // mario
+    drawMario();
+
+    // particles
+    for(const p of particles){
+      ctx.fillStyle=p.color;
+      ctx.fillRect(Math.round(p.x-cam.x), Math.round(p.y), p.size, p.size);
+    }
+  }
+
+  /* ── GAME LOOP ──────────────────────── */
+  function loop(){
+    update();
+    updateTimers();
+    draw();
+    requestAnimationFrame(loop);
+  }
+
+  initGame();
+  loop();
+})();
+</script>
+
 </body>
 </html>
