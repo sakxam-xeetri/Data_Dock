@@ -271,6 +271,14 @@ function renderStats() {
   document.getElementById("stat-todos").textContent = userData.todos.filter(t => !t.done).length;
   document.getElementById("stat-apikeys").textContent = userData.apikeys.length;
   document.getElementById("stat-notes").textContent = userData.notes.length;
+
+  // Update status bar total records
+  const totalEl = document.getElementById("status-total-records");
+  if (totalEl) {
+    const total = userData.contacts.length + userData.teams.length + userData.links.length
+      + userData.todos.length + userData.apikeys.length + userData.notes.length;
+    totalEl.textContent = total;
+  }
 }
 
 // ============================================================
@@ -300,6 +308,7 @@ function renderContacts(filterText = "") {
             ${contact.role ? `<span class="card-role">${escapeHTML(contact.role)}</span>` : ""}
           </div>
           <div class="card-actions">
+            <button class="btn-icon" title="View as text" onclick="window.datadock.viewContact(${originalIdx})"><i class="fas fa-eye"></i></button>
             <button class="btn-icon" title="Edit" onclick="window.datadock.editContact(${originalIdx})"><i class="fas fa-pen"></i></button>
             <button class="btn-icon danger" title="Delete" onclick="window.datadock.confirmDelete('contact', ${originalIdx})"><i class="fas fa-trash-alt"></i></button>
           </div>
@@ -396,6 +405,7 @@ function renderTeams(filterText = "") {
             <span class="card-role">${(team.members || []).length} member${(team.members || []).length !== 1 ? "s" : ""}</span>
           </div>
           <div class="card-actions">
+            <button class="btn-icon" title="View as text" onclick="window.datadock.viewTeam(${originalIdx})"><i class="fas fa-eye"></i></button>
             <button class="btn-icon" title="Copy All Info" onclick="window.datadock.copyText(${JSON.stringify(copyText).replace(/'/g, "\\'").replace(/"/g, '&quot;')})"><i class="fas fa-copy"></i></button>
             <button class="btn-icon" title="Edit" onclick="window.datadock.editTeam(${originalIdx})"><i class="fas fa-pen"></i></button>
             <button class="btn-icon danger" title="Delete" onclick="window.datadock.confirmDelete('team', ${originalIdx})"><i class="fas fa-trash-alt"></i></button>
@@ -440,6 +450,7 @@ function renderLinks(filterText = "") {
             ${safeUrl ? `<a class="link-url" href="${safeUrl}" target="_blank" rel="noopener noreferrer">${escapeHTML(link.url)}</a>` : `<span class="link-url">${escapeHTML(link.url)}</span>`}
           </div>
           <div class="card-actions">
+            <button class="btn-icon" title="View as text" onclick="window.datadock.viewLink(${originalIdx})"><i class="fas fa-eye"></i></button>
             <button class="btn-icon" title="Copy URL" onclick="window.datadock.copyText('${escapeHTML(link.url)}')"><i class="fas fa-copy"></i></button>
             <button class="btn-icon" title="Edit" onclick="window.datadock.editLink(${originalIdx})"><i class="fas fa-pen"></i></button>
             <button class="btn-icon danger" title="Delete" onclick="window.datadock.confirmDelete('link', ${originalIdx})"><i class="fas fa-trash-alt"></i></button>
@@ -887,6 +898,193 @@ document.getElementById("confirm-delete-btn").addEventListener("click", async ()
   pendingDeleteAction = null;
   closeModal("confirm-modal");
 });
+
+// ============================================================
+// VIEW CONTACT AS NOTEPAD
+// ============================================================
+function viewContact(idx) {
+  const c = userData.contacts[idx];
+  if (!c) return;
+
+  // Avatar initials
+  const initials = (c.name || "?").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
+  document.getElementById("cv-avatar").textContent = initials;
+  document.getElementById("cv-name").textContent = c.name;
+  const roleEl = document.getElementById("cv-role");
+  roleEl.textContent = c.role || "";
+  roleEl.style.display = c.role ? "" : "none";
+
+  // Field rows
+  const fields = [
+    { icon: "fas fa-envelope", label: "Email",    val: c.email,    cls: "em" },
+    { icon: "fas fa-phone",    label: "Phone",    val: c.phone,    cls: "ph" },
+    { icon: "fab fa-github",   label: "GitHub",   val: c.github,   cls: "" },
+    { icon: "fab fa-linkedin", label: "LinkedIn", val: c.linkedin, cls: "li" },
+  ];
+  document.getElementById("cv-fields").innerHTML = fields.filter(f => f.val).map(f => `
+    <div class="cv-row">
+      <span class="cv-row-icon"><i class="${f.icon}"></i></span>
+      <span class="cv-row-label">${f.label}</span>
+      <span class="cv-row-val ${f.cls}" title="${escapeHTML(f.val)}">${escapeHTML(f.val)}</span>
+      <button class="cv-copy-btn" onclick="window.datadock.copyText('${escapeHTML(f.val).replace(/'/g,"&#39;")}')"><i class="fas fa-copy"></i></button>
+    </div>
+  `).join("");
+
+  // Notes
+  const notesEl = document.getElementById("cv-notes");
+  if (c.notes) {
+    notesEl.style.display = "";
+    notesEl.innerHTML = `<div class="cv-notes"><span class="cv-notes-lbl"><i class="fas fa-sticky-note"></i> Notes</span>${escapeHTML(c.notes)}</div>`;
+  } else {
+    notesEl.style.display = "none";
+    notesEl.innerHTML = "";
+  }
+
+  // Store idx for copy-all
+  document.getElementById("contact-view-modal").dataset.contactIdx = idx;
+  document.getElementById("contact-view-modal").classList.remove("hidden");
+}
+
+function copyContactAll() {
+  const modal = document.getElementById("contact-view-modal");
+  // Use generic copyAll if available
+  if (modal.dataset.copyAll) {
+    copyText(modal.dataset.copyAll);
+    return;
+  }
+  const idx = modal.dataset.contactIdx;
+  const c = userData.contacts[+idx];
+  if (!c) return;
+  const lines = [`Name    : ${c.name}`];
+  if (c.role)     lines.push(`Role    : ${c.role}`);
+  if (c.email)    lines.push(`Email   : ${c.email}`);
+  if (c.phone)    lines.push(`Phone   : ${c.phone}`);
+  if (c.github)   lines.push(`GitHub  : ${c.github}`);
+  if (c.linkedin) lines.push(`LinkedIn: ${c.linkedin}`);
+  if (c.notes)    lines.push(`\nNotes:\n${c.notes}`);
+  copyText(lines.join("\n"));
+}
+
+// ============================================================
+// GENERIC VIEW MODAL HELPER
+// ============================================================
+function openViewModal(title, initials, subtitle, fields, notes, copyAllText) {
+  document.getElementById("cv-avatar").textContent = initials;
+  document.getElementById("cv-name").textContent = title;
+  const roleEl = document.getElementById("cv-role");
+  roleEl.textContent = subtitle || "";
+  roleEl.style.display = subtitle ? "" : "none";
+
+  document.getElementById("cv-fields").innerHTML = fields.filter(f => f.val).map(f => `
+    <div class="cv-row">
+      <span class="cv-row-icon"><i class="${f.icon}"></i></span>
+      <span class="cv-row-label">${f.label}</span>
+      <span class="cv-row-val ${f.cls || ''}" title="${escapeHTML(f.val)}">${escapeHTML(f.val)}</span>
+      <button class="cv-copy-btn" onclick="window.datadock.copyText('${escapeHTML(f.val).replace(/'/g,"&#39;")}')"><i class="fas fa-copy"></i></button>
+    </div>
+  `).join("");
+
+  const notesEl = document.getElementById("cv-notes");
+  if (notes) {
+    notesEl.style.display = "";
+    notesEl.innerHTML = `<div class="cv-notes"><span class="cv-notes-lbl"><i class="fas fa-sticky-note"></i> Notes</span>${escapeHTML(notes)}</div>`;
+  } else {
+    notesEl.style.display = "none";
+    notesEl.innerHTML = "";
+  }
+
+  const modal = document.getElementById("contact-view-modal");
+  modal.dataset.copyAll = copyAllText;
+  modal.classList.remove("hidden");
+}
+
+function copyViewAll() {
+  const text = document.getElementById("contact-view-modal").dataset.copyAll || "";
+  copyText(text);
+}
+
+// ============================================================
+// VIEW TEAM
+// ============================================================
+function viewTeam(idx) {
+  const t = userData.teams[idx];
+  if (!t) return;
+  const initials = (t.teamName || "?").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
+  const fields = [
+    { icon: "fas fa-phone", label: "Phone", val: t.phone, cls: "ph" },
+  ];
+  (t.socials || []).forEach(s => {
+    fields.push({ icon: "fas fa-globe", label: s.platform || "Social", val: s.url });
+  });
+  (t.members || []).forEach((m, i) => {
+    fields.push({ icon: "fas fa-user", label: `Member ${i+1}`, val: `${m.name}${m.role ? ' — ' + m.role : ''}${m.phone ? ' | ' + m.phone : ''}${m.email ? ' | ' + m.email : ''}` });
+  });
+
+  const lines = [`Team: ${t.teamName}`];
+  if (t.phone) lines.push(`Phone: ${t.phone}`);
+  (t.socials || []).forEach(s => lines.push(`${s.platform}: ${s.url}`));
+  (t.members || []).forEach((m, i) => {
+    lines.push(`\nMember ${i+1}: ${m.name}`);
+    if (m.role) lines.push(`  Role: ${m.role}`);
+    if (m.phone) lines.push(`  Phone: ${m.phone}`);
+    if (m.email) lines.push(`  Email: ${m.email}`);
+    if (m.college) lines.push(`  College: ${m.college}`);
+  });
+  if (t.notes) lines.push(`\nNotes:\n${t.notes}`);
+
+  openViewModal(t.teamName, initials, `${(t.members||[]).length} member${(t.members||[]).length!==1?'s':''}`, fields, t.notes, lines.join("\n"));
+}
+
+// ============================================================
+// VIEW LINK
+// ============================================================
+function viewLink(idx) {
+  const l = userData.links[idx];
+  if (!l) return;
+  const initials = (l.title || "?").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
+  const fields = [
+    { icon: "fas fa-heading", label: "Title", val: l.title },
+    { icon: "fas fa-link",    label: "URL",   val: l.url, cls: "em" },
+  ];
+  const lines = [`Title: ${l.title}`, `URL  : ${l.url}`];
+  if (l.notes) lines.push(`\nNotes:\n${l.notes}`);
+  openViewModal(l.title, initials, null, fields, l.notes, lines.join("\n"));
+}
+
+// ============================================================
+// VIEW API KEY
+// ============================================================
+function viewApikey(idx) {
+  const k = userData.apikeys[idx];
+  if (!k) return;
+  const initials = (k.label || "?").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
+  const fields = [
+    { icon: "fas fa-tag",  label: "Label",    val: k.label },
+    { icon: "fas fa-key",  label: "Value",    val: k.value },
+    { icon: "fas fa-folder", label: "Category", val: k.category },
+  ];
+  const lines = [`Label   : ${k.label}`, `Value   : ${k.value}`];
+  if (k.category) lines.push(`Category: ${k.category}`);
+  if (k.notes) lines.push(`\nNotes:\n${k.notes}`);
+  openViewModal(k.label, initials, k.category || null, fields, k.notes, lines.join("\n"));
+}
+
+// ============================================================
+// VIEW NOTE
+// ============================================================
+function viewNote(idx) {
+  const n = userData.notes[idx];
+  if (!n) return;
+  const initials = (n.title || "?").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
+  const fields = [
+    { icon: "fas fa-heading", label: "Title", val: n.title },
+    { icon: "fas fa-tag",     label: "Tag",   val: n.tag },
+  ];
+  const lines = [`Title: ${n.title}`];
+  if (n.tag) lines.push(`Tag  : ${n.tag}`);
+  if (n.body) lines.push(`\n${n.body}`);
+  openViewModal(n.title, initials, n.tag || null, fields, n.body, lines.join("\n"));
+}
 
 // ============================================================
 // COPY TO CLIPBOARD
@@ -1354,6 +1552,7 @@ function renderApikeys(filterText = '') {
             ${key.category ? `<span class="apikey-category">${escapeHTML(key.category)}</span>` : ''}
           </div>
           <div class="card-actions">
+            <button class="btn-icon" title="View as text" onclick="window.datadock.viewApikey(${originalIdx})"><i class="fas fa-eye"></i></button>
             <button class="btn-icon" title="Edit" onclick="window.datadock.editApikey(${originalIdx})"><i class="fas fa-pen"></i></button>
             <button class="btn-icon danger" title="Delete" onclick="window.datadock.confirmDelete('apikey', ${originalIdx})"><i class="fas fa-trash-alt"></i></button>
           </div>
@@ -1472,6 +1671,7 @@ function renderNotes(filterText = '') {
             ${note.tag ? `<span class="note-tag">${escapeHTML(note.tag)}</span>` : ''}
           </div>
           <div class="card-actions">
+            <button class="btn-icon" title="View as text" onclick="window.datadock.viewNote(${originalIdx})"><i class="fas fa-eye"></i></button>
             <button class="btn-icon" title="Edit" onclick="window.datadock.editNote(${originalIdx})"><i class="fas fa-pen"></i></button>
             <button class="btn-icon danger" title="Delete" onclick="window.datadock.confirmDelete('note', ${originalIdx})"><i class="fas fa-trash-alt"></i></button>
           </div>
@@ -2072,6 +2272,13 @@ document.querySelector('#apikey-modal .toggle-visibility')?.addEventListener('cl
 // EXPOSE FUNCTIONS TO WINDOW (for inline onclick handlers)
 // ============================================================
 window.datadock = {
+  viewContact,
+  viewTeam,
+  viewLink,
+  viewApikey,
+  viewNote,
+  copyContactAll,
+  copyViewAll,
   editContact: openContactModal,
   editTeam: openTeamModal,
   editLink: openLinkModal,
