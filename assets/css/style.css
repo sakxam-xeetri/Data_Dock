@@ -1193,6 +1193,118 @@ body.sidebar-collapsed .sidebar-nav {
 }
 
 /* ============================================================
+   SCROLLABLE LIST CONTAINER
+   ============================================================ */
+.scrollable-list-container {
+  position: relative;
+  max-height: 75vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 4px;
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+.scrollable-list-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollable-list-container::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 3px;
+}
+
+.scrollable-list-container::-webkit-scrollbar-thumb {
+  background: rgba(0, 255, 65, 0.25);
+  border-radius: 3px;
+  transition: background 0.2s;
+}
+
+.scrollable-list-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 255, 65, 0.45);
+}
+
+/* Firefox scrollbar */
+.scrollable-list-container {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 255, 65, 0.25) rgba(255, 255, 255, 0.03);
+}
+
+/* Fade hint at bottom when scrollable */
+.scrollable-list-container::after {
+  content: '';
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: block;
+  height: 32px;
+  background: linear-gradient(to top, var(--bg-primary, #0a0e17), transparent);
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.3s;
+}
+
+.scrollable-list-container.scrolled-bottom::after {
+  opacity: 0;
+}
+
+/* Scroll to top button */
+.scroll-to-top-btn {
+  position: sticky;
+  bottom: 16px;
+  left: 100%;
+  z-index: 10;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 255, 65, 0.3);
+  background: rgba(10, 14, 23, 0.9);
+  color: var(--neon-green, #00ff41);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  backdrop-filter: blur(8px);
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+}
+
+.scroll-to-top-btn:hover {
+  background: rgba(0, 255, 65, 0.15);
+  border-color: rgba(0, 255, 65, 0.6);
+  transform: translateY(-2px);
+}
+
+.scroll-to-top-btn.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Item count badge */
+.item-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 22px;
+  padding: 0 7px;
+  border-radius: 11px;
+  background: rgba(0, 255, 65, 0.1);
+  color: var(--neon-green, #00ff41);
+  font-size: 0.7rem;
+  font-weight: 600;
+  margin-left: 8px;
+  vertical-align: middle;
+  letter-spacing: 0.02em;
+}
+
+.item-count-badge:empty {
+  display: none;
+}
+
+/* ============================================================
    CARDS GRID
    ============================================================ */
 .cards-grid {
@@ -2950,6 +3062,28 @@ a.dash-recent-detail.link-url:hover { color: var(--neon-green); }
   display: flex;
   flex-direction: column;
   gap: 2px;
+  max-height: 400px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 255, 65, 0.25) rgba(255, 255, 255, 0.03);
+}
+
+.activity-feed::-webkit-scrollbar {
+  width: 5px;
+}
+
+.activity-feed::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 3px;
+}
+
+.activity-feed::-webkit-scrollbar-thumb {
+  background: rgba(0, 255, 65, 0.25);
+  border-radius: 3px;
+}
+
+.activity-feed::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 255, 65, 0.45);
 }
 
 .activity-group-label {
