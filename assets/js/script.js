@@ -968,14 +968,14 @@ function copyContactAll() {
 // ============================================================
 // GENERIC VIEW MODAL HELPER
 // ============================================================
-function openViewModal(title, initials, subtitle, fields, notes, copyAllText) {
+function openViewModal(title, initials, subtitle, fields, notes, copyAllText, extraHTML) {
   document.getElementById("cv-avatar").textContent = initials;
   document.getElementById("cv-name").textContent = title;
   const roleEl = document.getElementById("cv-role");
   roleEl.textContent = subtitle || "";
   roleEl.style.display = subtitle ? "" : "none";
 
-  document.getElementById("cv-fields").innerHTML = fields.filter(f => f.val).map(f => `
+  let html = fields.filter(f => f.val).map(f => `
     <div class="cv-row">
       <span class="cv-row-icon"><i class="${f.icon}"></i></span>
       <span class="cv-row-label">${f.label}</span>
@@ -983,6 +983,10 @@ function openViewModal(title, initials, subtitle, fields, notes, copyAllText) {
       <button class="cv-copy-btn" onclick="window.datadock.copyText('${escapeHTML(f.val).replace(/'/g,"&#39;")}')"><i class="fas fa-copy"></i></button>
     </div>
   `).join("");
+
+  if (extraHTML) html += extraHTML;
+
+  document.getElementById("cv-fields").innerHTML = html;
 
   const notesEl = document.getElementById("cv-notes");
   if (notes) {
@@ -1014,16 +1018,36 @@ function viewTeam(idx) {
     { icon: "fas fa-phone", label: "Phone", val: t.phone, cls: "ph" },
   ];
   (t.socials || []).forEach(s => {
-    fields.push({ icon: "fas fa-globe", label: s.platform || "Social", val: s.url });
+    fields.push({ icon: "fas fa-globe", label: s.platform || "Social", val: s.url, cls: "em" });
   });
-  (t.members || []).forEach((m, i) => {
-    fields.push({ icon: "fas fa-user", label: `Member ${i+1}`, val: `${m.name}${m.role ? ' — ' + m.role : ''}${m.phone ? ' | ' + m.phone : ''}${m.email ? ' | ' + m.email : ''}` });
-  });
+
+  // Build member sub-cards HTML
+  let membersHTML = "";
+  const members = t.members || [];
+  if (members.length) {
+    membersHTML += `<div class="cv-section-label"><i class="fas fa-users"></i> Members (${members.length})</div>`;
+    members.forEach(m => {
+      const mInit = (m.name || "?").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
+      membersHTML += `<div class="cv-member">`;
+      membersHTML += `<div class="cv-member-head">`;
+      membersHTML += `<div class="cv-member-avatar">${mInit}</div>`;
+      membersHTML += `<span class="cv-member-name">${escapeHTML(m.name)}</span>`;
+      if (m.role) membersHTML += `<span class="cv-member-role">${escapeHTML(m.role)}</span>`;
+      membersHTML += `</div>`;
+      if (m.phone) membersHTML += `<div class="cv-member-detail"><i class="fas fa-phone"></i> <span>${escapeHTML(m.phone)}</span></div>`;
+      if (m.email) membersHTML += `<div class="cv-member-detail"><i class="fas fa-envelope"></i> <span>${escapeHTML(m.email)}</span></div>`;
+      if (m.college) membersHTML += `<div class="cv-member-detail"><i class="fas fa-university"></i> <span>${escapeHTML(m.college)}</span></div>`;
+      (m.socials || []).forEach(s => {
+        if (s.url) membersHTML += `<div class="cv-member-detail"><i class="fas fa-globe"></i> <span>${escapeHTML(s.url)}</span></div>`;
+      });
+      membersHTML += `</div>`;
+    });
+  }
 
   const lines = [`Team: ${t.teamName}`];
   if (t.phone) lines.push(`Phone: ${t.phone}`);
   (t.socials || []).forEach(s => lines.push(`${s.platform}: ${s.url}`));
-  (t.members || []).forEach((m, i) => {
+  members.forEach((m, i) => {
     lines.push(`\nMember ${i+1}: ${m.name}`);
     if (m.role) lines.push(`  Role: ${m.role}`);
     if (m.phone) lines.push(`  Phone: ${m.phone}`);
@@ -1032,7 +1056,7 @@ function viewTeam(idx) {
   });
   if (t.notes) lines.push(`\nNotes:\n${t.notes}`);
 
-  openViewModal(t.teamName, initials, `${(t.members||[]).length} member${(t.members||[]).length!==1?'s':''}`, fields, t.notes, lines.join("\n"));
+  openViewModal(t.teamName, initials, `${members.length} member${members.length!==1?'s':''}`, fields, t.notes, lines.join("\n"), membersHTML);
 }
 
 // ============================================================
@@ -1076,14 +1100,13 @@ function viewNote(idx) {
   const n = userData.notes[idx];
   if (!n) return;
   const initials = (n.title || "?").split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
-  const fields = [
-    { icon: "fas fa-heading", label: "Title", val: n.title },
-    { icon: "fas fa-tag",     label: "Tag",   val: n.tag },
-  ];
+  const fields = [];
+  if (n.tag) fields.push({ icon: "fas fa-tag", label: "Tag", val: n.tag });
   const lines = [`Title: ${n.title}`];
   if (n.tag) lines.push(`Tag  : ${n.tag}`);
   if (n.body) lines.push(`\n${n.body}`);
-  openViewModal(n.title, initials, n.tag || null, fields, n.body, lines.join("\n"));
+  // Pass body as the notes param so it renders in the scrollable notes section
+  openViewModal(n.title, initials, n.tag || null, fields, n.body || null, lines.join("\n"));
 }
 
 // ============================================================
