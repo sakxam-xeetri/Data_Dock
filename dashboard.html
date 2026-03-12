@@ -6,6 +6,207 @@
   <title>DataDock — Dashboard</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <style>
+    /* =====================================================
+       DATADOCK — MARIO TERMINAL OVERRIDE (dashboard)
+       ===================================================== */
+
+    /* ── Sidebar ── */
+    .sidebar {
+      border-right: 3px solid #e52521 !important;
+      box-shadow: 3px 0 0 #9b1a17, 0 0 40px rgba(229,37,33,.1) !important;
+      background: #080105 !important;
+    }
+    .sidebar-header {
+      background: #110205 !important;
+      border-bottom: 3px solid #e52521 !important;
+      box-shadow: 0 2px 0 #9b1a17 !important;
+    }
+    .sidebar-logo {
+      font-family: 'Press Start 2P', monospace !important;
+      font-size: .65rem !important;
+      color: #f7b731 !important;
+      text-shadow: 2px 2px 0 #9b1a17 !important;
+    }
+    .sidebar-logo i { color: #f7b731 !important; filter: drop-shadow(0 0 4px rgba(247,183,49,.5)) !important; }
+    .nav-item {
+      font-family: 'Press Start 2P', monospace !important;
+      font-size: .44rem !important;
+      border-left: 3px solid transparent !important;
+      transition: all .12s !important;
+    }
+    .nav-item.active {
+      border-left-color: #e52521 !important;
+      background: rgba(229,37,33,.08) !important;
+      color: #f7b731 !important;
+    }
+    .nav-item:hover:not(.active) {
+      border-left-color: rgba(229,37,33,.45) !important;
+      background: rgba(229,37,33,.04) !important;
+    }
+    .sidebar-footer { border-top: 2px dashed rgba(229,37,33,.25) !important; }
+    .user-name { font-family: 'Press Start 2P', monospace !important; font-size: .42rem !important; color: #f7b731 !important; }
+
+    /* ── Score bar ── */
+    .mario-score-bar {
+      background: #110205;
+      border-bottom: 2px solid rgba(229,37,33,.25);
+      padding: 6px 24px;
+      display: flex;
+      gap: 22px;
+      align-items: center;
+      flex-wrap: wrap;
+      font-family: 'Press Start 2P', monospace;
+      font-size: .42rem;
+      letter-spacing: 1px;
+      color: #f8d8a0;
+      position: sticky;
+      top: 0;
+      z-index: 30;
+    }
+    .mario-score-bar b { color: #f7b731; }
+    .msb-right { margin-left: auto; }
+    @keyframes msb-blink { 50% { opacity: 0; } }
+    .msb-blink { animation: msb-blink 1s step-end infinite; }
+
+    /* ── Buttons ── */
+    .btn-primary {
+      font-family: 'Press Start 2P', monospace !important;
+      font-size: .48rem !important;
+      background: #e52521 !important;
+      color: #fff !important;
+      border: 2px solid #ff6b65 !important;
+      box-shadow: 0 4px 0 #9b1a17 !important;
+      border-radius: 0 !important;
+      position: relative !important;
+      top: 0 !important;
+      letter-spacing: .5px !important;
+      transition: top .08s, box-shadow .08s !important;
+    }
+    .btn-primary:hover { background: #ff3a35 !important; box-shadow: 0 4px 0 #9b1a17, 0 0 16px rgba(229,37,33,.35) !important; }
+    .btn-primary:active { top: 3px !important; box-shadow: 0 1px 0 #9b1a17 !important; }
+    .btn-secondary {
+      font-family: 'Press Start 2P', monospace !important;
+      font-size: .48rem !important;
+      border-radius: 0 !important;
+      position: relative !important;
+      top: 0 !important;
+      letter-spacing: .5px !important;
+      transition: top .08s, box-shadow .08s !important;
+    }
+    .btn-secondary:active { top: 3px !important; }
+    .btn-danger {
+      font-family: 'Press Start 2P', monospace !important;
+      font-size: .48rem !important;
+      border-radius: 0 !important;
+      box-shadow: 0 4px 0 #7a0000 !important;
+      position: relative !important;
+      top: 0 !important;
+      transition: top .08s, box-shadow .08s !important;
+    }
+    .btn-danger:active { top: 3px !important; box-shadow: 0 1px 0 #7a0000 !important; }
+
+    /* ── Section headers ── */
+    .section-header h1 {
+      font-family: 'Press Start 2P', monospace !important;
+      font-size: clamp(.62rem, 1.4vw, .84rem) !important;
+      color: #f8d8a0 !important;
+      text-shadow: 2px 2px 0 rgba(229,37,33,.35) !important;
+      letter-spacing: .5px !important;
+    }
+    .section-header h1 i { color: #e52521 !important; filter: drop-shadow(0 0 4px rgba(229,37,33,.4)) !important; }
+
+    /* ── Stat cards ── */
+    .stat-card {
+      border-top: 3px solid #e52521 !important;
+      border-radius: 0 !important;
+      overflow: visible !important;
+      position: relative !important;
+    }
+    .stat-card::before {
+      content: '?';
+      position: absolute;
+      top: -14px; right: 8px;
+      width: 22px; height: 22px;
+      background: #f7b731;
+      color: #1a0800;
+      font-family: 'Press Start 2P', monospace;
+      font-size: .38rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 1px 1px 0 #b88a20;
+      z-index: 1;
+    }
+    .stat-number { font-family: 'Press Start 2P', monospace !important; font-size: 1.15rem !important; }
+    .stat-label { font-family: 'Press Start 2P', monospace !important; font-size: .38rem !important; letter-spacing: .5px !important; }
+
+    /* ── Widget headers ── */
+    .widget-header h2 {
+      font-family: 'Press Start 2P', monospace !important;
+      font-size: .52rem !important;
+      color: #f8d8a0 !important;
+    }
+    .widget-header h2 i { color: #e52521 !important; }
+    .dashboard-widget, .dashboard-todo-widget, .dashboard-calendar-widget {
+      border-top: 3px solid rgba(229,37,33,.4) !important;
+      border-radius: 0 !important;
+    }
+
+    /* ── Terminal console ── */
+    .terminal-console { border-radius: 0 !important; }
+    .terminal-header {
+      background: #110205 !important;
+      border-bottom: 2px solid #e52521 !important;
+    }
+    .terminal-header span { font-family: 'Press Start 2P', monospace !important; font-size: .44rem !important; color: #f7b731 !important; }
+    .terminal-prompt { color: #e52521 !important; }
+
+    /* ── Modals ── */
+    .modal {
+      border: 2px solid rgba(229,37,33,.35) !important;
+      border-top: 3px solid #e52521 !important;
+      border-radius: 0 !important;
+      box-shadow: 0 0 0 1px #9b1a17, 0 0 40px rgba(229,37,33,.1), 0 20px 40px rgba(0,0,0,.6) !important;
+    }
+    .modal-header {
+      background: #110205 !important;
+      border-bottom: 2px solid rgba(229,37,33,.3) !important;
+    }
+    .modal-header h2 { font-family: 'Press Start 2P', monospace !important; font-size: .56rem !important; color: #f8d8a0 !important; }
+
+    /* ── Form labels ── */
+    .form-group label { font-family: 'Press Start 2P', monospace !important; font-size: .44rem !important; color: #f8d8a0 !important; letter-spacing: .5px !important; }
+
+    /* ── Loading overlay ── */
+    .loading-text { font-family: 'Press Start 2P', monospace !important; color: #f7b731 !important; font-size: .52rem !important; text-shadow: 0 0 10px rgba(247,183,49,.35) !important; }
+    .spinner { border-top-color: #e52521 !important; box-shadow: 0 0 8px rgba(229,37,33,.3) !important; }
+
+    /* ── Quick FAB ── */
+    .quick-fab-main { background: #e52521 !important; box-shadow: 0 4px 0 #9b1a17 !important; border-radius: 0 !important; }
+    .quick-fab-item { font-family: 'Press Start 2P', monospace !important; font-size: .42rem !important; border-radius: 0 !important; }
+
+    /* ── Command palette ── */
+    .command-palette-shell { border: 2px solid #e52521 !important; border-radius: 0 !important; box-shadow: 0 0 0 1px #9b1a17, 0 0 40px rgba(229,37,33,.12) !important; }
+    .command-palette-header { border-bottom: 2px solid rgba(229,37,33,.35) !important; background: #110205 !important; }
+    .command-palette-header i { color: #e52521 !important; }
+
+    /* ── Settings ── */
+    .settings-card { border-top: 3px solid rgba(229,37,33,.4) !important; border-radius: 0 !important; }
+    .settings-card h3 { font-family: 'Press Start 2P', monospace !important; font-size: .52rem !important; color: #f7b731 !important; }
+    .settings-card h3 i { color: #e52521 !important; }
+
+    /* ── Content cards ── */
+    .secure-warning { border-left: 3px solid #e52521 !important; border-radius: 0 !important; }
+    .mobile-menu-toggle { background: #e52521 !important; border-radius: 0 !important; box-shadow: 0 3px 0 #9b1a17 !important; }
+    .toast { border-radius: 0 !important; border-left: 3px solid #e52521 !important; }
+    .empty-state i { color: #e52521 !important; }
+    .empty-state h3 { font-family: 'Press Start 2P', monospace !important; font-size: .55rem !important; }
+    .nepali-date-display { border-color: rgba(229,37,33,.3) !important; color: #f7b731 !important; background: rgba(229,37,33,.04) !important; }
+    .calendar-weekday.sun, .calendar-weekday.sat { color: #e52521 !important; }
+    .dash-cal-wday.sun, .dash-cal-wday.sat { color: #e52521 !important; }
+  </style>
 </head>
 <body class="dashboard-page">
   <!-- Matrix Background -->
@@ -98,6 +299,15 @@
 
   <!-- Main Content -->
   <main class="main-content">
+
+    <!-- Mario Score Bar -->
+    <div class="mario-score-bar">
+      <span>SCORE <b>000000</b></span>
+      <span>★ × <b>03</b></span>
+      <span>WORLD <b>1-1</b></span>
+      <span>TIME <b class="msb-blink">∞</b></span>
+      <span class="msb-right">STATUS <b style="color:#00a800">■ ONLINE</b></span>
+    </div>
 
     <!-- ==================== DASHBOARD SECTION ==================== -->
     <section id="section-dashboard" class="content-section active">
@@ -923,7 +1133,7 @@
       function draw() {
         ctx.fillStyle = 'rgba(10, 10, 15, 0.06)';
         ctx.fillRect(0, 0, w, h);
-        ctx.fillStyle = '#00ff9930';
+        ctx.fillStyle = '#e5252118';
         ctx.font = '14px monospace';
         for (let i = 0; i < cols; i++) {
           const char = chars[Math.floor(Math.random() * chars.length)];
