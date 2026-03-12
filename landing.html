@@ -240,14 +240,14 @@
        HERO
        ============================================= */
     .hero {
-      padding: 80px 0 56px;
+      padding: 44px 0 36px;
       overflow: hidden;
     }
     .hero-grid {
       display: grid;
-      grid-template-columns: 1.1fr .9fr;
-      gap: 44px;
-      align-items: center;
+      grid-template-columns: 0.88fr 1.12fr;
+      gap: 28px;
+      align-items: start;
     }
 
     .term-prompt {
@@ -325,15 +325,17 @@
       box-shadow:
         0 0 0 2px #2a1010,
         0 0 0 6px #3a1e14,
-        0 0 40px rgba(229,37,33,.12),
+        0 0 40px rgba(229,37,33,.15),
         0 22px 40px rgba(0,0,0,.7);
       overflow: hidden;
-      transform: perspective(900px) rotateY(-5deg) rotateX(2deg);
-      transition: transform .5s ease;
-      animation: float 6s ease-in-out infinite;
+      transition: box-shadow .3s ease;
     }
     .nes-monitor:hover {
-      transform: perspective(900px) rotateY(-2deg) rotateX(1deg);
+      box-shadow:
+        0 0 0 2px #2a1010,
+        0 0 0 6px #3a1e14,
+        0 0 60px rgba(229,37,33,.28),
+        0 22px 40px rgba(0,0,0,.7);
     }
 
     .nes-bar {
@@ -396,7 +398,7 @@
 
     /* ── MARIO GAME ──────────────────────────────── */
     .game-wrap { position: relative; background: #000; }
-    #game-canvas { display: block; width: 100%; image-rendering: pixelated; background: #6b8cff; }
+    #game-canvas { display: block; width: 100%; aspect-ratio: 16/9; image-rendering: pixelated; background: #6b8cff; }
     .game-hud {
       position: absolute; top: 0; left: 0; right: 0;
       display: flex; justify-content: space-between;
@@ -774,12 +776,12 @@
                 <span id="hud-coins">★ 0</span>
                 <span id="hud-lives">♥ 3</span>
               </div>
-              <canvas id="game-canvas" width="480" height="320"></canvas>
+              <canvas id="game-canvas" width="640" height="360"></canvas>
               <div class="game-overlay" id="game-overlay">
                 <div class="go-title">DATADOCK MARIO</div>
                 <div class="go-sub">COLLECT COINS · DODGE ENEMIES</div>
                 <div class="go-sub">USE BUTTONS OR ARROW KEYS</div>
-                <div class="go-blink">▶ CLICK TO START</div>
+                <div class="go-blink">PRESS SPACE TO PLAY</div>
               </div>
             </div>
             <div class="game-controls">
@@ -920,17 +922,17 @@
   // legend: .=air g=ground B=brick ?=coin-block P=pipe-left p=pipe-right
   //         1/2=pipe-bottom, C=coin, E=enemy, F=flag, *=castle
   const levelRows = [
-    '............................................................................................................F...*',
-    '............................................................................................................|...*',
-    '............................................................................................................|...*',
-    '......................????..........C.C.C.......BBB??BBB.....C.C.........????........C.C.C.C.................|...*',
-    '......................C..C.............................C.C.............C..C..C...C..C........................|...*',
-    '..............................................BBB...................BBB...............................Pp......|...*',
-    '..........C.C...............................C.....C.......Pp..........E....E.......BBB??BBB..........12......|...*',
-    '.....E..........Pp......E......BBB.................E......12..............................................E..|...*',
-    '................12.............C.C.C.........E.............................................................|...*',
-    'gggggggggggggggggggggggggggg....gggggggggggggggggggggggggggggggggggg...ggggggggggggggggggggggggggggggggggggggggg',
-    'gggggggggggggggggggggggggggg....gggggggggggggggggggggggggggggggggggg...ggggggggggggggggggggggggggggggggggggggggg',
+    '...........................................................................................................................................F...*',
+    '...........................................................................................................................................|...*',
+    '...........................................................................................................................................|...*',
+    '......................????..........C.C.C.......BBB??BBB.....C.C.........????........C.C.C.C......BBB.......????....C....C....C......|...*',
+    '......................C..C.............................C.C.............C..C..C...C..C....................C..C..................C.......|...*',
+    '..............................................BBB...................BBB...............................Pp.................BBB..........Pp......|...*',
+    '..........C.C...............................C.....C.......Pp..........E....E.......BBB??BBB..........12...........E......C.....C.....12......|...*',
+    '.....E..........Pp......E......BBB.................E......12.........................................E.....E..........Pp..............E..|...*',
+    '................12.............C.C.C.........E......................................................................12......................|...*',
+    'gggggggggggggggggggggggggggg....gggggggggggggggggggggggggggggggggggg...gggggggggggggggggggggggggggggggggggggggggg....gggggggggggggggggggggggggggggg',
+    'gggggggggggggggggggggggggggg....gggggggggggggggggggggggggggggggggggg...gggggggggggggggggggggggggggggggggggggggggg....gggggggggggggggggggggggggggggg',
   ];
   const ROWS = levelRows.length;
   const COLS = levelRows[0].length;
@@ -991,11 +993,20 @@
   /* ── input ──────────────────────────── */
   const keys = {left:false, right:false, jump:false};
 
-  // Keyboard support too
+  // Keyboard support
   document.addEventListener('keydown', e=>{
     if(e.key==='ArrowLeft'||e.key==='a') keys.left=true;
     if(e.key==='ArrowRight'||e.key==='d') keys.right=true;
-    if(e.key==='ArrowUp'||e.key==='w'||e.key===' ') keys.jump=true;
+    if(e.key==='ArrowUp'||e.key==='w'||e.key===' '){
+      // prevent page scroll when spacebar used to jump
+      if(e.key===' ') e.preventDefault();
+      keys.jump=true;
+      // also start/restart the game with spacebar
+      if(gameSt==='title'||gameSt==='dead'||gameSt==='win'){
+        if(gameSt!=='title') initGame();
+        gameSt='play'; hideOverlay();
+      }
+    }
   });
   document.addEventListener('keyup', e=>{
     if(e.key==='ArrowLeft'||e.key==='a') keys.left=false;
@@ -1021,10 +1032,10 @@
   document.getElementById('game-overlay').addEventListener('click', ()=>{ if(gameSt==='title'||gameSt==='dead'||gameSt==='win') { if(gameSt!=='title') initGame(); gameSt='play'; hideOverlay(); }});
 
   function hideOverlay(){ document.getElementById('game-overlay').classList.add('hidden'); }
-  function showOverlay(t,s1,s2){
+  function showOverlay(t,s1){
     const o=document.getElementById('game-overlay');
     o.classList.remove('hidden');
-    o.innerHTML = '<div class="go-title">'+t+'</div><div class="go-sub">'+s1+'</div><div class="go-blink">'+s2+'</div>';
+    o.innerHTML = '<div class="go-title">'+t+'</div><div class="go-sub">'+s1+'</div><div class="go-blink">PRESS SPACE TO PLAY</div>';
   }
   function updateHud(){
     document.getElementById('hud-score').textContent = 'SCORE '+score;
@@ -1219,7 +1230,7 @@
     updateHud();
     if(lives <= 0){
       gameSt = 'dead'; dieT = 60;
-      showOverlay('GAME OVER','SCORE: '+score,'▶ CLICK TO RESTART');
+      showOverlay('GAME OVER','SCORE: '+score);
     } else {
       resetMario();
       mario.invT = 90;
@@ -1230,7 +1241,7 @@
   function updateTimers(){
     if(gameSt==='win'){
       winT--;
-      if(winT<=0) showOverlay('YOU WIN!','SCORE: '+score,'▶ CLICK TO PLAY AGAIN');
+      if(winT<=0) showOverlay('YOU WIN!','SCORE: '+score);
     }
   }
 
@@ -1336,18 +1347,23 @@
   /* ── clouds & hills (parallax) ──────── */
   function drawBg(){
     ctx.fillStyle=C.sky; ctx.fillRect(0,0,W,H);
+    // fill ground area below tiles with solid dirt so no sky gap
+    ctx.fillStyle=C.ground; ctx.fillRect(0,GROUND_Y,W,H-GROUND_Y);
+    ctx.fillStyle=C.groundTop; ctx.fillRect(0,GROUND_Y,W,3);
     // hills
     const parallax = cam.x * 0.3;
     ctx.fillStyle=C.hill;
     drawHill(100-parallax%600, GROUND_Y, 80, 40);
     drawHill(350-parallax%600, GROUND_Y, 55, 28);
     drawHill(520-parallax%600, GROUND_Y, 70, 35);
+    drawHill(700-parallax%600, GROUND_Y, 65, 32);
     // clouds
     const cp = cam.x * 0.15;
     ctx.fillStyle=C.cloud;
-    drawCloud(80-cp%500, 30);
-    drawCloud(250-cp%500, 50);
-    drawCloud(420-cp%500, 25);
+    drawCloud(80-cp%500,  30);
+    drawCloud(220-cp%500, 60);
+    drawCloud(400-cp%500, 25);
+    drawCloud(560-cp%500, 50);
   }
   function drawHill(x,groundY,w,h){
     ctx.beginPath();
