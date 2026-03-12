@@ -7,6 +7,8 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   updateProfile,
   onAuthStateChanged,
   signOut
@@ -102,6 +104,21 @@ document.getElementById("login-form").addEventListener("submit", async (e) => {
   }
 });
 
+// ---------- Handle redirect result (Google redirect flow) ----------
+(async () => {
+  try {
+    const result = await getRedirectResult(auth);
+    if (result?.user) {
+      showLoading();
+      await initUserWorkspace(result.user.uid);
+      showToast("Logged in with Google!", "success");
+      // onAuthStateChanged will redirect
+    }
+  } catch (err) {
+    showToast(getFirebaseErrorMessage(err.code), "error");
+  }
+})();
+
 // ---------- Google Login ----------
 document.getElementById("google-login-btn").addEventListener("click", async () => {
   showLoading();
@@ -111,7 +128,11 @@ document.getElementById("google-login-btn").addEventListener("click", async () =
     showToast("Logged in with Google!", "success");
   } catch (err) {
     hideLoading();
-    if (err.code !== "auth/popup-closed-by-user") {
+    if (err.code === "auth/popup-blocked" || err.code === "auth/popup-cancelled-by-user") {
+      // Popup was blocked — fall back to redirect flow
+      showToast("Popup blocked. Redirecting...", "info");
+      setTimeout(() => signInWithRedirect(auth, googleProvider), 800);
+    } else if (err.code !== "auth/popup-closed-by-user") {
       showToast(getFirebaseErrorMessage(err.code), "error");
     }
   }
@@ -135,8 +156,11 @@ function getFirebaseErrorMessage(code) {
     "auth/wrong-password": "Incorrect password.",
     "auth/invalid-credential": "Invalid email or password.",
     "auth/too-many-requests": "Too many attempts. Please try again later.",
-    "auth/popup-blocked": "Popup was blocked. Please allow popups.",
-    "auth/network-request-failed": "Network error. Check your connection."
+    "auth/popup-blocked": "Popup was blocked. Please allow popups for this site.",
+    "auth/network-request-failed": "Network error. Check your connection.",
+    "auth/unauthorized-domain": "This domain is not authorized in Firebase. Go to Firebase Console → Authentication → Settings → Authorized domains and add your domain.",
+    "auth/cancelled-popup-request": "Another sign-in is already in progress.",
+    "auth/operation-not-allowed": "Google sign-in is not enabled. Enable it in Firebase Console → Authentication → Sign-in method."
   };
   return messages[code] || "An error occurred. Please try again.";
 }
