@@ -20,8 +20,8 @@
       --pro-border: #1e2030;
       --pro-border-hover: #2a2d42;
       --pro-text: #e2e4ec;
-      --pro-text-secondary: #8b8fa4;
-      --pro-text-muted: #4a4e66;
+      --pro-text-secondary: #9499b0;
+      --pro-text-muted: #5e6380;
       --pro-accent: #5b8def;
       --pro-accent-hover: #7aa3ff;
       --pro-accent-subtle: rgba(91, 141, 239, 0.08);
@@ -63,6 +63,33 @@
       filter: none !important;
       font-size: 1.1rem !important;
     }
+    /* ── Sidebar Nav Group Labels ── */
+    .nav-group-label {
+      padding: 16px 16px 4px !important;
+      font-family: 'IBM Plex Mono', monospace !important;
+      font-size: 0.62rem !important;
+      font-weight: 600 !important;
+      text-transform: uppercase !important;
+      letter-spacing: 1.2px !important;
+      color: var(--pro-text-muted) !important;
+      user-select: none;
+    }
+    body.sidebar-collapsed .nav-group-label {
+      display: none;
+    }
+    .nav-group-label span {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .nav-group-label span::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--pro-border);
+    }
+
+    /* ── Navigation ── */
     .nav-item {
       font-family: 'IBM Plex Mono', monospace !important;
       font-size: 0.82rem !important;
@@ -171,11 +198,48 @@
       font-size: 1.15rem !important;
     }
 
+    /* ── Quick Actions Bar ── */
+    .quick-actions-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .quick-action-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      background: var(--pro-card);
+      border: 1px solid var(--pro-border);
+      border-radius: 6px;
+      color: var(--pro-text-secondary);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      letter-spacing: 0.3px;
+    }
+    .quick-action-chip i {
+      font-size: 0.7rem;
+      color: var(--pro-accent);
+    }
+    .quick-action-chip:hover {
+      border-color: var(--pro-accent);
+      color: var(--pro-accent);
+      background: var(--pro-accent-subtle);
+      transform: translateY(-1px);
+    }
+    .quick-action-chip:active {
+      transform: scale(0.97);
+    }
+
     /* ── Stat Cards ── */
     .stats-grid {
       grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important;
       gap: 10px !important;
-      margin-bottom: 20px !important;
+      margin-bottom: 16px !important;
     }
     .stat-card {
       border: 1px solid var(--pro-border) !important;
@@ -186,6 +250,7 @@
       padding: 12px 14px !important;
       gap: 10px !important;
       transition: all 0.2s ease !important;
+      cursor: pointer !important;
     }
     .stat-card::before {
       content: '' !important;
@@ -265,10 +330,69 @@
     .dashboard-calendar-widget::before {
       background: linear-gradient(90deg, var(--pro-purple), transparent);
     }
-    /* Compact inner padding - apply via the base CSS padding override */
-    .dashboard-widget { padding: 12px 14px !important; }
-    .dashboard-todo-widget { padding: 12px 14px !important; }
-    .dashboard-calendar-widget { padding: 12px 14px !important; }
+    .dashboard-widget { padding: 14px 16px !important; }
+    .dashboard-todo-widget { padding: 14px 16px !important; }
+    .dashboard-calendar-widget { padding: 14px 16px !important; }
+
+    /* ── Activity Feed ── */
+    .activity-feed {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .activity-group-label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.62rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--pro-text-muted);
+      padding: 10px 4px 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .activity-group-label i {
+      font-size: 0.6rem;
+    }
+    .activity-group:first-child .activity-group-label {
+      padding-top: 0;
+    }
+
+    /* ── Dashboard Grid 60/40 ── */
+    .dashboard-grid {
+      grid-template-columns: 1.4fr 1fr !important;
+      gap: 16px !important;
+    }
+    @media (max-width: 1024px) {
+      .dashboard-grid { grid-template-columns: 1fr !important; }
+    }
+    .dashboard-col-left, .dashboard-col-right { gap: 12px !important; }
+
+    /* ── Status Bar kbd hint ── */
+    .msb-kbd-hint {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      color: var(--pro-text-muted);
+    }
+    .msb-kbd-hint kbd {
+      background: var(--pro-card);
+      border: 1px solid var(--pro-border);
+      border-radius: 3px;
+      padding: 1px 5px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--pro-text-secondary);
+    }
+
+    /* ── Collapsible Terminal ── */
+    .terminal-console.collapsed .terminal-body {
+      display: none;
+    }
+    .terminal-console.collapsed .terminal-toggle-icon {
+      transform: rotate(-90deg);
+    }
 
     /* ── Terminal Console ── */
     .terminal-console {
@@ -513,9 +637,6 @@
     .dash-recent-icon { width: 26px !important; height: 26px !important; font-size: 0.72rem !important; }
     .dash-recent-name { font-size: 0.78rem !important; }
     .dash-recent-detail { font-size: 0.68rem !important; }
-    /* Compact dashboard column gaps */
-    .dashboard-grid { gap: 14px !important; }
-    .dashboard-col-left, .dashboard-col-right { gap: 12px !important; }
     /* Calendar widget optimised size */
     .dash-cal-day { padding: 4px 1px !important; font-size: 0.68rem !important; }
     .dash-cal-wday { font-size: 0.58rem !important; padding: 2px 0 !important; }
@@ -738,6 +859,8 @@
         <i class="fas fa-th-large"></i>
         <span>Dashboard</span>
       </a>
+
+      <div class="nav-group-label"><span>Data</span></div>
       <a href="#" class="nav-item" data-section="contacts">
         <i class="fas fa-address-book"></i>
         <span>Contacts</span>
@@ -750,22 +873,26 @@
         <i class="fas fa-link"></i>
         <span>Links</span>
       </a>
+
+      <div class="nav-group-label"><span>Tools</span></div>
       <a href="#" class="nav-item" data-section="todos">
         <i class="fas fa-check-square"></i>
         <span>To-Do</span>
-      </a>
-      <a href="#" class="nav-item" data-section="apikeys">
-        <i class="fas fa-key"></i>
-        <span>API Keys</span>
       </a>
       <a href="#" class="nav-item" data-section="notes">
         <i class="fas fa-sticky-note"></i>
         <span>Notes</span>
       </a>
+      <a href="#" class="nav-item" data-section="apikeys">
+        <i class="fas fa-key"></i>
+        <span>API Keys</span>
+      </a>
       <a href="#" class="nav-item" data-section="calendar">
         <i class="fas fa-calendar-alt"></i>
         <span>Calendar</span>
       </a>
+
+      <div class="nav-group-label"><span>System</span></div>
       <a href="#" class="nav-item" data-section="settings">
         <i class="fas fa-cog"></i>
         <span>Settings</span>
@@ -795,10 +922,10 @@
     <div class="mario-score-bar">
       <span><i class="fas fa-database" style="color:var(--pro-accent);margin-right:4px;"></i> <b>DataDock</b></span>
       <span class="msb-divider"></span>
-      <span>Environment <b>Production</b></span>
-      <span class="msb-divider"></span>
       <span>Records <b id="status-total-records">0</b></span>
-      <span class="msb-right"><i class="fas fa-circle" style="color:var(--pro-success);font-size:0.5rem;margin-right:4px;"></i> <b>Connected</b></span>
+      <span class="msb-divider"></span>
+      <span class="msb-kbd-hint"><kbd>Ctrl</kbd>+<kbd>K</kbd> Command Palette</span>
+      <span class="msb-right"><i class="fas fa-circle" style="color:var(--pro-success);font-size:0.5rem;margin-right:4px;"></i> <b>Synced</b></span>
     </div>
 
     <!-- ==================== DASHBOARD SECTION ==================== -->
@@ -814,49 +941,60 @@
         <div class="header-actions">
           <div class="search-bar">
             <i class="fas fa-search"></i>
-            <input type="text" id="global-search" placeholder="Search everything..." />
+            <input type="text" id="global-search" placeholder="Search everything... (Ctrl+K)" />
           </div>
         </div>
       </div>
 
+      <!-- Quick Actions Bar -->
+      <div class="quick-actions-bar">
+        <button class="quick-action-chip" id="qa-add-contact"><i class="fas fa-user-plus"></i> Contact</button>
+        <button class="quick-action-chip" id="qa-add-team"><i class="fas fa-users"></i> Team</button>
+        <button class="quick-action-chip" id="qa-add-link"><i class="fas fa-link"></i> Link</button>
+        <button class="quick-action-chip" id="qa-add-todo"><i class="fas fa-check-square"></i> Task</button>
+        <button class="quick-action-chip" id="qa-add-note"><i class="fas fa-sticky-note"></i> Note</button>
+        <button class="quick-action-chip" id="qa-add-apikey"><i class="fas fa-key"></i> API Key</button>
+        <button class="quick-action-chip" id="qa-add-event"><i class="fas fa-calendar-plus"></i> Event</button>
+      </div>
+
       <!-- Stats Cards -->
       <div class="stats-grid">
-        <div class="stat-card stat-contacts">
+        <div class="stat-card stat-contacts" onclick="window.datadock?.gotoSection?.('contacts') || document.querySelector('[data-section=contacts]')?.click()">
           <div class="stat-icon"><i class="fas fa-address-book"></i></div>
           <div class="stat-info">
             <span class="stat-number" id="stat-contacts">0</span>
             <span class="stat-label">Contacts</span>
           </div>
         </div>
-        <div class="stat-card stat-teams">
+        <div class="stat-card stat-teams" onclick="window.datadock?.gotoSection?.('teams') || document.querySelector('[data-section=teams]')?.click()">
           <div class="stat-icon"><i class="fas fa-users"></i></div>
           <div class="stat-info">
             <span class="stat-number" id="stat-teams">0</span>
             <span class="stat-label">Teams</span>
           </div>
         </div>
-        <div class="stat-card stat-links">
+        <div class="stat-card stat-links" onclick="window.datadock?.gotoSection?.('links') || document.querySelector('[data-section=links]')?.click()">
           <div class="stat-icon"><i class="fas fa-link"></i></div>
           <div class="stat-info">
             <span class="stat-number" id="stat-links">0</span>
             <span class="stat-label">Links</span>
           </div>
         </div>
-        <div class="stat-card stat-todos">
+        <div class="stat-card stat-todos" onclick="window.datadock?.gotoSection?.('todos') || document.querySelector('[data-section=todos]')?.click()">
           <div class="stat-icon"><i class="fas fa-check-square"></i></div>
           <div class="stat-info">
             <span class="stat-number" id="stat-todos">0</span>
             <span class="stat-label">To-Do</span>
           </div>
         </div>
-        <div class="stat-card stat-apikeys">
+        <div class="stat-card stat-apikeys" onclick="window.datadock?.gotoSection?.('apikeys') || document.querySelector('[data-section=apikeys]')?.click()">
           <div class="stat-icon"><i class="fas fa-key"></i></div>
           <div class="stat-info">
             <span class="stat-number" id="stat-apikeys">0</span>
             <span class="stat-label">API Keys</span>
           </div>
         </div>
-        <div class="stat-card stat-notes">
+        <div class="stat-card stat-notes" onclick="window.datadock?.gotoSection?.('notes') || document.querySelector('[data-section=notes]')?.click()">
           <div class="stat-icon"><i class="fas fa-sticky-note"></i></div>
           <div class="stat-info">
             <span class="stat-number" id="stat-notes">0</span>
@@ -865,10 +1003,45 @@
         </div>
       </div>
 
-      <!-- Dashboard Two-Column Layout -->
+      <!-- Dashboard Two-Column Layout (60/40 split) -->
       <div class="dashboard-grid">
-        <!-- Left Column -->
+        <!-- Left Column — Primary Content -->
         <div class="dashboard-col-left">
+          <!-- Dashboard To-Do Widget -->
+          <div class="dashboard-todo-widget">
+            <div class="widget-header">
+              <h2><i class="fas fa-check-square"></i> Active Tasks</h2>
+              <button class="btn btn-sm btn-secondary" id="dash-todo-viewall">View All <i class="fas fa-arrow-right"></i></button>
+            </div>
+            <div id="dash-todo-list" class="dash-todo-list">
+              <p class="dash-empty-msg"><i class="fas fa-check-circle"></i> No pending tasks. You're all caught up!</p>
+            </div>
+          </div>
+
+          <!-- Unified Recent Activity Feed -->
+          <div class="dashboard-widget activity-feed-widget">
+            <div class="widget-header">
+              <h2><i class="fas fa-clock"></i> Recent Activity</h2>
+            </div>
+            <div id="activity-feed" class="activity-feed">
+              <div class="activity-group">
+                <div class="activity-group-label"><i class="fas fa-address-book"></i> Contacts</div>
+                <div id="recent-contacts" class="dash-recent-list"></div>
+              </div>
+              <div class="activity-group">
+                <div class="activity-group-label"><i class="fas fa-users"></i> Teams</div>
+                <div id="recent-teams" class="dash-recent-list"></div>
+              </div>
+              <div class="activity-group">
+                <div class="activity-group-label"><i class="fas fa-link"></i> Links</div>
+                <div id="recent-links" class="dash-recent-list"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column — Supporting Widgets -->
+        <div class="dashboard-col-right">
           <!-- Dashboard Calendar Widget -->
           <div class="dashboard-calendar-widget">
             <div class="widget-header">
@@ -893,49 +1066,14 @@
             </div>
           </div>
 
-          <!-- Dashboard To-Do Widget -->
-          <div class="dashboard-todo-widget">
-            <div class="widget-header">
-              <h2><i class="fas fa-check-square"></i> To-Do</h2>
-              <button class="btn btn-sm btn-secondary" id="dash-todo-viewall">View All <i class="fas fa-arrow-right"></i></button>
-            </div>
-            <div id="dash-todo-list" class="dash-todo-list">
-              <p class="dash-empty-msg"><i class="fas fa-check-circle"></i> No pending tasks. You're all caught up!</p>
-            </div>
-          </div>
-
-          <!-- Recent Contacts -->
-          <div class="dashboard-widget">
-            <div class="widget-header">
-              <h2><i class="fas fa-address-book"></i> Recent Contacts</h2>
-            </div>
-            <div id="recent-contacts" class="dash-recent-list"></div>
-          </div>
-        </div>
-
-        <!-- Right Column -->
-        <div class="dashboard-col-right">
-          <!-- Recent Teams -->
-          <div class="dashboard-widget">
-            <div class="widget-header">
-              <h2><i class="fas fa-users"></i> Recent Teams</h2>
-            </div>
-            <div id="recent-teams" class="dash-recent-list"></div>
-          </div>
-
-          <!-- Recent Links -->
-          <div class="dashboard-widget">
-            <div class="widget-header">
-              <h2><i class="fas fa-link"></i> Recent Links</h2>
-            </div>
-            <div id="recent-links" class="dash-recent-list"></div>
-          </div>
-
-          <!-- Terminal Console (System Log Panel) -->
-          <div class="terminal-console">
-            <div class="terminal-header">
+          <!-- Terminal Console (Collapsible) -->
+          <div class="terminal-console" id="terminal-widget">
+            <div class="terminal-header" id="terminal-toggle-header" style="cursor:pointer;">
               <span><i class="fas fa-terminal"></i> system.log</span>
-              <button class="terminal-clear-btn" id="terminal-clear" title="Clear"><i class="fas fa-eraser"></i></button>
+              <div style="display:flex;gap:6px;align-items:center;">
+                <button class="terminal-clear-btn" id="terminal-clear" title="Clear"><i class="fas fa-eraser"></i></button>
+                <i class="fas fa-chevron-down terminal-toggle-icon" style="font-size:0.65rem;color:var(--pro-text-muted);transition:transform 0.2s;"></i>
+              </div>
             </div>
             <div class="terminal-body" id="terminal-body">
               <div class="terminal-line"><span class="terminal-prompt">&gt;</span> DataDock v2.0 — System ready</div>
@@ -1268,13 +1406,17 @@
 
   <!-- Floating Quick Add -->
   <div class="quick-fab" id="quick-fab">
-    <button class="quick-fab-main" id="quick-fab-main" title="Quick add">
+    <button class="quick-fab-main" id="quick-fab-main" title="Quick add (Ctrl+N)">
       <i class="fas fa-plus"></i>
     </button>
     <div class="quick-fab-menu" id="quick-fab-menu">
       <button class="quick-fab-item" id="fab-add-contact"><i class="fas fa-user-plus"></i> Contact</button>
       <button class="quick-fab-item" id="fab-add-team"><i class="fas fa-users"></i> Team</button>
       <button class="quick-fab-item" id="fab-add-link"><i class="fas fa-link"></i> Link</button>
+      <button class="quick-fab-item" id="fab-add-todo"><i class="fas fa-check-square"></i> Task</button>
+      <button class="quick-fab-item" id="fab-add-note"><i class="fas fa-sticky-note"></i> Note</button>
+      <button class="quick-fab-item" id="fab-add-apikey"><i class="fas fa-key"></i> API Key</button>
+      <button class="quick-fab-item" id="fab-add-event"><i class="fas fa-calendar-plus"></i> Event</button>
     </div>
   </div>
 
