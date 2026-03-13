@@ -15,6 +15,26 @@
 
 ---
 
+## 📸 Screenshots
+
+### Landing
+![DataDock Landing](../assets/img/landing.png)
+
+### Dashboard
+![DataDock Dashboard](../assets/img/dashboard.png)
+
+---
+
+## 📖 Story Time
+
+We started building DataDock because hackathons and events kept giving us the same painful problem: every time we had to apply, we were hunting for team member details, contacts, links, and credentials across different chats, notes, and old forms.
+
+It became annoying to repeatedly fill forms, verify member information, and track developer essentials like API keys and to-do items in scattered places. So we created one centralized platform where we can manage everything in one secure workspace and move faster during competitions.
+
+DataDock came to life from that exact need: less form chaos, better team coordination, and a cleaner workflow under pressure.
+
+---
+
 ## ✨ Features
 
 ### 🔐 Authentication
