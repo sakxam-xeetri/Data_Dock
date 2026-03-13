@@ -152,6 +152,17 @@ const firebaseConfig = {
 
 > **Note:** Firebase web API keys are safe to include in frontend code. Security is enforced via Firestore Rules and Authentication, not by keeping the key secret. Optionally restrict the key by HTTP referrer in the [Google Cloud Console](https://console.cloud.google.com).
 
+### 2.1 Public Repository Safety Checklist
+
+Before making this repository public:
+
+1. Keep `assets/js/firebase-config.js` on placeholder values in Git.
+2. If real Firebase values were ever committed, **rotate the API key** in Google Cloud Console and regenerate credentials as needed.
+3. Restrict the Firebase Browser API key by HTTP referrer (your production domains only).
+4. Verify Firestore Security Rules are locked to authenticated user scope.
+
+> If secrets were committed previously, rewriting Git history is recommended before publishing (`git filter-repo` or BFG Repo-Cleaner), then force-push the cleaned history.
+
 ---
 
 ### 3. Enable Firebase Services

@@ -1,0 +1,15 @@
+# ============================================================
+# Firebase — keep your real config out of version control.
+# Copy firebase-config.example.js → firebase-config.js and
+# fill in your actual values. That file is ignored below.
+# ============================================================
+assets/js/firebase-config.js
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Dependency directories (if you ever add a build step)
+node_modules/
